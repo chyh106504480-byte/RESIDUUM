@@ -1,0 +1,393 @@
+<title>RESIDUUM Pitch</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Barlow:wght@200;300;400;500;700&family=JetBrains+Mono:wght@400;700&display=swap">
+
+<style>
+/* Single dark theme by choice: this is a projection deck. A dark ground with a
+   warm signal colour reads best in a dim room and matches the subject. Every
+   colour is declared explicitly so the page holds on any host background. */
+:root{
+  --ground:#08090B;
+  --ground-2:#0E1114;
+  --ink:#E6ECF2;
+  --ink-2:#98A4B0;
+  --ink-3:#5E6975;
+  --amber:#E8A33D;
+  --amber-hot:#FFC978;
+  --amber-dim:rgba(232,163,61,.13);
+  --cyan:#63BECB;
+  --danger:#E4675C;
+  --line:#222A32;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;background:var(--ground);color:var(--ink);
+  font-family:'Barlow',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  line-height:1.55;overflow:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+.deck{position:relative;height:100vh;width:100%}
+.slide{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;justify-content:center;
+  padding:clamp(32px,6vw,96px);
+  opacity:0;visibility:hidden;transform:translateY(14px);
+  transition:opacity .45s ease,transform .45s ease,visibility .45s;
+}
+.slide.active{opacity:1;visibility:visible;transform:none}
+.inner{max-width:1180px;margin:0 auto;width:100%}
+@media (prefers-reduced-motion:reduce){
+  .slide{transition:opacity .01s,visibility .01s;transform:none}
+}
+
+.eyebrow{
+  font-family:'JetBrains Mono',monospace;
+  font-size:clamp(10px,1.1vw,13px);letter-spacing:.28em;text-transform:uppercase;
+  color:var(--amber);font-weight:700;margin:0 0 clamp(16px,2.4vw,30px);
+}
+h1{
+  font-family:'Chakra Petch',sans-serif;
+  font-size:clamp(64px,15vw,210px);font-weight:700;line-height:.86;
+  margin:0;letter-spacing:-.025em;
+}
+h1 .sub{
+  display:block;font-family:'Barlow',sans-serif;
+  font-size:clamp(15px,2.2vw,28px);font-weight:300;letter-spacing:.02em;
+  color:var(--ink-2);margin-top:clamp(16px,2.2vw,30px);max-width:24ch;line-height:1.45;
+}
+h2{
+  font-family:'Chakra Petch',sans-serif;
+  font-size:clamp(32px,6vw,80px);font-weight:700;line-height:1.05;
+  margin:0 0 clamp(18px,2.6vw,34px);letter-spacing:-.015em;text-wrap:balance;
+}
+.lead{
+  font-size:clamp(19px,2.6vw,36px);line-height:1.42;color:var(--ink);
+  max-width:22ch;font-weight:200;letter-spacing:-.005em;
+}
+.lead.wide{max-width:30ch}
+.lead b{color:var(--amber-hot);font-weight:700}
+.note{
+  font-size:clamp(14px,1.6vw,21px);color:var(--ink-2);
+  margin-top:clamp(18px,2.4vw,32px);max-width:56ch;line-height:1.6;font-weight:300;
+}
+.note b{color:var(--ink);font-weight:500}
+
+.cover{align-items:flex-start}
+.cover .meta{
+  margin-top:clamp(32px,5vw,66px);display:flex;flex-wrap:wrap;gap:clamp(20px,3vw,46px);
+  font-family:'JetBrains Mono',monospace;font-size:clamp(10px,1.1vw,13px);
+  letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);
+}
+.cover .meta b{color:var(--ink-2);font-weight:400}
+
+/* opening scene */
+.scene p{
+  font-family:'Barlow',sans-serif;font-weight:200;
+  font-size:clamp(24px,4.2vw,62px);line-height:1.28;letter-spacing:-.015em;
+  margin:0 0 clamp(12px,1.6vw,22px);max-width:20ch;color:var(--ink);
+}
+.scene p:last-child{color:var(--amber-hot);font-weight:700}
+
+/* evidence matrix */
+.matrix{border-collapse:collapse;width:100%;margin-top:clamp(8px,1.4vw,18px)}
+.matrix th,.matrix td{border-bottom:1px solid var(--line)}
+.matrix thead th{
+  padding:clamp(10px,1.5vw,20px) clamp(6px,1vw,14px);text-align:center;
+  font-family:'JetBrains Mono',monospace;
+  font-size:clamp(9px,1.15vw,15px);letter-spacing:.12em;color:var(--ink-2);font-weight:700;
+  text-transform:uppercase;border-bottom-color:var(--ink-3);
+}
+.matrix thead th:first-child{text-align:left;width:26%}
+.matrix tbody th{
+  text-align:left;padding:clamp(14px,2.2vw,32px) clamp(4px,1vw,16px);
+  font-family:'Chakra Petch',sans-serif;font-weight:700;
+  font-size:clamp(22px,3.4vw,48px);letter-spacing:-.01em;
+}
+.matrix tbody td{text-align:center;padding:clamp(14px,2.2vw,32px) clamp(6px,1vw,14px)}
+.mark{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:clamp(30px,4.4vw,60px);height:clamp(30px,4.4vw,60px);border-radius:50%;
+  font-size:clamp(15px,2.1vw,28px);font-weight:700;
+}
+.mark.y{background:var(--amber);color:var(--ground);box-shadow:0 0 0 clamp(5px,.8vw,12px) var(--amber-dim)}
+.mark.n{color:var(--ink-3);border:1px dashed var(--ink-3)}
+.matrix-key{
+  margin-top:clamp(18px,2.6vw,34px);font-size:clamp(16px,2vw,28px);
+  color:var(--ink-2);max-width:46ch;line-height:1.5;font-weight:300;
+}
+.matrix-key b{color:var(--amber-hot);font-weight:700}
+
+/* combinations */
+.combos{display:flex;flex-wrap:wrap;gap:clamp(12px,1.8vw,22px);margin-top:clamp(20px,3vw,42px)}
+.combo{
+  flex:1 1 210px;border:1px solid var(--line);border-left:3px solid var(--amber);
+  padding:clamp(14px,2vw,26px);background:var(--ground-2);
+}
+.combo .pair{
+  font-family:'JetBrains Mono',monospace;margin:0;
+  font-size:clamp(10px,1.15vw,14px);color:var(--ink-2);letter-spacing:.08em;
+  text-transform:uppercase;
+}
+.combo .arrow{color:var(--amber);margin:0 .45em}
+.combo .who{
+  font-family:'Chakra Petch',sans-serif;font-weight:700;margin:8px 0 0;
+  font-size:clamp(22px,3.2vw,42px);color:var(--ink);letter-spacing:-.01em;
+}
+
+/* formula */
+.formula{
+  font-family:'JetBrains Mono',monospace;font-weight:700;
+  font-size:clamp(22px,4.4vw,60px);color:var(--amber);
+  margin:clamp(20px,3vw,40px) 0;letter-spacing:.01em;
+}
+.ladder{display:flex;flex-wrap:wrap;gap:clamp(16px,3vw,52px);margin-top:clamp(10px,1.6vw,22px)}
+.rung{font-family:'JetBrains Mono',monospace;font-size:clamp(11px,1.4vw,17px);color:var(--ink-3);letter-spacing:.1em;text-transform:uppercase}
+.rung b{display:block;font-family:'Chakra Petch',sans-serif;font-size:clamp(20px,3.2vw,42px);color:var(--ink);margin-top:8px;letter-spacing:-.01em;text-transform:none}
+.rung.crit b{color:var(--danger)}
+
+/* not building */
+.nope{list-style:none;padding:0;margin:clamp(10px,1.6vw,20px) 0 0;
+  display:flex;flex-wrap:wrap;gap:clamp(10px,1.4vw,18px)}
+.nope li{
+  border:1px dashed var(--ink-3);padding:clamp(10px,1.4vw,20px) clamp(14px,2vw,28px);
+  font-size:clamp(15px,2vw,27px);color:var(--ink-2);font-weight:300;
+}
+.nope li s{text-decoration:none;color:var(--danger);margin-right:.55em;font-weight:700}
+
+/* seven days */
+.days{display:flex;gap:2px;margin-top:clamp(16px,2.4vw,34px);align-items:flex-end}
+.day{
+  flex:1;background:var(--ground-2);border-top:3px solid var(--amber);
+  padding:clamp(10px,1.4vw,22px) clamp(6px,.9vw,14px);
+}
+.day.gate{border-top-color:var(--danger)}
+.day .n{font-family:'JetBrains Mono',monospace;font-size:clamp(9px,1vw,13px);color:var(--ink-3);letter-spacing:.12em}
+.day .t{font-family:'Chakra Petch',sans-serif;font-size:clamp(12px,1.5vw,20px);font-weight:700;margin:8px 0 0;line-height:1.2;color:var(--ink)}
+.day.gate .t{color:var(--danger)}
+
+/* recruiting */
+.offer{
+  margin-top:clamp(22px,3vw,44px);border-left:3px solid var(--cyan);
+  padding-left:clamp(16px,2.2vw,30px);
+}
+.offer p{font-size:clamp(16px,2.1vw,29px);color:var(--ink);margin:0 0 14px;max-width:36ch;line-height:1.45;font-weight:300}
+.offer p:last-child{margin-bottom:0;color:var(--cyan);font-weight:700}
+
+/* closing */
+.close h2{max-width:18ch}
+
+/* nav */
+.nav{position:fixed;bottom:clamp(16px,2.4vw,32px);left:0;right:0;
+  display:flex;justify-content:center;align-items:center;gap:10px;z-index:20}
+.dot{
+  width:7px;height:7px;border-radius:50%;background:var(--ink-3);opacity:.4;
+  border:none;padding:0;cursor:pointer;transition:opacity .25s,background .25s,width .25s;
+}
+.dot.on{background:var(--amber);opacity:1;width:22px;border-radius:4px}
+.dot:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
+.hint{
+  position:fixed;bottom:clamp(16px,2.4vw,32px);right:clamp(20px,3vw,40px);
+  font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em;
+  color:var(--ink-3);z-index:20;text-transform:uppercase;
+}
+.counter{
+  position:fixed;top:clamp(16px,2.4vw,32px);right:clamp(20px,3vw,40px);
+  font-family:'JetBrains Mono',monospace;font-size:clamp(10px,1.1vw,13px);
+  letter-spacing:.16em;color:var(--ink-3);z-index:20;
+}
+@media (max-width:700px){
+  .hint{display:none}
+  .days{flex-wrap:wrap}
+  .day{flex:1 1 30%}
+  .lead,.lead.wide,.scene p,.matrix-key{max-width:none}
+}
+</style>
+
+<div class="deck" id="deck">
+
+  <!-- 1 -->
+  <section class="slide cover active">
+    <div class="inner">
+      <p class="eyebrow">3D Game Project · Seven-Day Vertical Slice</p>
+      <h1>RESIDUUM<span class="sub">A first-person horror investigation game</span></h1>
+      <div class="meta">
+        <span>Unity 6 · <b>URP</b></span>
+        <span>One run · <b>8–12 min</b></span>
+        <span>Team of <b>two</b></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section class="slide scene">
+    <div class="inner">
+      <p>You're standing in a dark hallway.</p>
+      <p>Your flashlight is the only light.</p>
+      <p>You know something is in here.</p>
+      <p>You don't know what.</p>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section class="slide">
+    <div class="inner">
+      <p class="eyebrow">The core design</p>
+      <table class="matrix">
+        <thead>
+          <tr><th>Ghost</th><th>EMF&nbsp;5</th><th>UV Fingerprints</th><th>Ghost Writing</th></tr>
+        </thead>
+        <tbody>
+          <tr><th>Spirit</th>
+            <td><span class="mark y">✓</span></td><td><span class="mark y">✓</span></td><td><span class="mark n">—</span></td></tr>
+          <tr><th>Wraith</th>
+            <td><span class="mark y">✓</span></td><td><span class="mark n">—</span></td><td><span class="mark y">✓</span></td></tr>
+          <tr><th>Poltergeist</th>
+            <td><span class="mark n">—</span></td><td><span class="mark y">✓</span></td><td><span class="mark y">✓</span></td></tr>
+        </tbody>
+      </table>
+      <p class="matrix-key">Three ghosts. Three kinds of evidence.<br>Every ghost has <b>exactly two</b>.</p>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section class="slide">
+    <div class="inner">
+      <p class="eyebrow">Why the table closes</p>
+      <h2>Two out of three. Exactly three combinations.</h2>
+      <div class="combos">
+        <div class="combo"><p class="pair">EMF<span class="arrow">+</span>UV</p><p class="who">Spirit</p></div>
+        <div class="combo"><p class="pair">EMF<span class="arrow">+</span>Writing</p><p class="who">Wraith</p></div>
+        <div class="combo"><p class="pair">UV<span class="arrow">+</span>Writing</p><p class="who">Poltergeist</p></div>
+      </div>
+      <p class="note">One piece of evidence is never enough — every piece is shared by two ghosts. Find two, and the answer is <b>certain</b>.<br><br><b>No luck. Pure deduction.</b></p>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section class="slide">
+    <div class="inner">
+      <p class="eyebrow">Where the tension comes from</p>
+      <h2>Sanity isn't a health bar. It's a countdown.</h2>
+      <p class="lead wide">Stay in the dark and it drops. The lower it gets, the more likely the ghost <b>hunts you</b>.</p>
+      <p class="formula">P = (50 − sanity) / 50</p>
+      <div class="ladder">
+        <span class="rung">Sanity 50%<b>Never hunts</b></span>
+        <span class="rung">Sanity 25%<b>Even odds</b></span>
+        <span class="rung crit">Sanity 0%<b>Always hunts</b></span>
+      </div>
+      <p class="note">So every extra piece of evidence costs you. <b>That trade is the whole game.</b></p>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section class="slide">
+    <div class="inner">
+      <p class="eyebrow">Why one week is enough</p>
+      <h2>Because we know exactly what we're not building.</h2>
+      <ul class="nope">
+        <li><s>✕</s>Multiplayer</li>
+        <li><s>✕</s>Voice recognition</li>
+        <li><s>✕</s>A second map</li>
+        <li><s>✕</s>A fourth ghost</li>
+        <li><s>✕</s>Save system</li>
+      </ul>
+      <p class="note">Phasmophobia has twenty-four ghosts, seven kinds of evidence, forty tools. We're not copying the content — <b>we're copying the logic</b>, compressed to the smallest form that still closes.<br><br>One finished room beats three grey boxes.</p>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section class="slide">
+    <div class="inner">
+      <p class="eyebrow">Execution</p>
+      <h2>Playable first. We don't touch art until day six.</h2>
+      <div class="days">
+        <div class="day"><span class="n">D1</span><p class="t">Move &amp; see</p></div>
+        <div class="day"><span class="n">D2</span><p class="t">Tools in hand</p></div>
+        <div class="day gate"><span class="n">D3</span><p class="t">Evidence loop</p></div>
+        <div class="day gate"><span class="n">D4</span><p class="t">The ghost</p></div>
+        <div class="day"><span class="n">D5</span><p class="t">Full cycle</p></div>
+        <div class="day"><span class="n">D6</span><p class="t">Atmosphere</p></div>
+        <div class="day"><span class="n">D7</span><p class="t">Polish</p></div>
+      </div>
+      <p class="note">The red days are <b>risk gates</b>. If evidence isn't working by day three, we cut a piece of evidence. If the ghost AI isn't running by day four, we sacrifice the visuals.<br><br>A game made of white boxes that you can finish beats a beautiful one you can't.</p>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section class="slide">
+    <div class="inner">
+      <p class="eyebrow">I need one person</p>
+      <h2>If your strength is art</h2>
+      <p class="lead">Ninety percent of horror is atmosphere, not mechanics.</p>
+      <div class="offer">
+        <p>The design is finished. The code is handled.</p>
+        <p>You won't write a line of it, and you won't wait on me — day one you start in your own scene.</p>
+        <p>How this game feels is entirely your call.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9 -->
+  <section class="slide close">
+    <div class="inner">
+      <p class="eyebrow">RESIDUUM</p>
+      <h2>Find the evidence. Name what's hunting you. Get out alive.</h2>
+      <p class="note">Design document, seven-day schedule, seventeen build modules — all written. The project is set up. The first module shipped today.<br><br><b>We're not starting from zero. We're starting from day two.</b></p>
+    </div>
+  </section>
+
+</div>
+
+<div class="counter" id="counter">01 / 09</div>
+<nav class="nav" id="nav" aria-label="Slide navigation"></nav>
+<div class="hint">← → to navigate</div>
+
+<script>
+(function(){
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var nav = document.getElementById('nav');
+  var counter = document.getElementById('counter');
+  var index = 0;
+
+  slides.forEach(function(_, i){
+    var b = document.createElement('button');
+    b.className = 'dot' + (i === 0 ? ' on' : '');
+    b.setAttribute('aria-label', 'Slide ' + (i + 1));
+    b.addEventListener('click', function(){ go(i); });
+    nav.appendChild(b);
+  });
+  var dots = Array.prototype.slice.call(nav.children);
+
+  function pad(n){ return n < 10 ? '0' + n : '' + n; }
+
+  function go(n){
+    index = Math.max(0, Math.min(slides.length - 1, n));
+    slides.forEach(function(s, i){ s.classList.toggle('active', i === index); });
+    dots.forEach(function(d, i){ d.classList.toggle('on', i === index); });
+    counter.textContent = pad(index + 1) + ' / ' + pad(slides.length);
+  }
+
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown'){ e.preventDefault(); go(index + 1); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp'){ e.preventDefault(); go(index - 1); }
+    else if (e.key === 'Home'){ go(0); }
+    else if (e.key === 'End'){ go(slides.length - 1); }
+  });
+
+  var startX = null;
+  document.addEventListener('touchstart', function(e){ startX = e.touches[0].clientX; }, {passive:true});
+  document.addEventListener('touchend', function(e){
+    if (startX === null) return;
+    var dx = e.changedTouches[0].clientX - startX;
+    if (Math.abs(dx) > 50) go(index + (dx < 0 ? 1 : -1));
+    startX = null;
+  }, {passive:true});
+
+  document.querySelector('.deck').addEventListener('click', function(e){
+    if (e.target.closest('.nav')) return;
+    go(index + 1);
+  });
+})();
+</script>

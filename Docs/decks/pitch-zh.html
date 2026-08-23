@@ -1,0 +1,401 @@
+<title>残响 Pitch</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=JetBrains+Mono:wght@400;700&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap">
+
+<style>
+/* 单一深色主题 —— 这是投屏用的演示页，刻意不跟随观看者主题：
+   投影环境下深底暖光是最有戏剧性也最易读的组合。所有颜色显式声明。 */
+:root{
+  --ground:#08090B;
+  --ground-2:#0E1114;
+  --ink:#E4EAF0;
+  --ink-2:#98A4B0;
+  --ink-3:#5E6975;
+  --amber:#E8A33D;
+  --amber-hot:#FFC978;
+  --amber-dim:rgba(232,163,61,.13);
+  --cyan:#63BECB;
+  --danger:#E4675C;
+  --line:#222A32;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;background:var(--ground);color:var(--ink);
+  font-family:'Noto Sans SC','Chakra Petch',-apple-system,BlinkMacSystemFont,sans-serif;
+  line-height:1.6;overflow:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+.deck{position:relative;height:100vh;width:100%}
+.slide{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;justify-content:center;
+  padding:clamp(32px,6vw,96px);
+  opacity:0;visibility:hidden;
+  transform:translateY(14px);
+  transition:opacity .45s ease,transform .45s ease,visibility .45s;
+}
+.slide.active{opacity:1;visibility:visible;transform:none}
+.inner{max-width:1180px;margin:0 auto;width:100%}
+@media (prefers-reduced-motion:reduce){
+  .slide{transition:opacity .01s,visibility .01s;transform:none}
+}
+
+.eyebrow{
+  font-family:'JetBrains Mono','Noto Sans SC',monospace;
+  font-size:clamp(10px,1.1vw,13px);letter-spacing:.26em;text-transform:uppercase;
+  color:var(--amber);font-weight:700;margin:0 0 clamp(16px,2.4vw,30px);
+}
+h1{
+  font-family:'Chakra Petch','Noto Sans SC',sans-serif;
+  font-size:clamp(60px,13vw,180px);font-weight:700;line-height:.9;
+  margin:0;letter-spacing:-.02em;
+}
+h1 .en{
+  display:block;font-size:clamp(14px,2.4vw,30px);font-weight:600;
+  letter-spacing:.5em;color:var(--amber);margin-top:clamp(14px,2vw,26px);
+}
+h2{
+  font-family:'Chakra Petch','Noto Sans SC',sans-serif;
+  font-size:clamp(30px,5.6vw,72px);font-weight:700;line-height:1.1;
+  margin:0 0 clamp(18px,2.6vw,34px);letter-spacing:-.01em;text-wrap:balance;
+}
+.lead{
+  font-size:clamp(17px,2.3vw,30px);line-height:1.62;color:var(--ink);
+  max-width:24ch;font-weight:300;
+}
+.lead.wide{max-width:34ch}
+.lead b{color:var(--amber-hot);font-weight:700}
+.sub{
+  font-size:clamp(14px,1.5vw,19px);color:var(--ink-2);margin-top:clamp(18px,2.4vw,32px);
+  max-width:52ch;line-height:1.7;
+}
+.sub b{color:var(--ink);font-weight:500}
+
+/* 封面 */
+.cover{justify-content:center;align-items:flex-start}
+.cover .tag{
+  margin-top:clamp(28px,4vw,52px);font-size:clamp(14px,1.6vw,20px);
+  color:var(--ink-2);max-width:40ch;line-height:1.7;
+}
+.cover .meta{
+  margin-top:clamp(32px,5vw,64px);display:flex;flex-wrap:wrap;gap:clamp(20px,3vw,44px);
+  font-family:'JetBrains Mono',monospace;font-size:clamp(10px,1.1vw,13px);
+  letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);
+}
+.cover .meta b{color:var(--ink-2);font-weight:400}
+
+/* 场景开场 */
+.scene p{
+  font-size:clamp(19px,2.9vw,40px);line-height:1.55;font-weight:300;
+  margin:0 0 clamp(14px,1.8vw,24px);max-width:22ch;color:var(--ink);
+}
+.scene p:last-child{color:var(--amber-hot);font-weight:700}
+
+/* 推理表 */
+.matrix{border-collapse:collapse;width:100%;margin-top:clamp(8px,1.4vw,18px)}
+.matrix th,.matrix td{border-bottom:1px solid var(--line)}
+.matrix thead th{
+  padding:clamp(10px,1.5vw,20px) clamp(6px,1vw,14px);text-align:center;
+  font-family:'JetBrains Mono','Noto Sans SC',monospace;
+  font-size:clamp(10px,1.25vw,16px);letter-spacing:.1em;color:var(--ink-2);font-weight:700;
+  text-transform:uppercase;border-bottom-color:var(--ink-3);
+}
+.matrix thead th:first-child{text-align:left;width:30%}
+.matrix tbody th{
+  text-align:left;padding:clamp(14px,2.2vw,30px) clamp(8px,1.4vw,20px);
+  font-family:'Chakra Petch','Noto Sans SC',sans-serif;font-weight:700;
+  font-size:clamp(18px,2.6vw,36px);
+}
+.matrix tbody th small{
+  display:block;font-family:'JetBrains Mono',monospace;font-weight:400;
+  font-size:clamp(9px,1vw,13px);letter-spacing:.16em;color:var(--ink-3);
+  text-transform:uppercase;margin-top:4px;
+}
+.matrix tbody td{text-align:center;padding:clamp(14px,2.2vw,30px) clamp(6px,1vw,14px)}
+.mark{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:clamp(30px,4.2vw,56px);height:clamp(30px,4.2vw,56px);border-radius:50%;
+  font-size:clamp(15px,2vw,26px);font-weight:700;
+}
+.mark.y{background:var(--amber);color:var(--ground);box-shadow:0 0 0 clamp(5px,.8vw,11px) var(--amber-dim)}
+.mark.n{color:var(--ink-3);border:1px dashed var(--ink-3)}
+.matrix-key{
+  margin-top:clamp(18px,2.6vw,34px);font-size:clamp(14px,1.7vw,22px);
+  color:var(--ink-2);max-width:56ch;line-height:1.65;
+}
+.matrix-key b{color:var(--amber-hot);font-weight:700}
+
+/* 组合演算 */
+.combos{display:flex;flex-wrap:wrap;gap:clamp(12px,1.8vw,22px);margin-top:clamp(20px,3vw,40px)}
+.combo{
+  flex:1 1 200px;border:1px solid var(--line);border-left:3px solid var(--amber);
+  padding:clamp(14px,2vw,24px);background:var(--ground-2);
+}
+.combo .pair{
+  font-family:'JetBrains Mono','Noto Sans SC',monospace;
+  font-size:clamp(11px,1.25vw,15px);color:var(--ink-2);letter-spacing:.05em;
+}
+.combo .arrow{color:var(--amber);margin:0 .5em}
+.combo .who{
+  font-family:'Chakra Petch','Noto Sans SC',sans-serif;font-weight:700;
+  font-size:clamp(20px,2.8vw,34px);margin-top:6px;color:var(--ink);
+}
+
+/* 公式 */
+.formula{
+  font-family:'JetBrains Mono',monospace;font-weight:700;
+  font-size:clamp(24px,4.6vw,62px);color:var(--amber);
+  margin:clamp(20px,3vw,40px) 0;letter-spacing:.02em;
+}
+.ladder{display:flex;flex-wrap:wrap;gap:clamp(14px,2.4vw,38px);margin-top:clamp(10px,1.6vw,22px)}
+.rung{font-family:'JetBrains Mono',monospace;font-size:clamp(13px,1.7vw,22px);color:var(--ink-2)}
+.rung b{display:block;font-size:clamp(20px,3vw,40px);color:var(--ink);margin-top:6px}
+.rung.crit b{color:var(--danger)}
+
+/* 不做什么 */
+.nope{list-style:none;padding:0;margin:clamp(8px,1.4vw,18px) 0 0;
+  display:flex;flex-wrap:wrap;gap:clamp(10px,1.4vw,18px)}
+.nope li{
+  border:1px dashed var(--ink-3);padding:clamp(10px,1.4vw,18px) clamp(14px,2vw,26px);
+  font-size:clamp(14px,1.8vw,24px);color:var(--ink-2);
+}
+.nope li s{text-decoration:none;color:var(--danger);margin-right:.5em;font-weight:700}
+
+/* 七天 */
+.days{display:flex;gap:2px;margin-top:clamp(16px,2.4vw,32px);align-items:flex-end}
+.day{
+  flex:1;background:var(--ground-2);border-top:3px solid var(--amber);
+  padding:clamp(10px,1.4vw,20px) clamp(6px,.9vw,14px);
+}
+.day.gate{border-top-color:var(--danger)}
+.day .n{font-family:'JetBrains Mono',monospace;font-size:clamp(9px,1vw,13px);color:var(--ink-3);letter-spacing:.1em}
+.day .t{font-size:clamp(12px,1.4vw,18px);font-weight:700;margin-top:6px;line-height:1.3;color:var(--ink)}
+.day.gate .t{color:var(--danger)}
+
+/* 招人 */
+.recruit .lead{max-width:26ch}
+.offer{
+  margin-top:clamp(22px,3vw,42px);border-left:3px solid var(--cyan);
+  padding-left:clamp(16px,2.2vw,28px);
+}
+.offer p{font-size:clamp(15px,1.9vw,25px);color:var(--ink);margin:0 0 12px;max-width:38ch;line-height:1.6}
+.offer p:last-child{margin-bottom:0;color:var(--cyan);font-weight:700}
+
+/* 导航 */
+.nav{
+  position:fixed;bottom:clamp(16px,2.4vw,32px);left:0;right:0;
+  display:flex;justify-content:center;align-items:center;gap:10px;z-index:20;
+}
+.dot{
+  width:7px;height:7px;border-radius:50%;background:var(--ink-3);opacity:.4;
+  border:none;padding:0;cursor:pointer;transition:opacity .25s,background .25s,width .25s;
+}
+.dot.on{background:var(--amber);opacity:1;width:22px;border-radius:4px}
+.dot:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
+.hint{
+  position:fixed;bottom:clamp(16px,2.4vw,32px);right:clamp(20px,3vw,40px);
+  font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.12em;
+  color:var(--ink-3);z-index:20;text-transform:uppercase;
+}
+.counter{
+  position:fixed;top:clamp(16px,2.4vw,32px);right:clamp(20px,3vw,40px);
+  font-family:'JetBrains Mono',monospace;font-size:clamp(10px,1.1vw,13px);
+  letter-spacing:.14em;color:var(--ink-3);z-index:20;
+}
+@media (max-width:700px){
+  .hint{display:none}
+  .days{flex-wrap:wrap}
+  .day{flex:1 1 30%}
+  .lead,.lead.wide,.scene p{max-width:none}
+}
+</style>
+
+<div class="deck" id="deck">
+
+  <!-- 1 封面 -->
+  <section class="slide cover active">
+    <div class="inner">
+      <p class="eyebrow">3D 游戏制作 · 七天垂直切片</p>
+      <h1>残响<span class="en">RESIDUUM</span></h1>
+      <p class="tag">第一人称写实恐怖取证游戏</p>
+      <div class="meta">
+        <span>Unity 6 · <b>URP</b></span>
+        <span>单局 <b>8–12 分钟</b></span>
+        <span>团队 <b>2 人</b></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 场景 -->
+  <section class="slide scene">
+    <div class="inner">
+      <p>你站在一栋黑房子的走廊里。</p>
+      <p>手电筒是你唯一的光。</p>
+      <p>你知道这里有东西。</p>
+      <p>但你不知道它是什么。</p>
+    </div>
+  </section>
+
+  <!-- 3 推理表 -->
+  <section class="slide">
+    <div class="inner">
+      <p class="eyebrow">核心设计</p>
+      <table class="matrix">
+        <thead>
+          <tr><th>鬼种</th><th>EMF-5</th><th>紫外线指纹</th><th>鬼影书写</th></tr>
+        </thead>
+        <tbody>
+          <tr><th>怨灵<small>Spirit</small></th>
+            <td><span class="mark y">✓</span></td><td><span class="mark y">✓</span></td><td><span class="mark n">—</span></td></tr>
+          <tr><th>幽影<small>Wraith</small></th>
+            <td><span class="mark y">✓</span></td><td><span class="mark n">—</span></td><td><span class="mark y">✓</span></td></tr>
+          <tr><th>骚灵<small>Poltergeist</small></th>
+            <td><span class="mark n">—</span></td><td><span class="mark y">✓</span></td><td><span class="mark y">✓</span></td></tr>
+        </tbody>
+      </table>
+      <p class="matrix-key">三种鬼，三种证据，每种鬼<b>恰好持有两项</b>。</p>
+    </div>
+  </section>
+
+  <!-- 4 组合唯一性 -->
+  <section class="slide">
+    <div class="inner">
+      <p class="eyebrow">为什么这张表是闭合的</p>
+      <h2>从三项取两项，恰好三种组合</h2>
+      <div class="combos">
+        <div class="combo"><p class="pair">EMF-5<span class="arrow">+</span>紫外线</p><p class="who">怨灵</p></div>
+        <div class="combo"><p class="pair">EMF-5<span class="arrow">+</span>鬼影书写</p><p class="who">幽影</p></div>
+        <div class="combo"><p class="pair">紫外线<span class="arrow">+</span>鬼影书写</p><p class="who">骚灵</p></div>
+      </div>
+      <p class="sub">一项证据永远不够——每项都被两种鬼共享。集齐两项，答案<b>唯一确定</b>。<br>没有运气，全是演绎。</p>
+    </div>
+  </section>
+
+  <!-- 5 理智 -->
+  <section class="slide">
+    <div class="inner">
+      <p class="eyebrow">张力从哪来</p>
+      <h2>理智不是血条，是倒计时</h2>
+      <p class="lead wide">待在黑暗里，理智持续下降。理智越低，<b>被猎杀的概率越高</b>。</p>
+      <p class="formula">P = (50 − 理智) / 50</p>
+      <div class="ladder">
+        <span class="rung">理智 50%<b>不会猎杀</b></span>
+        <span class="rung">理智 25%<b>50% 概率</b></span>
+        <span class="rung crit">理智 0%<b>必定猎杀</b></span>
+      </div>
+      <p class="sub">所以每多找一件证据，都是在拿命换。<b>这个张力就是游戏的全部。</b></p>
+    </div>
+  </section>
+
+  <!-- 6 不做什么 -->
+  <section class="slide">
+    <div class="inner">
+      <p class="eyebrow">为什么一周做得完</p>
+      <h2>因为我们很清楚不做什么</h2>
+      <ul class="nope">
+        <li><s>✕</s>多人联机</li>
+        <li><s>✕</s>语音识别</li>
+        <li><s>✕</s>多张地图</li>
+        <li><s>✕</s>第四种鬼</li>
+        <li><s>✕</s>存档系统</li>
+      </ul>
+      <p class="sub">《恐鬼症》有 24 种鬼、7 种证据、40 件道具。我们不复制内容量，<b>只复制它的演绎结构</b>——并压缩到数学上最小的闭合形态。<br><br>一张打磨好的地图，胜过三张灰盒。</p>
+    </div>
+  </section>
+
+  <!-- 7 七天 -->
+  <section class="slide">
+    <div class="inner">
+      <p class="eyebrow">执行</p>
+      <h2>灰盒可玩优先，第五天前不碰美术</h2>
+      <div class="days">
+        <div class="day"><span class="n">D1</span><p class="t">能走能看</p></div>
+        <div class="day"><span class="n">D2</span><p class="t">道具在手</p></div>
+        <div class="day gate"><span class="n">D3</span><p class="t">证据闭环</p></div>
+        <div class="day gate"><span class="n">D4</span><p class="t">鬼来了</p></div>
+        <div class="day"><span class="n">D5</span><p class="t">完整循环</p></div>
+        <div class="day"><span class="n">D6</span><p class="t">美术氛围</p></div>
+        <div class="day"><span class="n">D7</span><p class="t">打磨交付</p></div>
+      </div>
+      <p class="sub">红色是<b>风险闸门</b>：第三天证据没闭环就砍掉一项证据，第四天鬼 AI 没跑通就牺牲画面。<br>一个白盒子做的、能玩完整局的游戏，永远好过画面精美但走不到结算的 Demo。</p>
+    </div>
+  </section>
+
+  <!-- 8 招人 -->
+  <section class="slide recruit">
+    <div class="inner">
+      <p class="eyebrow">我需要一个人</p>
+      <h2>如果你的强项是美术</h2>
+      <p class="lead">恐怖游戏九成的体验来自氛围，不来自机制。</p>
+      <div class="offer">
+        <p>机制我已经设计完了，代码我和 AI 一起写。</p>
+        <p>你不用碰一行代码，也不用等我。第一天就能在自己的场景里开工。</p>
+        <p>这个游戏看起来是什么感觉，完全由你决定。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9 收尾 -->
+  <section class="slide">
+    <div class="inner">
+      <p class="eyebrow">残响 RESIDUUM</p>
+      <h2>收集证据，判定它是什么，<br>然后活着走出去。</h2>
+      <p class="sub">设计文档、七天排期、17 个开发模块已全部就绪。<br>工程已建，架构已定，第一个模块的代码今天已经产出。</p>
+    </div>
+  </section>
+
+</div>
+
+<div class="counter" id="counter">01 / 09</div>
+<nav class="nav" id="nav" aria-label="幻灯片导航"></nav>
+<div class="hint">← → 翻页</div>
+
+<script>
+(function(){
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var nav = document.getElementById('nav');
+  var counter = document.getElementById('counter');
+  var index = 0;
+
+  slides.forEach(function(_, i){
+    var b = document.createElement('button');
+    b.className = 'dot' + (i === 0 ? ' on' : '');
+    b.setAttribute('aria-label', '第 ' + (i + 1) + ' 页');
+    b.addEventListener('click', function(){ go(i); });
+    nav.appendChild(b);
+  });
+  var dots = Array.prototype.slice.call(nav.children);
+
+  function pad(n){ return n < 10 ? '0' + n : '' + n; }
+
+  function go(n){
+    index = Math.max(0, Math.min(slides.length - 1, n));
+    slides.forEach(function(s, i){ s.classList.toggle('active', i === index); });
+    dots.forEach(function(d, i){ d.classList.toggle('on', i === index); });
+    counter.textContent = pad(index + 1) + ' / ' + pad(slides.length);
+  }
+
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown'){ e.preventDefault(); go(index + 1); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp'){ e.preventDefault(); go(index - 1); }
+    else if (e.key === 'Home'){ go(0); }
+    else if (e.key === 'End'){ go(slides.length - 1); }
+  });
+
+  var startX = null;
+  document.addEventListener('touchstart', function(e){ startX = e.touches[0].clientX; }, {passive:true});
+  document.addEventListener('touchend', function(e){
+    if (startX === null) return;
+    var dx = e.changedTouches[0].clientX - startX;
+    if (Math.abs(dx) > 50) go(index + (dx < 0 ? 1 : -1));
+    startX = null;
+  }, {passive:true});
+
+  document.querySelector('.deck').addEventListener('click', function(e){
+    if (e.target.closest('.nav')) return;
+    go(index + 1);
+  });
+})();
+</script>

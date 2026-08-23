@@ -1,0 +1,621 @@
+<title>残响制作总控</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=JetBrains+Mono:wght@400;700&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap">
+
+<style>
+:root{
+  --ground:#E7EAEE; --surface:#FFFFFF; --surface-2:#F1F4F7; --sunken:#DCE1E7;
+  --line:#D0D7DF; --line-strong:#AEB8C3;
+  --ink:#0F141A; --ink-2:#414C58; --ink-3:#6D7883;
+  --amber:#8F5C0C; --amber-hot:#B8781A; --amber-glow:rgba(184,120,26,.14);
+  --cyan:#15606B; --danger:#9E2F27; --ok:#276048;
+  --shadow:0 1px 2px rgba(15,20,26,.06), 0 8px 24px rgba(15,20,26,.05);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#0C0F12; --surface:#14181D; --surface-2:#1A2027; --sunken:#090B0D;
+    --line:#252D36; --line-strong:#3A444F;
+    --ink:#DDE4EB; --ink-2:#98A4B0; --ink-3:#697580;
+    --amber:#E8A33D; --amber-hot:#FFC978; --amber-glow:rgba(232,163,61,.13);
+    --cyan:#63BECB; --danger:#E4675C; --ok:#5FBF8E;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 30px rgba(0,0,0,.28);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0C0F12; --surface:#14181D; --surface-2:#1A2027; --sunken:#090B0D;
+  --line:#252D36; --line-strong:#3A444F;
+  --ink:#DDE4EB; --ink-2:#98A4B0; --ink-3:#697580;
+  --amber:#E8A33D; --amber-hot:#FFC978; --amber-glow:rgba(232,163,61,.13);
+  --cyan:#63BECB; --danger:#E4675C; --ok:#5FBF8E;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 30px rgba(0,0,0,.28);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--ground); color:var(--ink);
+  font-family:'Noto Sans SC','Chakra Petch',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  font-weight:400; line-height:1.75; font-size:15.5px;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1080px;margin:0 auto;padding:0 28px}
+
+/* ── typography ── */
+h1,h2,h3,h4{font-family:'Chakra Petch','Noto Sans SC',sans-serif;text-wrap:balance;margin:0}
+.eyebrow{
+  font-family:'JetBrains Mono','Noto Sans SC',monospace;
+  font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--amber);font-weight:700;
+}
+.mono{font-family:'JetBrains Mono','Noto Sans SC',monospace;font-variant-numeric:tabular-nums}
+
+/* ── header ── */
+header{
+  background:var(--sunken); border-bottom:1px solid var(--line);
+  position:relative; overflow:hidden;
+}
+header::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:repeating-linear-gradient(0deg,transparent 0 3px,rgba(127,140,155,.055) 3px 4px);
+}
+.hd{display:flex;flex-wrap:wrap;gap:40px;align-items:flex-end;padding:52px 0 40px;position:relative;z-index:1}
+.hd-main{flex:1 1 380px;min-width:0}
+h1{font-size:clamp(40px,7vw,68px);font-weight:700;line-height:.98;letter-spacing:-.01em}
+h1 .en{
+  display:block;font-size:clamp(13px,2vw,17px);font-weight:600;
+  letter-spacing:.46em;color:var(--amber);margin-top:14px;
+}
+.tagline{color:var(--ink-2);font-size:16px;max-width:52ch;margin:22px 0 0;line-height:1.7}
+
+/* EMF meter */
+.meter{flex:0 0 auto;display:flex;flex-direction:column;gap:9px;align-items:flex-start}
+.meter-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.18em;color:var(--ink-3);text-transform:uppercase}
+.bars{display:flex;gap:5px;align-items:flex-end;height:56px}
+.bar{width:15px;background:var(--line);border:1px solid var(--line-strong);border-radius:1px}
+.bar:nth-child(1){height:36%} .bar:nth-child(2){height:52%}
+.bar:nth-child(3){height:68%} .bar:nth-child(4){height:84%} .bar:nth-child(5){height:100%}
+.bar.on{background:var(--amber);border-color:var(--amber);box-shadow:0 0 10px var(--amber-glow)}
+@media (prefers-reduced-motion:no-preference){
+  .bar.on{animation:pulse 2.6s ease-in-out infinite}
+  .bar.on:nth-child(2){animation-delay:.12s}
+  .bar.on:nth-child(3){animation-delay:.24s}
+  .bar.on:nth-child(4){animation-delay:.36s}
+  .bar.on:nth-child(5){animation-delay:.48s}
+}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.44}}
+
+.facts{
+  display:flex;flex-wrap:wrap;gap:0;border-top:1px solid var(--line);
+  position:relative;z-index:1;
+}
+.fact{flex:1 1 150px;padding:16px 20px 18px;border-right:1px solid var(--line)}
+.fact:last-child{border-right:none}
+.fact dt{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.16em;color:var(--ink-3);text-transform:uppercase;margin:0 0 5px}
+.fact dd{margin:0;font-family:'Chakra Petch','Noto Sans SC',sans-serif;font-weight:700;font-size:17px;color:var(--ink)}
+
+/* ── sections ── */
+section{padding:56px 0;border-bottom:1px solid var(--line)}
+section:last-of-type{border-bottom:none}
+h2{font-size:clamp(24px,3.4vw,32px);font-weight:700;letter-spacing:-.005em;margin:8px 0 0}
+.sec-intro{color:var(--ink-2);max-width:64ch;margin:14px 0 0}
+.sec-head{margin-bottom:34px}
+
+/* ── evidence matrix ── */
+.matrix-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:3px;background:var(--surface);box-shadow:var(--shadow)}
+table.matrix{border-collapse:collapse;width:100%;min-width:560px}
+table.matrix th,table.matrix td{border-bottom:1px solid var(--line);padding:0}
+table.matrix thead th{
+  background:var(--surface-2);text-align:center;padding:16px 14px;
+  font-family:'JetBrains Mono','Noto Sans SC',monospace;font-size:11px;font-weight:700;
+  letter-spacing:.1em;color:var(--ink-2);text-transform:uppercase;
+  border-bottom:1px solid var(--line-strong);
+}
+table.matrix thead th:first-child{text-align:left;width:32%}
+table.matrix tbody th{
+  text-align:left;padding:18px 18px;font-weight:700;font-size:16px;
+  font-family:'Chakra Petch','Noto Sans SC',sans-serif;
+  border-right:1px solid var(--line);
+}
+table.matrix tbody th small{display:block;font-family:'JetBrains Mono',monospace;font-size:10.5px;font-weight:400;color:var(--ink-3);letter-spacing:.13em;text-transform:uppercase;margin-top:2px}
+table.matrix tbody td{text-align:center;border-right:1px solid var(--line);padding:18px 10px}
+table.matrix tbody td:last-child{border-right:none}
+.chk{display:inline-block;width:26px;height:26px;line-height:26px;border-radius:50%;font-weight:700;font-size:14px}
+.chk.yes{background:var(--amber);color:var(--sunken);box-shadow:0 0 0 4px var(--amber-glow)}
+.chk.no{color:var(--ink-3);background:transparent;border:1px dashed var(--line-strong)}
+.matrix-note{
+  padding:18px 20px;background:var(--surface-2);border-top:1px solid var(--line-strong);
+  font-size:14px;color:var(--ink-2);
+}
+.matrix-note b{color:var(--ink);font-weight:700}
+
+/* ── generic cards ── */
+.grid{display:grid;gap:16px}
+.g3{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.g2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.card{
+  background:var(--surface);border:1px solid var(--line);border-radius:3px;
+  padding:22px;box-shadow:var(--shadow);
+}
+.card h3{font-size:17px;font-weight:700;margin-bottom:6px}
+.card h3 .sub{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;color:var(--ink-3);text-transform:uppercase;font-weight:400;display:block;margin-top:3px}
+.card p{margin:8px 0 0;font-size:14.5px;color:var(--ink-2);line-height:1.65}
+.card ul{margin:10px 0 0;padding-left:18px;font-size:14px;color:var(--ink-2)}
+.card li{margin:4px 0}
+
+/* ── loop ── */
+.loop{display:flex;flex-wrap:wrap;gap:10px;align-items:stretch;counter-reset:step}
+.step{
+  flex:1 1 150px;background:var(--surface);border:1px solid var(--line);
+  border-top:2px solid var(--amber);border-radius:3px;padding:16px 16px 18px;position:relative;
+}
+.step .n{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--amber);letter-spacing:.14em;font-weight:700}
+.step h4{font-size:15px;margin:6px 0 5px;font-weight:700}
+.step p{margin:0;font-size:13px;color:var(--ink-3);line-height:1.55}
+
+/* ── data table ── */
+.dt-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:3px;background:var(--surface);box-shadow:var(--shadow)}
+table.dt{border-collapse:collapse;width:100%;min-width:480px;font-size:14.5px}
+table.dt th{
+  text-align:left;padding:13px 18px;background:var(--surface-2);
+  font-family:'JetBrains Mono','Noto Sans SC',monospace;font-size:10.5px;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--ink-3);font-weight:700;border-bottom:1px solid var(--line-strong);
+}
+table.dt td{padding:13px 18px;border-bottom:1px solid var(--line);color:var(--ink-2)}
+table.dt tr:last-child td{border-bottom:none}
+table.dt td:first-child{color:var(--ink);font-weight:500}
+table.dt td.num{font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;color:var(--amber);font-weight:700;white-space:nowrap}
+
+/* ── map ── */
+.map{
+  display:grid;gap:5px;background:var(--surface);border:1px solid var(--line);
+  padding:5px;border-radius:3px;box-shadow:var(--shadow);
+  grid-template-columns:repeat(6,1fr);
+  grid-template-areas:
+    "gar gar kit kit din din"
+    "bth hal hal hal hal mas"
+    "bth bra bra brb brb mas"
+    "liv liv liv liv liv liv"
+    "ent ent ent ent ent ent";
+}
+.room{
+  background:var(--surface-2);border:1px solid var(--line);border-radius:2px;
+  padding:14px 10px;text-align:center;min-height:64px;
+  display:flex;flex-direction:column;justify-content:center;gap:3px;
+}
+.room .cn{font-family:'Chakra Petch','Noto Sans SC',sans-serif;font-weight:700;font-size:14px;color:var(--ink)}
+.room .en{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.11em;color:var(--ink-3);text-transform:uppercase}
+.room.hall{background:transparent;border-style:dashed}
+.room.exit{border-color:var(--amber);background:var(--amber-glow)}
+.room.exit .cn{color:var(--amber)}
+.map-legend{display:flex;flex-wrap:wrap;gap:20px;margin-top:14px;font-size:13px;color:var(--ink-3)}
+.map-legend span{display:flex;align-items:center;gap:7px}
+.swatch{width:11px;height:11px;border-radius:2px;flex:none}
+
+/* ── schedule ── */
+.days{display:flex;flex-direction:column;gap:0}
+.day{display:flex;gap:22px;padding:20px 0;border-bottom:1px solid var(--line);align-items:flex-start}
+.day:last-child{border-bottom:none}
+.day-tag{flex:0 0 92px;text-align:right}
+.day-tag .d{font-family:'Chakra Petch',sans-serif;font-size:26px;font-weight:700;line-height:1;color:var(--ink)}
+.day-tag .date{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--ink-3);letter-spacing:.08em;display:block;margin-top:5px}
+.day-body{flex:1 1 auto;min-width:0}
+.day-body h4{font-size:17px;font-weight:700;margin-bottom:8px}
+.day-cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin-top:10px}
+.col-h,.col-p{border-left:2px solid var(--line-strong);padding-left:13px}
+.col-h{border-left-color:var(--amber)}
+.col-p{border-left-color:var(--cyan)}
+.col-h .who,.col-p .who{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;font-weight:700;display:block;margin-bottom:5px}
+.col-h .who{color:var(--amber)} .col-p .who{color:var(--cyan)}
+.day-cols ul{margin:0;padding-left:16px;font-size:13.5px;color:var(--ink-2);line-height:1.6}
+.day-cols li{margin:3px 0}
+.gate{
+  margin-top:14px;padding:12px 16px;border:1px solid var(--danger);
+  border-left-width:3px;border-radius:2px;background:var(--surface);
+  font-size:13.5px;color:var(--ink-2);
+}
+.gate b{color:var(--danger);font-family:'JetBrains Mono','Noto Sans SC',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;display:block;margin-bottom:4px}
+.checkpoint{
+  margin-top:12px;font-size:13.5px;color:var(--ink-2);
+  padding:9px 14px;background:var(--surface-2);border-radius:2px;border:1px solid var(--line);
+}
+.checkpoint b{color:var(--ok);font-weight:700}
+
+/* ── task board ── */
+.tasks{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px}
+.task{
+  background:var(--surface);border:1px solid var(--line);border-radius:3px;
+  padding:13px 14px;border-left:3px solid var(--line-strong);
+}
+.task.pA{border-left-color:var(--amber)}
+.task.pB{border-left-color:var(--cyan)}
+.task.pC{border-left-color:var(--danger)}
+.task.pD{border-left-color:var(--ok)}
+.task .id{font-family:'JetBrains Mono',monospace;font-size:10.5px;font-weight:700;letter-spacing:.1em;color:var(--ink-3)}
+.task .nm{font-family:'Chakra Petch','Noto Sans SC',sans-serif;font-weight:700;font-size:14.5px;margin:3px 0 6px;line-height:1.3}
+.task .own{font-size:11.5px;color:var(--ink-3);font-family:'JetBrains Mono','Noto Sans SC',monospace;letter-spacing:.05em}
+.phase-key{display:flex;flex-wrap:wrap;gap:18px;margin-bottom:18px;font-size:12.5px;color:var(--ink-3);font-family:'JetBrains Mono','Noto Sans SC',monospace}
+.phase-key span{display:flex;align-items:center;gap:7px}
+
+/* ── not doing ── */
+.nope{display:flex;flex-wrap:wrap;gap:9px}
+.nope li{
+  list-style:none;padding:7px 14px;border:1px dashed var(--line-strong);border-radius:2px;
+  font-size:13.5px;color:var(--ink-3);background:var(--surface);
+}
+.nope li::before{content:"✕ ";color:var(--danger);font-weight:700}
+
+/* ── assets ── */
+a{color:var(--amber);text-decoration:none;border-bottom:1px solid var(--amber-glow)}
+a:hover{border-bottom-color:var(--amber)}
+a:focus-visible{outline:2px solid var(--amber);outline-offset:2px;border-radius:2px}
+
+footer{padding:36px 0 56px;color:var(--ink-3);font-size:13px;border-top:1px solid var(--line)}
+footer .mono{color:var(--ink-3)}
+
+@media (max-width:640px){
+  .wrap{padding:0 18px}
+  .day{flex-direction:column;gap:10px}
+  .day-tag{text-align:left;display:flex;align-items:baseline;gap:10px}
+  .day-tag .date{margin-top:0}
+  .map{grid-template-columns:repeat(2,1fr);grid-template-areas:
+    "gar kit" "din bth" "hal hal" "bra brb" "mas liv" "ent ent";}
+  .fact{border-right:none;border-bottom:1px solid var(--line)}
+}
+</style>
+
+<header>
+  <div class="wrap">
+    <div class="hd">
+      <div class="hd-main">
+        <p class="eyebrow">3D 游戏制作 · 七天垂直切片 · 制作总控</p>
+        <h1>残响<span class="en">RESIDUUM</span></h1>
+        <p class="tagline">第一人称写实恐怖取证游戏。你带着三件设备走进一栋不该进的房子，必须在理智耗尽前收集到足够证据、判定纠缠此地的究竟是什么，然后活着走出去。</p>
+      </div>
+      <div class="meter" aria-hidden="true">
+        <span class="meter-label">EMF Reading</span>
+        <div class="bars">
+          <div class="bar on"></div><div class="bar on"></div><div class="bar on"></div><div class="bar on"></div><div class="bar on"></div>
+        </div>
+        <span class="meter-label" style="color:var(--amber)">LEVEL 5 — 证据确认</span>
+      </div>
+    </div>
+  </div>
+  <div class="wrap">
+    <dl class="facts">
+      <div class="fact"><dt>引擎</dt><dd>Unity 6 · URP</dd></div>
+      <div class="fact"><dt>视角</dt><dd>第一人称</dd></div>
+      <div class="fact"><dt>团队</dt><dd>2 人 + Codex</dd></div>
+      <div class="fact"><dt>单局时长</dt><dd class="mono">8–12 min</dd></div>
+      <div class="fact"><dt>交付</dt><dd class="mono">8 / 29</dd></div>
+    </dl>
+  </div>
+</header>
+
+<main class="wrap">
+
+<section>
+  <div class="sec-head">
+    <p class="eyebrow">核心设计</p>
+    <h2>3 × 3 推理表</h2>
+    <p class="sec-intro">《恐鬼症》有 24 种鬼、7 种证据、40 件道具。我们不复制内容量，我们复制它的<b>演绎结构</b>——并且把它压缩到数学上闭合的最小形态。</p>
+  </div>
+
+  <div class="matrix-wrap">
+    <table class="matrix">
+      <thead>
+        <tr><th>鬼种</th><th>EMF-5 电磁读数</th><th>紫外线指纹</th><th>鬼影书写</th></tr>
+      </thead>
+      <tbody>
+        <tr><th>怨灵<small>Spirit</small></th>
+          <td><span class="chk yes">✓</span></td><td><span class="chk yes">✓</span></td><td><span class="chk no">—</span></td></tr>
+        <tr><th>幽影<small>Wraith</small></th>
+          <td><span class="chk yes">✓</span></td><td><span class="chk no">—</span></td><td><span class="chk yes">✓</span></td></tr>
+        <tr><th>骚灵<small>Poltergeist</small></th>
+          <td><span class="chk no">—</span></td><td><span class="chk yes">✓</span></td><td><span class="chk yes">✓</span></td></tr>
+      </tbody>
+    </table>
+    <p class="matrix-note">「从 3 项取 2 项」恰好有 3 种组合，与 3 种鬼<b>一一对应</b>。于是：单项证据永远不够判定（每项都被两种鬼共享），集齐两项则答案<b>唯一确定</b>。零冗余、零歧义、零运气——这是可以在 pitch 上讲 30 秒并让评审点头的设计。</p>
+  </div>
+
+  <div class="grid g3" style="margin-top:18px">
+    <div class="card">
+      <h3>怨灵 <span class="sub">Spirit · 迟缓 · 执拗</span></h3>
+      <p>长时间停留在鬼房，脚步声沉重清晰。移动最慢，但猎杀持续最久。</p>
+      <ul><li>移动 1.6 m/s · 猎杀 30 s</li><li>被熏香驱散后 180 s 内不猎杀</li></ul>
+    </div>
+    <div class="card">
+      <h3>幽影 <span class="sub">Wraith · 飘忽 · 无踪</span></h3>
+      <p>地板上<b>不留脚印</b>——玩家可用这点辅助判断。追击中会短距瞬移接近。</p>
+      <ul><li>移动 1.7 m/s</li><li>每 6 s 触发 1.5 s 加速冲刺</li></ul>
+    </div>
+    <div class="card">
+      <h3>骚灵 <span class="sub">Poltergeist · 暴躁 · 破坏</span></h3>
+      <p>频繁抛掷房间内物品制造巨响。猎杀开始瞬间将周围物品同时抛飞。</p>
+      <ul><li>互动频率 ×2.0</li><li>理智扣减 ×1.5</li></ul>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head">
+    <p class="eyebrow">游戏循环</p>
+    <h2>八分钟到十二分钟</h2>
+    <p class="sec-intro">这是垂直切片的黄金长度——足够展示完整循环，短到可以在演示现场跑完两遍。</p>
+  </div>
+  <div class="loop">
+    <div class="step"><span class="n">01</span><h4>准备</h4><p>3 个装备槽，手电占其一。只能再带两件，必须取舍。</p></div>
+    <div class="step"><span class="n">02</span><h4>勘察</h4><p>黑暗中探索九个房间，靠温度骤降与 EMF 反应定位鬼房。</p></div>
+    <div class="step"><span class="n">03</span><h4>取证</h4><p>用手上的设备采集证据。每多待一秒，多一分证据，也多一分死。</p></div>
+    <div class="step"><span class="n">04</span><h4>判种</h4><p>打开笔记本，用排除法锁定鬼种。集齐两项即唯一确定。</p></div>
+    <div class="step"><span class="n">05</span><h4>生存</h4><p>理智跌破 50% 后随时可能被猎杀。躲进衣柜，或者跑。</p></div>
+    <div class="step"><span class="n">06</span><h4>撤离</h4><p>回到玄关提交判定。S / A / C / F 四档结算。</p></div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head">
+    <p class="eyebrow">节奏引擎</p>
+    <h2>理智系统</h2>
+    <p class="sec-intro">理智不是血条，是<b>倒计时</b>。它让玩家在整局里持续计算「我还能待多久」，而这个焦虑本身就是游戏性。</p>
+  </div>
+  <div class="grid g2">
+    <div class="dt-wrap">
+      <table class="dt">
+        <thead><tr><th>状态 / 事件</th><th>理智变化</th></tr></thead>
+        <tbody>
+          <tr><td>起始值</td><td class="num">100 %</td></tr>
+          <tr><td>处于黑暗中</td><td class="num">−0.12 %/s</td></tr>
+          <tr><td>处于有灯光房间</td><td class="num">−0.06 %/s</td></tr>
+          <tr><td>手持开启的手电筒</td><td class="num">× 0.5</td></tr>
+          <tr><td>目击鬼魂事件</td><td class="num">−15 %</td></tr>
+          <tr><td>被猎杀追击期间</td><td class="num">−0.5 %/s</td></tr>
+          <tr><td>回到安全区</td><td class="num">+1.0 %/s</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card">
+      <h3>猎杀触发 <span class="sub">Hunt Trigger</span></h3>
+      <p>理智低于 50% 后，系统每 25 秒判定一次：</p>
+      <p class="mono" style="color:var(--amber);font-weight:700;font-size:15px;margin-top:12px">P = (50 − sanity) / 50</p>
+      <ul>
+        <li>理智 50% → 触发概率 0%</li>
+        <li>理智 25% → 触发概率 50%</li>
+        <li>理智 0% → <b style="color:var(--danger)">必定猎杀</b></li>
+      </ul>
+      <p style="margin-top:14px">猎杀期间全场灯光失效、手电筒故障闪烁、鬼显形并沿导航网格追击。失去视线 3 秒后转为搜索最后已知位置；玩家躲进藏匿点则无法被直接锁定，但鬼有 15% 概率来查。</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head">
+    <p class="eyebrow">关卡</p>
+    <h2>单层郊区住宅 · 九个房间</h2>
+    <p class="sec-intro">约 200 ㎡。鬼房每局从九个房间中随机选一个，玩家必须自己找出来。</p>
+  </div>
+  <div class="map">
+    <div class="room" style="grid-area:gar"><span class="cn">车库</span><span class="en">Garage</span></div>
+    <div class="room" style="grid-area:kit"><span class="cn">厨房</span><span class="en">Kitchen</span></div>
+    <div class="room" style="grid-area:din"><span class="cn">餐厅</span><span class="en">Dining</span></div>
+    <div class="room hall" style="grid-area:hal"><span class="cn">走廊（L 形转角）</span><span class="en">Hallway — sightline break</span></div>
+    <div class="room" style="grid-area:bth"><span class="cn">浴室</span><span class="en">Bathroom</span></div>
+    <div class="room" style="grid-area:bra"><span class="cn">卧室 A</span><span class="en">Bedroom A</span></div>
+    <div class="room" style="grid-area:brb"><span class="cn">卧室 B</span><span class="en">Bedroom B</span></div>
+    <div class="room" style="grid-area:mas"><span class="cn">主卧</span><span class="en">Master</span></div>
+    <div class="room" style="grid-area:liv"><span class="cn">客厅</span><span class="en">Living Room</span></div>
+    <div class="room exit" style="grid-area:ent"><span class="cn">玄关 · 出口</span><span class="en">Entrance — Exit</span></div>
+  </div>
+  <div class="map-legend">
+    <span><i class="swatch" style="background:var(--amber)"></i>出口，随时可撤离</span>
+    <span><i class="swatch" style="border:1px dashed var(--line-strong)"></i>走廊设 L 形，脚步声先于视觉到达</span>
+    <span><i class="swatch" style="background:var(--cyan)"></i>藏匿点 6 处，每房间到最近点 ≤ 12 米</span>
+  </div>
+  <div class="grid g3" style="margin-top:22px">
+    <div class="card"><h3>灯光 <span class="sub">Lighting</span></h3><p>冷蓝月光从窗户射入，室内近乎全黑。唯一暖光源是玩家手电（4200K，射程 12 米，锥角 45°）。每房间一盏可开关顶灯——开灯降低理智消耗，但更容易被注意到。</p></div>
+    <div class="card"><h3>鬼的表现 <span class="sub">Ghost Visual</span></h3><p>不做高精度鬼模型。Mixamo 人形 + Fresnel 半透明 Shader Graph 材质，平时只是一闪而过的轮廓，猎杀时才完全显形。<b>看不清比看得清更可怕</b>——既省成本，也是正确的恐怖设计。</p></div>
+    <div class="card"><h3>音频 <span class="sub">Audio</span></h3><p>恐怖游戏性价比最高的投入。AudioDirector 按理智值实时调整全局混音：理智越低，低频越重、混响越湿、心跳越明显。玩家会「感觉到」自己在崩溃。</p></div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head">
+    <p class="eyebrow">排期 · 8月22日 → 8月29日</p>
+    <h2>七天</h2>
+    <p class="sec-intro">三条铁律：<b>灰盒可玩优先，Day 5 之前不碰美术</b>；每天收工时项目必须处于能运行状态；关键路径永远排在美术、音频、UI 之前。</p>
+  </div>
+  <div class="days">
+
+    <div class="day">
+      <div class="day-tag"><span class="d">D0</span><span class="date">08 / 22 SAT</span></div>
+      <div class="day-body">
+        <h4>Pitch 与开工</h4>
+        <div class="day-cols">
+          <div class="col-h"><span class="who">Henry</span><ul><li>白板讲 3×3 推理表 + 地图 + 排期</li><li>建工程、导入 Starter Assets、git init</li></ul></div>
+          <div class="col-p"><span class="who">队友</span><ul><li>装 Unity 6，加入仓库</li><li>Clone 成功并跑通默认场景</li></ul></div>
+        </div>
+        <p class="checkpoint"><b>检查点</b> — 两人都能 clone 并运行同一个工程。这一步卡住，后面全部瘫痪。</p>
+      </div>
+    </div>
+
+    <div class="day">
+      <div class="day-tag"><span class="d">D1</span><span class="date">08 / 23 SUN</span></div>
+      <div class="day-body">
+        <h4>能走能看</h4>
+        <div class="day-cols">
+          <div class="col-h"><span class="who">Henry</span><ul><li>T01 玩家控制器 · T02 交互系统</li><li>ProBuilder 搭九房间灰盒地图</li><li><b>烘焙 NavMeshSurface</b></li></ul></div>
+          <div class="col-p"><span class="who">队友</span><ul><li>T14 HUD 的 Canvas 层级搭建</li><li>收集音效素材并归档</li></ul></div>
+        </div>
+        <p class="checkpoint"><b>检查点</b> — 能第一人称在灰盒房子里走动、开门；NavMesh 覆盖所有地板。</p>
+      </div>
+    </div>
+
+    <div class="day">
+      <div class="day-tag"><span class="d">D2</span><span class="date">08 / 24 MON</span></div>
+      <div class="day-body">
+        <h4>道具在手</h4>
+        <div class="day-cols">
+          <div class="col-h"><span class="who">Henry</span><ul><li>T03 道具槽 + 手电筒 · T04 房间系统</li><li>摆 9 个 RoomVolume</li><li>调手电手感——恐怖感的关键</li></ul></div>
+          <div class="col-p"><span class="who">队友</span><ul><li>T14 HUD：准星、理智条、道具槽</li><li>T17 音频总监开工</li></ul></div>
+        </div>
+        <p class="checkpoint"><b>检查点</b> — 三槽切换正常，手电有电量，进房间能读出温度。</p>
+      </div>
+    </div>
+
+    <div class="day">
+      <div class="day-tag"><span class="d">D3</span><span class="date">08 / 25 TUE</span></div>
+      <div class="day-body">
+        <h4>证据闭环</h4>
+        <div class="day-cols">
+          <div class="col-h"><span class="who">Henry</span><ul><li>T05 EMF · T06 UV 指纹 · T07 鬼影书 · T08 证据管理器</li><li>建三个 GhostDefinition 资产</li><li>场景中摆 15 处指纹点</li></ul></div>
+          <div class="col-p"><span class="who">队友</span><ul><li>T13 判定笔记本 UI（重点）</li><li>音效接入 HUD 反馈</li></ul></div>
+        </div>
+        <div class="gate"><b>风险闸门 一</b>若证据系统未闭环，立刻砍掉「鬼影书」，改为 2 证据 × 3 鬼的简化表。损失一点优雅性，保住进度。</div>
+      </div>
+    </div>
+
+    <div class="day">
+      <div class="day-tag"><span class="d">D4</span><span class="date">08 / 26 WED</span></div>
+      <div class="day-body">
+        <h4>鬼来了 —— 最难的一天</h4>
+        <div class="day-cols">
+          <div class="col-h"><span class="who">Henry</span><ul><li><b>全天投入 T09 鬼 AI</b>，预计 2–3 轮 Codex 迭代</li><li>T10 猎杀调度 · T11 躲藏系统</li><li>摆 6 个藏匿点并验证距离</li></ul></div>
+          <div class="col-p"><span class="who">队友</span><ul><li>T16 结算界面</li><li>T17 音频：猎杀层、心跳、鬼事件音</li></ul></div>
+        </div>
+        <div class="gate"><b>风险闸门 二</b>鬼 AI 是不可砍的核心。若卡住，Day 5 上午继续，美术日整体后移——宁可牺牲画面，不能牺牲这个。</div>
+      </div>
+    </div>
+
+    <div class="day">
+      <div class="day-tag"><span class="d">D5</span><span class="date">08 / 27 THU</span></div>
+      <div class="day-body">
+        <h4>完整循环</h4>
+        <div class="day-cols">
+          <div class="col-h"><span class="who">Henry</span><ul><li>T12 理智系统 · T15 回合管理器</li><li>全流程跑通测试</li><li>调平衡：衰减速率、猎杀概率、单局时长</li></ul></div>
+          <div class="col-p"><span class="who">队友</span><ul><li>联调 UI 与所有事件</li><li>补齐音效资源</li></ul></div>
+        </div>
+        <p class="checkpoint"><b>检查点</b> — 能从头到尾玩完一局并得到评级。<b>到这里游戏就「成立」了</b>，而此刻一切仍是灰盒——这是正确的。</p>
+      </div>
+    </div>
+
+    <div class="day">
+      <div class="day-tag"><span class="d">D6</span><span class="date">08 / 28 FRI</span></div>
+      <div class="day-body">
+        <h4>美术与氛围日</h4>
+        <div class="day-cols">
+          <div class="col-h"><span class="who">Henry</span><ul><li>导入免费素材，逐房间替换灰盒</li><li>保持碰撞体与 NavMesh 不变，只换视觉</li><li>灯光烘焙 + 后处理（Vignette / Grain / 猎杀红移）</li></ul></div>
+          <div class="col-p"><span class="who">队友</span><ul><li>AudioMixer 最终混音</li><li>填写素材许可清单</li><li>帧率检查</li></ul></div>
+        </div>
+        <p class="checkpoint"><b>检查点</b> — 画面统一、够黑、够冷。换完美术必须重新烘焙 NavMesh 并全流程跑一遍。</p>
+      </div>
+    </div>
+
+    <div class="day">
+      <div class="day-tag"><span class="d">D7</span><span class="date">08 / 29 SAT</span></div>
+      <div class="day-body">
+        <h4>打磨与交付</h4>
+        <div class="day-cols">
+          <div class="col-h"><span class="who">上午</span><ul><li>Bug 清理，按「会不会卡住玩家」排序</li><li>找 2–3 个陌生人盲测，只看不说话</li></ul></div>
+          <div class="col-p"><span class="who">下午</span><ul><li>录 3–5 分钟演示视频</li><li>Build 并在另一台机器上验证</li></ul></div>
+        </div>
+        <p class="checkpoint"><b>检查点</b> — 陌生人在无讲解的情况下能玩完一局。</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section>
+  <div class="sec-head">
+    <p class="eyebrow">Codex 任务看板</p>
+    <h2>十七个模块</h2>
+    <p class="sec-intro">每个任务只产出 1–2 个 .cs 文件，一次只派一个。所有跨模块通信走静态事件总线 <span class="mono">GameEvents</span>——这是让 Codex 生成的代码互不冲突的唯一办法。关键路径：<span class="mono" style="color:var(--amber)">T01 → T02 → T04 → T09 → T10 → T15</span>。</p>
+  </div>
+  <div class="phase-key">
+    <span><i class="swatch" style="background:var(--amber)"></i>阶段 A · 基础</span>
+    <span><i class="swatch" style="background:var(--cyan)"></i>阶段 B · 世界与证据</span>
+    <span><i class="swatch" style="background:var(--danger)"></i>阶段 C · 鬼与威胁</span>
+    <span><i class="swatch" style="background:var(--ok)"></i>阶段 D · 状态与 UI</span>
+  </div>
+  <div class="tasks">
+    <div class="task pA"><span class="id">T01</span><p class="nm">玩家控制器</p><span class="own">Henry</span></div>
+    <div class="task pA"><span class="id">T02</span><p class="nm">交互系统与门</p><span class="own">Henry</span></div>
+    <div class="task pA"><span class="id">T03</span><p class="nm">道具槽 + 手电筒</p><span class="own">Henry</span></div>
+    <div class="task pB"><span class="id">T04</span><p class="nm">房间系统与鬼房</p><span class="own">Henry</span></div>
+    <div class="task pB"><span class="id">T05</span><p class="nm">EMF 读数器</p><span class="own">Henry</span></div>
+    <div class="task pB"><span class="id">T06</span><p class="nm">紫外线灯与指纹</p><span class="own">Henry</span></div>
+    <div class="task pB"><span class="id">T07</span><p class="nm">鬼影书</p><span class="own">Henry</span></div>
+    <div class="task pB"><span class="id">T08</span><p class="nm">证据管理器</p><span class="own">Henry</span></div>
+    <div class="task pC"><span class="id">T09</span><p class="nm">鬼 AI 状态机</p><span class="own">Henry · 半天</span></div>
+    <div class="task pC"><span class="id">T10</span><p class="nm">猎杀调度器</p><span class="own">Henry</span></div>
+    <div class="task pC"><span class="id">T11</span><p class="nm">躲藏系统</p><span class="own">Henry</span></div>
+    <div class="task pD"><span class="id">T12</span><p class="nm">理智系统</p><span class="own">Henry</span></div>
+    <div class="task pD"><span class="id">T13</span><p class="nm">判定笔记本 UI</p><span class="own">队友</span></div>
+    <div class="task pD"><span class="id">T14</span><p class="nm">HUD</p><span class="own">队友</span></div>
+    <div class="task pD"><span class="id">T15</span><p class="nm">回合管理器</p><span class="own">Henry</span></div>
+    <div class="task pD"><span class="id">T16</span><p class="nm">结算界面</p><span class="own">队友</span></div>
+    <div class="task pD"><span class="id">T17</span><p class="nm">音频总监</p><span class="own">队友</span></div>
+  </div>
+  <div class="card" style="margin-top:20px">
+    <h3>审查比生成重要 <span class="sub">Your actual job</span></h3>
+    <p>Codex 一天能写完这个项目的所有代码，但只有你能判断「手感对不对」。每个模块落位前只审三件事：有没有直接引用别的模块（应该只用 GameEvents）、数值有没有 <span class="mono">[SerializeField]</span> 暴露、命名空间对不对。编译不过就把报错原文贴回去让它改，<b>不要自己硬改</b>。</p>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head">
+    <p class="eyebrow">范围控制</p>
+    <h2>明确不做什么</h2>
+    <p class="sec-intro">写下来是为了防止七天被吞掉。</p>
+  </div>
+  <ul class="nope">
+    <li>多人联机 —— 网络同步至少吃掉 3 天</li>
+    <li>语音识别灵魂盒 —— 第三方 SDK 风险不可控</li>
+    <li>多张地图 —— 一张打磨好的胜过三张灰盒</li>
+    <li>第 4 种鬼或证据 —— 会破坏 3×3 推理表</li>
+    <li>存档与进度系统</li>
+    <li>主菜单美术</li>
+  </ul>
+  <p class="sec-intro" style="margin-top:20px">若进度超前，按此顺序追加：① 温度计（第 4 项证据，需扩表到 4×4）② 第二张地图 ③ 熏香与十字架 ④ 本地双人分屏。</p>
+</section>
+
+<section>
+  <div class="sec-head">
+    <p class="eyebrow">素材</p>
+    <h2>全部免费，风格一致优先于单件精度</h2>
+    <p class="sec-intro">现实约束下的正确做法不是硬追写实，而是选定一套免费素材包，然后让全部美术围绕它统一。</p>
+  </div>
+  <div class="dt-wrap">
+    <table class="dt">
+      <thead><tr><th>用途</th><th>资源</th><th>要点</th></tr></thead>
+      <tbody>
+        <tr><td>第一人称控制器</td><td><a href="https://assetstore.unity.com/packages/essentials/starter-assets-firstperson-updates-in-new-charactercontroller-pa-196525">Starter Assets – FirstPerson</a></td><td>Unity 官方免费，2.3 MB，支持 Unity 6 + URP。<b>直接作为基座，别从零写</b></td></tr>
+        <tr><td>室内场景主体</td><td><a href="https://assetstore.unity.com/packages/3d/props/interior/house-interior-free-258782">House Interior – Free</a></td><td>73 MB，三管线兼容，作为地图主素材库</td></tr>
+        <tr><td>恐怖氛围补充</td><td><a href="https://assetstore.unity.com/packages/3d/environments/pbr-hospital-horror-pack-free-80117">PBR Hospital Horror Pack</a></td><td>破败感道具与材质</td></tr>
+        <tr><td>材质 / HDRI</td><td><a href="https://polyhaven.com/">Poly Haven</a></td><td><b>CC0 协议</b>，完全免费商用无需署名</td></tr>
+        <tr><td>人物模型与动画</td><td><a href="https://www.mixamo.com/">Mixamo</a></td><td>Adobe 免费，含 walk / run / scared 动画</td></tr>
+        <tr><td>音效</td><td><a href="https://sonniss.com/gameaudiogdc">Sonniss GDC Bundle</a> · <a href="https://freesound.org/">Freesound</a></td><td>Sonniss 每年放出数十 GB 免费商用游戏音效</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="gate" style="margin-top:16px"><b>许可红线</b>Unity Asset Store 免费资源可用于项目，但<b>不得二次分发原始素材文件</b>。每导入一个素材，在 <span class="mono">Docs/ASSET_LICENSES.md</span> 里记一行来源——pitch 时这是加分项。</div>
+</section>
+
+<section>
+  <div class="sec-head">
+    <p class="eyebrow">Pitch 讲稿</p>
+    <h2>三十秒版本</h2>
+  </div>
+  <div class="card" style="border-left:3px solid var(--amber)">
+    <p style="font-size:16px;color:var(--ink);line-height:1.85">「《残响》是一款第一人称恐怖取证游戏。你进入一栋闹鬼的房子，用有限的三件设备收集证据，判断纠缠这里的是三种鬼中的哪一种，然后活着出去。</p>
+    <p style="font-size:16px;color:var(--ink);line-height:1.85">我们的核心设计是一张 3×3 的推理表——三种鬼，三种证据，每种鬼恰好持有两项。这意味着玩家必须集齐两项证据才能判定，而集齐两项后答案唯一。<b>没有运气，全是演绎。</b></p>
+    <p style="font-size:16px;color:var(--ink);line-height:1.85">同时，你的理智会随着待在黑暗中持续下降，理智越低，被猎杀的概率越高。所以每多找一件证据，都是在拿命换。这个张力就是游戏的全部。</p>
+    <p style="font-size:16px;color:var(--ink);line-height:1.85">我们用 Unity 6 + URP，一周做一个十分钟可玩的垂直切片。」</p>
+    <p style="margin-top:18px;color:var(--ink-2)">现场要展示的三样东西：<b>① 3×3 推理表</b>（白板上画，30 秒讲完，最有说服力）<b>② 地图平面图 ③ 七天排期表</b>。</p>
+  </div>
+</section>
+
+</main>
+
+<footer class="wrap">
+  <p class="mono">残响 RESIDUUM · 制作总控 v1.0 · 总设计师 Henry · 配套文档：01_GDD / 02_技术架构 / 03_Codex任务包 / 04_七天排期</p>
+</footer>
