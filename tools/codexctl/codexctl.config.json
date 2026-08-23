@@ -47,18 +47,6 @@
       "message": "Unity 6.x 已弃用：FindObjectOfType / FindObjectsOfType / FindFirstObjectByType / 带 FindObjectsSortMode 的重载。用 FindAnyObjectByType 或 FindObjectsByType(FindObjectsInactive.…)"
     },
     {
-      "id": "G09",
-      "severity": "warn",
-      "pattern": "\\bFindFirstObjectByType\\b",
-      "message": "FindFirstObjectByType 在 Unity 6000.5 已弃用（依赖 instance ID 排序），改用 FindAnyObjectByType"
-    },
-    {
-      "id": "G10",
-      "severity": "warn",
-      "pattern": "\\bFindObjectsSortMode\\b",
-      "message": "带 FindObjectsSortMode 的 FindObjectsByType 重载在 Unity 6000.5 已弃用，改用不带该参数的重载"
-    },
-    {
       "id": "G02",
       "severity": "error",
       "pattern": "\\b(?:rb|rigidbody|_rb|_rigidbody|Rigidbody)\\s*\\.\\s*velocity\\b",

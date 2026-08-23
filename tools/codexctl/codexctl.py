@@ -102,17 +102,11 @@ DEFAULT_CONFIG = {
         "Assets/_Project/Scripts/Ghost/GhostDefinition.cs",
     ],
     "gate_rules": [
+        # 四种写法都在 Unity 6.x 被弃用，合并成一条 error：拆成多条会让同一行
+        # 被重复报告，而且严重级别不一致时反而让人不知道该不该修。
         {"id": "G01", "severity": "error",
-         "pattern": r"\bFindObjectsOfType\b|\bFindObjectOfType\b",
-         "message": "Unity 6 已弃用 FindObjectOfType，改用 FindAnyObjectByType / FindObjectsByType"},
-        # Unity 6000.5 又把 FindFirstObjectByType 也标了弃用（它依赖 instance ID 排序）。
-        # 单列一条 warn 而不是并进 G01，是为了让「早已弃用」和「刚弃用」在报告里能分开看。
-        {"id": "G09", "severity": "warn",
-         "pattern": r"\bFindFirstObjectByType\b",
-         "message": "FindFirstObjectByType 在 Unity 6000.5 已弃用（依赖 instance ID 排序），改用 FindAnyObjectByType"},
-        {"id": "G10", "severity": "warn",
-         "pattern": r"\bFindObjectsSortMode\b",
-         "message": "带 FindObjectsSortMode 的 FindObjectsByType 重载在 Unity 6000.5 已弃用，改用不带该参数的重载"},
+         "pattern": r"\bFindObjectsOfType\b|\bFindObjectOfType\b|\bFindFirstObjectByType\b|\bFindObjectsSortMode\b",
+         "message": "Unity 6.x 已弃用：FindObjectOfType / FindObjectsOfType / FindFirstObjectByType / 带 FindObjectsSortMode 的重载。用 FindAnyObjectByType 或 FindObjectsByType(FindObjectsInactive.…)"},
         {"id": "G02", "severity": "error",
          "pattern": r"\b(?:rb|rigidbody|_rb|_rigidbody|Rigidbody)\s*\.\s*velocity\b",
          "message": "Rigidbody.velocity 在 Unity 6 已改名 linearVelocity"},
