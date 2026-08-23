@@ -67,8 +67,8 @@
     {
       "id": "G05",
       "severity": "error",
-      "pattern": "^\\s*using\\s+Residuum\\.(?!Core\\b)",
-      "message": "模块之间禁止直接 using，跨模块通信一律走 Core.GameEvents 事件总线"
+      "pattern": "^\\s*using\\s+Residuum\\.(?!Core\\b|Evidence\\b)",
+      "message": "模块之间禁止直接 using（Core 与 Evidence 的枚举/接口除外），跨模块通信走 GameEvents"
     },
     {
       "id": "G06",
@@ -101,75 +101,75 @@
   "audit_checklist": [
     {
       "id": "A01",
-      "text": "只 using Residuum.Core，没有跨模块直接引用"
+      "text": "除 Residuum.Core / Residuum.Evidence 的枚举与接口外，未 using 或引用其它模块的具体类"
     },
     {
       "id": "A02",
-      "text": "跨模块通信全部走 GameEvents 静态事件总线"
+      "text": "命名空间为 Residuum.<指定模块名>"
     },
     {
       "id": "A03",
-      "text": "没有修改任何契约文件"
+      "text": "未修改 GameEvents 或任何接口的定义"
     },
     {
       "id": "A04",
-      "text": "零 FindObjectOfType / FindFirstObjectByType / GameObject.Find（用 FindAnyObjectByType）"
+      "text": "文件名与主类名完全一致"
     },
     {
       "id": "A05",
-      "text": "零 Rigidbody.velocity（用 linearVelocity）"
+      "text": "每个 GameEvents 订阅在 OnEnable 订阅、OnDisable 取消，严格配对且数量相等"
     },
     {
       "id": "A06",
-      "text": "零旧版 Input（UnityEngine.Input.*）"
+      "text": "所有 StartCoroutine 启动的协程都在 OnDisable 中停止"
     },
     {
       "id": "A07",
-      "text": "零 CinemachineVirtualCamera（用 CinemachineCamera）"
+      "text": "OnDestroy 时没有未清理的引用或计时器"
     },
     {
       "id": "A08",
-      "text": "所有可调数值 [SerializeField] + 中文 Tooltip"
+      "text": "零 FindObjectOfType / FindObjectsOfType / FindFirstObjectByType（用 FindAnyObjectByType；批量用 FindObjectsByType(FindObjectsInactive.Include)，不传 FindObjectsSortMode）"
     },
     {
       "id": "A09",
-      "text": "OnEnable / OnDisable 事件订阅与退订成对"
+      "text": "零 Rigidbody.velocity（Unity 6 改名 linearVelocity）"
     },
     {
       "id": "A10",
-      "text": "OnDestroy 清理所有引用与协程"
+      "text": "零旧版输入 Input.GetKey / GetAxis / mousePosition（统一 Input System）"
     },
     {
       "id": "A11",
-      "text": "静态事件在回合开始时重置，不跨局残留"
+      "text": "零 Cinemachine 2.x 类名（CinemachineVirtualCamera → CinemachineCamera，本工程 3.1.7）"
     },
     {
       "id": "A12",
-      "text": "帧率无关：所有插值用 dt，不用固定系数"
+      "text": "Update 中不重复调用 Camera.main（Awake 缓存）；协程内不反复 new WaitForSeconds"
     },
     {
       "id": "A13",
-      "text": "没有在 Update 里做 GetComponent / 分配内存"
+      "text": "没有硬编码数值常量（速度/时长/概率/距离/角度），全部 [SerializeField] private"
     },
     {
       "id": "A14",
-      "text": "空引用防护：外部序列化引用为空时不炸"
+      "text": "每个 [SerializeField] 字段都有 [Tooltip(\"中文说明\")]"
     },
     {
       "id": "A15",
-      "text": "命名空间与目录结构一致"
+      "text": "数值字段默认值合理，且与设计文档一致"
     },
     {
       "id": "A16",
-      "text": "没有引入新的第三方包或 Unity 包依赖"
+      "text": "GetComponent / 引用字段使用前做 null 检查；关键依赖缺失用 Debug.LogError 明确报出，不静默失败"
     },
     {
       "id": "A17",
-      "text": "没有留下 TODO / 未实现的分支"
+      "text": "没有除零、数组越界、负数开方等风险"
     },
     {
       "id": "A18",
-      "text": "符合任务验收标准里逐条列出的行为"
+      "text": "代码完整：无 \"...\" 省略、无 TODO 占位、可直接编译"
     }
   ]
 }

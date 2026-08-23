@@ -777,7 +777,8 @@ PREAMBLE = u"""你在 Unity 6 工程 RESIDUUM（第一人称恐怖取证游戏�
 
 架构铁律（违反直接打回，不要讨价还价）：
 1. 跨模块通信一律走 `Residuum.Core.GameEvents` 静态事件总线；模块之间禁止直接 using。
-   你的文件里除了 UnityEngine / System 之外，只允许 `using Residuum.Core;`。
+   你的文件里除了 UnityEngine / System 之外，只允许 `using Residuum.Core;`
+   和 `using Residuum.Evidence;`（后者仅限取用其中的枚举与接口，不得引用其它模块的具体类）。
 2. 下面 7 个契约文件**一个字都不许改**。需要新事件就在最终回复里写清楚要加什么签名，
    由人类统一加，不要自己动手：
 {contracts}
