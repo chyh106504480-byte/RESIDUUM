@@ -105,8 +105,8 @@ Assets/
 
 | 旧写法（已废弃） | 本项目正确写法 |
 |---|---|
-| `FindObjectOfType<T>()` | `FindFirstObjectByType<T>()` 或 `FindAnyObjectByType<T>()` |
-| `FindObjectsOfType<T>()` | `FindObjectsByType<T>(FindObjectsSortMode.None)` |
+| `FindObjectOfType<T>()` | **`FindAnyObjectByType<T>()`** —— `FindFirstObjectByType` 在 6.x 也已弃用（依赖 instance ID 排序），别用 |
+| `FindObjectsOfType<T>()` | **`FindObjectsByType<T>()`** 或 `FindObjectsByType<T>(FindObjectsInactive.Include)` —— 带 `FindObjectsSortMode` 的重载已弃用 |
 | `rigidbody.velocity` | `rigidbody.linearVelocity` |
 | `Input.GetKey` / `GetAxis` / `mousePosition` | Input System (`UnityEngine.InputSystem`) |
 | `CinemachineVirtualCamera` | **`CinemachineCamera`**（Cinemachine 3.x 已改名） |
