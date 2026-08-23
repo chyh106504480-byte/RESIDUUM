@@ -86,6 +86,26 @@ Codex 在最终回复里申请（它被明令禁止自己加）。你收到申�
 
 ---
 
+## 3.5 设计文档在哪（`Docs/`，全部已入库）
+
+| 文档 | 什么时候读 |
+|---|---|
+| `01_GDD_残响.md` | 要数值：理智衰减、移动速度、猎杀概率、证据判定。写任务包前对一遍 |
+| `02_技术架构.md` | 目录结构、四个接口、五条铁律。和 `AGENTS.md` 有重叠，冲突时以本文档为准 |
+| `03_Codex任务包.md` | **T01–T17 的原始定义**。写 `/task` 之前必读那一条 |
+| `04_七天排期.md` | 排期与交付清单 |
+| `05_美术协作规范.md` | 灰盒契约。Day 6 美术汇合前用得上 |
+| `06_审查流程.md` | 18 项自审清单原文（codexctl 已装载）、Codex 六种常见失败模式 |
+| `07_Pitch讲稿.md` / `08_Pitch_Script_EN.md` | 逐屏台词 |
+
+**跨模块 using 的准确规则**（`02` §铁律 + `06` 第 1 项）：
+模块文件除 UnityEngine / System 外，允许 `using Residuum.Core;` 和
+`using Residuum.Evidence;`（后者仅限取用其中的枚举与接口）。
+引用其它模块的**具体类**一律禁止 —— 走 GameEvents、`[SerializeField]` 注入
+或 `UnityEvent` 连线。闸门 `G05` 按这条判。
+
+---
+
 ## 4. 干活的方式：codexctl
 
 `~/RESIDUUM/tools/codexctl/codexctl.py`，零依赖 Python3。链路：
