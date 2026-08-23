@@ -111,3 +111,6 @@ InitTestScene*.unity*
 
 # codexctl 运行产物
 .codexctl/
+
+# 远程会话留下的空 git 锁文件（云端删不掉，本地 rm -rf 掉即可）
+_to_delete/
