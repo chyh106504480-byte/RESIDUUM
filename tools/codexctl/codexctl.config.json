@@ -1,0 +1,187 @@
+{
+  "project_root": "~/RESIDUUM",
+  "codex": {
+    "bin": "codex",
+    "model": null,
+    "sandbox": "workspace-write",
+    "approval": "never",
+    "extra_args": [],
+    "timeout_sec": 5400,
+    "use_subscription_auth": true,
+    "env": {}
+  },
+  "unity": {
+    "enabled": true,
+    "editor_path": null,
+    "hub_roots": [
+      "/Applications/Unity/Hub/Editor",
+      "~/Applications/Unity/Hub/Editor"
+    ],
+    "extra_args": [],
+    "timeout_sec": 2400,
+    "project_scope_prefix": "Assets/_Project"
+  },
+  "git": {
+    "branch_prefix": "codex/",
+    "auto_branch": true,
+    "auto_commit": false,
+    "base_branch": "main"
+  },
+  "repair": {
+    "max_attempts": 2
+  },
+  "contract_files": [
+    "Assets/_Project/Scripts/Core/GameEvents.cs",
+    "Assets/_Project/Scripts/Core/RoundResult.cs",
+    "Assets/_Project/Scripts/Evidence/EvidenceType.cs",
+    "Assets/_Project/Scripts/Evidence/IEvidenceSource.cs",
+    "Assets/_Project/Scripts/World/IInteractable.cs",
+    "Assets/_Project/Scripts/Items/IHoldable.cs",
+    "Assets/_Project/Scripts/Ghost/GhostDefinition.cs"
+  ],
+  "gate_rules": [
+    {
+      "id": "G01",
+      "severity": "error",
+      "pattern": "\\bFindObjectsOfType\\b|\\bFindObjectOfType\\b|\\bFindFirstObjectByType\\b|\\bFindObjectsSortMode\\b",
+      "message": "Unity 6.x 已弃用：FindObjectOfType / FindObjectsOfType / FindFirstObjectByType / 带 FindObjectsSortMode 的重载。用 FindAnyObjectByType 或 FindObjectsByType(FindObjectsInactive.…)"
+    },
+    {
+      "id": "G09",
+      "severity": "warn",
+      "pattern": "\\bFindFirstObjectByType\\b",
+      "message": "FindFirstObjectByType 在 Unity 6000.5 已弃用（依赖 instance ID 排序），改用 FindAnyObjectByType"
+    },
+    {
+      "id": "G10",
+      "severity": "warn",
+      "pattern": "\\bFindObjectsSortMode\\b",
+      "message": "带 FindObjectsSortMode 的 FindObjectsByType 重载在 Unity 6000.5 已弃用，改用不带该参数的重载"
+    },
+    {
+      "id": "G02",
+      "severity": "error",
+      "pattern": "\\b(?:rb|rigidbody|_rb|_rigidbody|Rigidbody)\\s*\\.\\s*velocity\\b",
+      "message": "Rigidbody.velocity 在 Unity 6 已改名 linearVelocity"
+    },
+    {
+      "id": "G03",
+      "severity": "error",
+      "pattern": "\\bUnityEngine\\.Input\\.|(?<![\\w.])Input\\s*\\.\\s*(?:GetKey|GetAxis|GetButton|GetMouse|mousePosition)",
+      "message": "禁止旧版 Input Manager，本项目统一走 Input System"
+    },
+    {
+      "id": "G04",
+      "severity": "error",
+      "pattern": "\\bCinemachineVirtualCamera\\b",
+      "message": "Cinemachine 3.x 已改名 CinemachineCamera"
+    },
+    {
+      "id": "G05",
+      "severity": "error",
+      "pattern": "^\\s*using\\s+Residuum\\.(?!Core\\b)",
+      "message": "模块之间禁止直接 using，跨模块通信一律走 Core.GameEvents 事件总线"
+    },
+    {
+      "id": "G06",
+      "severity": "warn",
+      "pattern": "^\\s*public\\s+(?:float|int|bool|string|Vector[23])\\s+\\w+\\s*(?:=[^=>]|;)",
+      "message": "可调数值应当 [SerializeField] private，而非 public 字段"
+    },
+    {
+      "id": "G07",
+      "severity": "warn",
+      "pattern": "\\bGameObject\\.Find\\s*\\(",
+      "message": "GameObject.Find 按名字查找脆弱，改用序列化引用",
+      "exclude": [
+        "**/Editor/**"
+      ]
+    },
+    {
+      "id": "G08",
+      "severity": "warn",
+      "pattern": "\\bDebug\\.Log\\s*\\(",
+      "message": "提交前清理调试日志（或改用条件编译）",
+      "exclude": [
+        "**/Editor/**"
+      ]
+    }
+  ],
+  "gate_include": [
+    "Assets/_Project/Scripts/**/*.cs"
+  ],
+  "audit_checklist": [
+    {
+      "id": "A01",
+      "text": "只 using Residuum.Core，没有跨模块直接引用"
+    },
+    {
+      "id": "A02",
+      "text": "跨模块通信全部走 GameEvents 静态事件总线"
+    },
+    {
+      "id": "A03",
+      "text": "没有修改任何契约文件"
+    },
+    {
+      "id": "A04",
+      "text": "零 FindObjectOfType / FindFirstObjectByType / GameObject.Find（用 FindAnyObjectByType）"
+    },
+    {
+      "id": "A05",
+      "text": "零 Rigidbody.velocity（用 linearVelocity）"
+    },
+    {
+      "id": "A06",
+      "text": "零旧版 Input（UnityEngine.Input.*）"
+    },
+    {
+      "id": "A07",
+      "text": "零 CinemachineVirtualCamera（用 CinemachineCamera）"
+    },
+    {
+      "id": "A08",
+      "text": "所有可调数值 [SerializeField] + 中文 Tooltip"
+    },
+    {
+      "id": "A09",
+      "text": "OnEnable / OnDisable 事件订阅与退订成对"
+    },
+    {
+      "id": "A10",
+      "text": "OnDestroy 清理所有引用与协程"
+    },
+    {
+      "id": "A11",
+      "text": "静态事件在回合开始时重置，不跨局残留"
+    },
+    {
+      "id": "A12",
+      "text": "帧率无关：所有插值用 dt，不用固定系数"
+    },
+    {
+      "id": "A13",
+      "text": "没有在 Update 里做 GetComponent / 分配内存"
+    },
+    {
+      "id": "A14",
+      "text": "空引用防护：外部序列化引用为空时不炸"
+    },
+    {
+      "id": "A15",
+      "text": "命名空间与目录结构一致"
+    },
+    {
+      "id": "A16",
+      "text": "没有引入新的第三方包或 Unity 包依赖"
+    },
+    {
+      "id": "A17",
+      "text": "没有留下 TODO / 未实现的分支"
+    },
+    {
+      "id": "A18",
+      "text": "符合任务验收标准里逐条列出的行为"
+    }
+  ]
+}
