@@ -83,6 +83,9 @@ namespace Residuum.Player
         [Tooltip("手柄视角转速，单位：度/秒。")]
         [SerializeField] private float _gamepadLookSpeed = 150f;
 
+        [Tooltip("进入播放模式时是否锁定鼠标并隐藏光标；调试时可关闭。")]
+        [SerializeField] private bool _lockCursorOnStart = true;
+
         [Tooltip("是否反转视角的 Y 轴。")]
         [SerializeField] private bool _invertY;
 
@@ -209,6 +212,12 @@ namespace Residuum.Player
 
         private void OnEnable()
         {
+            if (_lockCursorOnStart)
+            {
+                Cursor.lockState = CursorLockMode.Locked;
+                Cursor.visible = false;
+            }
+
             GameEvents.OnHuntStart += HandleHuntStart;
             GameEvents.OnHuntEnd += HandleHuntEnd;
             GameEvents.OnHidingChanged += HandleHidingChanged;
@@ -227,6 +236,8 @@ namespace Residuum.Player
 
             DisableInputActions();
             IsSprinting = false;
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
         }
 
         private void OnDestroy()
