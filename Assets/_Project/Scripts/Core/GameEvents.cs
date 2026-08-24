@@ -60,6 +60,19 @@ namespace Residuum.Core
         public static event Action<bool> OnHidingChanged;
 
         // ─────────────────────────────────────────────
+        //  玩家交互
+        // ─────────────────────────────────────────────
+        /// <summary>
+        /// 准星当前指向的可交互目标发生变化时触发。
+        /// 参数：要显示的提示文案（例如 "[E] 开门"）；null 表示当前没有目标，UI 侧应隐藏提示。
+        ///
+        /// 【为什么传 string 而不是 IInteractable】IInteractable 属于 Residuum.World，
+        /// 若在这里传接口，Core 就反向依赖了 World，破坏分层。提示文案是 UI 唯一需要的信息，
+        /// 由 PlayerInteractor 从目标的 PromptText 取出后广播即可。
+        /// </summary>
+        public static event Action<string> OnInteractPromptChanged;
+
+        // ─────────────────────────────────────────────
         //  本回合鬼种的证据配置
         //  由 GameManager 在回合开始时写入，各证据道具只读。
         //  这样道具模块不需要引用 Ghost 模块即可知道自己该不该出证据。
@@ -102,6 +115,7 @@ namespace Residuum.Core
         public static void RaiseGhostInteract(Vector3 pos)    => OnGhostInteract?.Invoke(pos);
         public static void RaiseGhostEvent(Vector3 pos)       => OnGhostEvent?.Invoke(pos);
         public static void RaiseHidingChanged(bool hiding)    => OnHidingChanged?.Invoke(hiding);
+        public static void RaiseInteractPromptChanged(string prompt) => OnInteractPromptChanged?.Invoke(prompt);
 
         // ─────────────────────────────────────────────
         //  静态状态重置
@@ -125,6 +139,7 @@ namespace Residuum.Core
             OnGhostInteract = null;
             OnGhostEvent = null;
             OnHidingChanged = null;
+            OnInteractPromptChanged = null;
 
             GhostHasEMF5 = false;
             GhostHasUVFingerprint = false;
