@@ -74,8 +74,8 @@ namespace Residuum.World.Editor
                 UnityEditor.Undo.RegisterCreatedObjectUndo(testBench, UndoLabel);
 
                 CreateTestDoor(testBench.transform);
-                Residuum.Items.Flashlight flashlight = CreateFlashlight(testBench.transform, inputActions);
                 Transform handAnchor = EnsureHandAnchor(playerCamera.transform);
+                Residuum.Items.Flashlight flashlight = CreateFlashlight(handAnchor, inputActions);
                 Residuum.Items.ItemSlotSystem itemSlotSystem = EnsureItemSlotSystem(playerController.gameObject);
                 ConfigureItemSlotSystem(itemSlotSystem, flashlight, handAnchor, inputActions);
 
@@ -120,12 +120,12 @@ namespace Residuum.World.Editor
         }
 
         private static Residuum.Items.Flashlight CreateFlashlight(
-            Transform testBenchTransform,
+            Transform handAnchor,
             UnityEngine.InputSystem.InputActionAsset inputActions)
         {
             GameObject flashlightObject = new GameObject(FlashlightName);
             UnityEditor.Undo.RegisterCreatedObjectUndo(flashlightObject, UndoLabel);
-            UnityEditor.Undo.SetTransformParent(flashlightObject.transform, testBenchTransform, UndoLabel);
+            UnityEditor.Undo.SetTransformParent(flashlightObject.transform, handAnchor, UndoLabel);
             flashlightObject.transform.localPosition = Vector3.zero;
             flashlightObject.transform.localRotation = Quaternion.identity;
 
@@ -251,8 +251,7 @@ namespace Residuum.World.Editor
                 bool isFlashlightSlot = slotIndex == FlashlightSlotIndex;
                 slotsProperty.GetArrayElementAtIndex(slotIndex).objectReferenceValue =
                     isFlashlightSlot ? flashlight : null;
-                heldModelsProperty.GetArrayElementAtIndex(slotIndex).objectReferenceValue =
-                    isFlashlightSlot ? flashlight.gameObject : null;
+                heldModelsProperty.GetArrayElementAtIndex(slotIndex).objectReferenceValue = null;
             }
 
             handAnchorProperty.objectReferenceValue = handAnchor;
