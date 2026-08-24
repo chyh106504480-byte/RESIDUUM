@@ -81,11 +81,11 @@ Assets/
 ├── _Project/            ← 所有自写内容，与第三方彻底隔离
 │   ├── Scripts/
 │   │   ├── Core/        GameManager, GameEvents, RoundResult
-│   │   ├── Player/      PlayerController, PlayerInteractor, PlayerSanity, PlayerHiding
+│   │   ├── Player/      PlayerController, PlayerSanity, PlayerHiding
 │   │   ├── Ghost/       GhostAI, GhostDefinition, HuntController
 │   │   ├── Evidence/    EvidenceManager, EMFReader, UVLight, GhostWritingBook, Fingerprint
 │   │   ├── Items/       ItemSlotSystem, Flashlight
-│   │   ├── World/       Door, RoomVolume, RoomManager, HidingSpot
+│   │   ├── World/       PlayerInteractor, Door, RoomVolume, RoomManager, HidingSpot
 │   │   ├── UI/          HUDController, JournalUI, ResultScreen
 │   │   └── Audio/       AudioDirector
 │   ├── Prefabs/  ScriptableObjects/  Scenes/  Art/  Audio/

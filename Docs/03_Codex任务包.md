@@ -86,18 +86,18 @@ InputActionAsset 怎么连。
 
 | | |
 |---|---|
-| **文件** | `_Project/Scripts/Player/PlayerInteractor.cs`、`_Project/Scripts/World/Door.cs` |
+| **文件** | `_Project/Scripts/World/PlayerInteractor.cs`、`_Project/Scripts/World/Door.cs` |
 | **依赖** | `IInteractable` 接口已存在 |
 
 **📋 Prompt**
 ```
 写两个文件：
 
-【1】Residuum.Player.PlayerInteractor（挂在玩家摄像机上）
+【1】Residuum.World.PlayerInteractor（挂在玩家摄像机上）
 - 每帧从摄像机中心发射射线，距离可调(默认2.5米)，LayerMask 可配置
 - 命中实现了 Residuum.World.IInteractable 的物体且 CanInteract 为 true 时，
-  触发 public event Action<string> OnPromptChanged（参数为 PromptText），
-  没命中时触发 OnPromptChanged(null)
+  调用 GameEvents.RaiseInteractPromptChanged(目标的 PromptText)，
+  没命中时调用 GameEvents.RaiseInteractPromptChanged(null)
 - 按 E 键调用 Interact(gameObject)
 - 射线检测做频率限制：每 0.1 秒检测一次而非每帧，减少开销
 - 猎杀期间(订阅 GameEvents.OnHuntStart/OnHuntEnd)交互距离缩短到 1.5 米
@@ -543,7 +543,7 @@ GameObject 层级结构，以便我手动搭 UI。
 
 显示元素（每个都可在 Inspector 里单独关闭，方便截图演示）：
 1. 准星：一个小点，命中可交互物时变成圆圈并在下方显示提示文字
-   （订阅 PlayerInteractor.OnPromptChanged）
+   （订阅 GameEvents.OnInteractPromptChanged）
 2. 理智条：订阅 GameEvents.OnSanityChanged。
    颜色随数值渐变：100%=白 → 50%=琥珀 → 0%=深红。低于 25% 时整条以
    1.2 秒周期缓慢脉动
