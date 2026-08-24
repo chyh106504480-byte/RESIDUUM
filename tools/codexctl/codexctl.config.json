@@ -3,10 +3,16 @@
   "codex": {
     "bin": "codex",
     "model": null,
+    "model_tiers": {
+      "simple": "gpt-5.6-terra",
+      "core": "gpt-5.6-sol"
+    },
+    "reasoning_effort": "high",
     "sandbox": "workspace-write",
     "approval": "never",
     "extra_args": [],
-    "timeout_sec": 5400,
+    "timeout_sec": 2400,
+    "stall_timeout_sec": 360,
     "use_subscription_auth": true,
     "env": {}
   },

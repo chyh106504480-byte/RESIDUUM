@@ -30,6 +30,8 @@ import shutil
 import subprocess
 import sys
 import textwrap
+import threading
+import time as _time
 
 VERSION = "0.1.0"
 
@@ -70,10 +72,18 @@ DEFAULT_CONFIG = {
     "codex": {
         "bin": "codex",
         "model": None,
+        # 按任务难度分档选模型（Henry 定的规矩：
+        # 简单代码用 terra，核心与困难代码用 sol，推理强度都用 high）
+        "model_tiers": {
+            "simple": "gpt-5.6-terra",
+            "core": "gpt-5.6-sol",
+        },
+        "reasoning_effort": "high",
         "sandbox": "workspace-write",
         "approval": "never",
         "extra_args": [],
-        "timeout_sec": 5400,
+        "timeout_sec": 2400,        # 硬上限 40 分钟
+        "stall_timeout_sec": 360,   # 6 分钟无新事件判为卡死
         "use_subscription_auth": True,
         "env": {},
     },
@@ -192,6 +202,11 @@ class Task(object):
         self.branch = meta.get("branch") or ""
         self.depends = [x.strip() for x in meta.get("depends", "").split(",") if x.strip()]
         self.unity = str(meta.get("unity", "true")).lower() not in ("false", "0", "no")
+        # 难度分档：simple = 简单机械任务，core = 核心与困难任务。
+        # 决定用哪个模型跑，见 config 的 codex.model_tiers。
+        self.tier = (meta.get("tier") or "").strip().lower()
+        # 也允许任务包直接写死 model:，优先级高于 tier
+        self.model = (meta.get("model") or "").strip()
         self.body = body.strip()
         self.path = path
         self.meta = meta
@@ -368,8 +383,27 @@ def codex_env(cfg):
     return env
 
 
+def model_for_task(cfg, task):
+    """按任务难度选模型。
+
+    Henry 定的规矩：简单代码用 terra，核心与困难代码用 sol，推理强度都是 high。
+    任务包 frontmatter 里写 `tier: simple` 或 `tier: core`；
+    直接写 `model: gpt-5.6-xxx` 则优先级更高。
+    两者都没写就回落到配置里的 codex.model（通常是 None，即用 codex 全局默认）。
+    """
+    if getattr(task, "model", ""):
+        return task.model
+    tiers = cfg["codex"].get("model_tiers") or {}
+    tier = getattr(task, "tier", "")
+    if tier and tier in tiers:
+        return tiers[tier]
+    if tier:
+        warn("任务包写了 tier=%s，但配置里没有对应模型，回落到默认" % tier)
+    return None
+
+
 def build_codex_cmd(cfg, prompt, resume_thread=None, output_schema=None,
-                    output_last=None, cwd=None):
+                    output_last=None, cwd=None, model_override=None):
     """注意：
     1. -a/--ask-for-approval 是全局标志，必须放在 exec 子命令之前。
     2. `codex exec resume <id>` 子命令不接受 --sandbox / -C ——
@@ -389,8 +423,12 @@ def build_codex_cmd(cfg, prompt, resume_thread=None, output_schema=None,
             cmd += ["--sandbox", cc["sandbox"]]
         if cwd:
             cmd += ["-C", cwd]
-    if cc.get("model"):
+    if model_override:
+        cmd += ["-m", model_override]
+    elif cc.get("model"):
         cmd += ["-m", cc["model"]]
+    if cc.get("reasoning_effort"):
+        cmd += ["-c", "model_reasoning_effort=%s" % cc["reasoning_effort"]]
     if output_schema:
         cmd += ["--output-schema", output_schema]
     if output_last:
@@ -400,7 +438,7 @@ def build_codex_cmd(cfg, prompt, resume_thread=None, output_schema=None,
     return cmd
 
 def run_codex(cfg, prompt, out_dir, tag, resume_thread=None,
-              output_schema=None, dry_run=False):
+              output_schema=None, dry_run=False, model_override=None):
     jsonl_path = os.path.join(out_dir, "%s.jsonl" % tag)
     stderr_path = os.path.join(out_dir, "%s.stderr.log" % tag)
     last_path = os.path.join(out_dir, "%s.final.md" % tag)
@@ -408,7 +446,7 @@ def run_codex(cfg, prompt, out_dir, tag, resume_thread=None,
 
     cmd = build_codex_cmd(cfg, prompt, resume_thread=resume_thread,
                           output_schema=output_schema, output_last=last_path,
-                          cwd=cfg["project_root"])
+                          cwd=cfg["project_root"], model_override=model_override)
     res = CodexResult()
     res.jsonl_path, res.stderr_path = jsonl_path, stderr_path
 
@@ -426,11 +464,40 @@ def run_codex(cfg, prompt, out_dir, tag, resume_thread=None,
 
     with open(jsonl_path, "w", encoding="utf-8") as jf, \
          open(stderr_path, "w", encoding="utf-8") as ef:
+        # stdin 必须给 DEVNULL：codex exec 在 stdin 是打开的管道时会等 EOF
+        # （stderr 里表现为 "Reading additional input from stdin..."），
+        # 即便 prompt 已经作为位置参数传了也一样，于是整个进程永远挂住。
         proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=ef,
+                                stdin=subprocess.DEVNULL,
                                 text=True, bufsize=1, cwd=cfg["project_root"],
                                 env=codex_env(cfg))
+
+        # 看门狗：主循环 for line in proc.stdout 是阻塞读，codex 一个字节都不吐时
+        # 永远走不到下面的 proc.wait(timeout=...)。所以另起一个线程盯着，
+        # 长时间没有新事件就直接把它杀掉，别让一轮任务白挂几个小时。
+        stall_sec = int(cc.get("stall_timeout_sec") or 0)
+        hard_sec = int(cc.get("timeout_sec") or 0)
+        watch = {"last": _time.time(), "start": _time.time(), "killed": ""}
+
+        def _watchdog():
+            while proc.poll() is None:
+                _time.sleep(5)
+                now = _time.time()
+                if stall_sec and now - watch["last"] > stall_sec:
+                    watch["killed"] = "stall"
+                    proc.kill()
+                    return
+                if hard_sec and now - watch["start"] > hard_sec:
+                    watch["killed"] = "timeout"
+                    proc.kill()
+                    return
+
+        wd = threading.Thread(target=_watchdog, daemon=True)
+        wd.start()
+
         try:
             for line in proc.stdout:
+                watch["last"] = _time.time()
                 jf.write(line)
                 line = line.strip()
                 if not line:
@@ -463,6 +530,14 @@ def run_codex(cfg, prompt, out_dir, tag, resume_thread=None,
         except subprocess.TimeoutExpired:
             proc.kill()
             fail("codex 超时（%ss），已终止" % cfg["codex"]["timeout_sec"])
+
+        if watch["killed"] == "stall":
+            fail("codex 卡死：%ss 没有任何新事件，已强制终止。"
+                 % stall_sec)
+            dim("    多半是 collab/子智能体 spawn 失败，看 %s"
+                % os.path.relpath(stderr_path, cfg["project_root"]))
+        elif watch["killed"] == "timeout":
+            fail("codex 超过硬上限 %ss，已强制终止" % hard_sec)
         res.returncode = proc.returncode if proc.returncode is not None else -1
 
     if not res.final_message:
@@ -1000,7 +1075,13 @@ def cmd_run(cfg, args):
 
     step("1 · Codex 实现")
     prompt = compose_prompt(cfg, task)
-    r = run_codex(cfg, prompt, out_dir, "impl", dry_run=args.dry_run)
+    picked_model = model_for_task(cfg, task)
+    if picked_model:
+        dim("  模型：%s（tier=%s，推理 %s）" % (
+            picked_model, getattr(task, "tier", "") or "-",
+            cfg["codex"].get("reasoning_effort") or "默认"))
+    r = run_codex(cfg, prompt, out_dir, "impl", dry_run=args.dry_run,
+                  model_override=picked_model)
     if r.returncode != 0:
         warn("codex 退出码 %d（继续做验证，看看产出到什么程度）" % r.returncode)
     if r.usage:
