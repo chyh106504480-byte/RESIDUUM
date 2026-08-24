@@ -1,6 +1,5 @@
 using Residuum.Core;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 namespace Residuum.Items
 {
@@ -13,15 +12,11 @@ namespace Residuum.Items
         private const int ThirdSlotIndex = 2;
         private const string PlayerActionMapName = "Player";
         private const string UiActionMapName = "UI";
-        private const string PreviousActionName = "Previous";
-        private const string NextActionName = "Next";
+        private const string SlotOneActionName = "Slot1";
+        private const string SlotTwoActionName = "Slot2";
+        private const string SlotThreeActionName = "Slot3";
         private const string AttackActionName = "Attack";
         private const string ScrollWheelActionName = "ScrollWheel";
-        private const string FirstSlotBindingPath = "<Keyboard>/1";
-        private const string SecondSlotBindingPath = "<Keyboard>/2";
-        private const string ThirdSlotBindingPath = "<Keyboard>/3";
-        private const string PrimaryUseBindingPath = "<Mouse>/leftButton";
-        private const string ScrollBindingPath = "<Mouse>/scroll";
 
         [Header("依赖")]
         [Tooltip("三个道具槽中的控制组件，长度必须为 3；组件需实现 IHoldable。")]
@@ -33,8 +28,8 @@ namespace Residuum.Items
         [Tooltip("玩家相机下的手持模型挂点。")]
         [SerializeField] private Transform _handAnchor;
 
-        [Tooltip("工程现有的 Assets/InputSystem_Actions.inputactions。脚本只创建运行时 Action 副本，不修改输入资产。")]
-        [SerializeField] private InputActionAsset _inputActions;
+        [Tooltip("工程现有的 Assets/InputSystem_Actions.inputactions。脚本直接使用其中定义的 Action。")]
+        [SerializeField] private UnityEngine.InputSystem.InputActionAsset _inputActions;
 
         [Header("切换")]
         [Tooltip("鼠标滚轮输入超过此绝对值时才切换槽位，用于过滤设备噪声。")]
@@ -44,13 +39,18 @@ namespace Residuum.Items
 
         private readonly IHoldable[] _holdables = new IHoldable[SlotCount];
 
-        private InputAction _slotOneAction;
-        private InputAction _slotTwoAction;
-        private InputAction _slotThreeAction;
-        private InputAction _scrollAction;
-        private InputAction _primaryUseAction;
+        private UnityEngine.InputSystem.InputAction _slotOneAction;
+        private UnityEngine.InputSystem.InputAction _slotTwoAction;
+        private UnityEngine.InputSystem.InputAction _slotThreeAction;
+        private UnityEngine.InputSystem.InputAction _scrollAction;
+        private UnityEngine.InputSystem.InputAction _primaryUseAction;
         private int _currentSlotIndex = -1;
         private bool _isInitialized;
+        private bool _slotOneActionEnabledHere;
+        private bool _slotTwoActionEnabledHere;
+        private bool _slotThreeActionEnabledHere;
+        private bool _scrollActionEnabledHere;
+        private bool _primaryUseActionEnabledHere;
 
         private void Awake()
         {
@@ -105,7 +105,13 @@ namespace Residuum.Items
         private void OnDestroy()
         {
             UnsubscribeInputActions();
-            DisposeInputActions();
+            DisableInputActions();
+
+            _slotOneAction = null;
+            _slotTwoAction = null;
+            _slotThreeAction = null;
+            _scrollAction = null;
+            _primaryUseAction = null;
             Current = null;
         }
 
@@ -171,56 +177,31 @@ namespace Residuum.Items
                 return false;
             }
 
-            InputActionMap playerMap = _inputActions.FindActionMap(PlayerActionMapName, false);
-            InputActionMap uiMap = _inputActions.FindActionMap(UiActionMapName, false);
-            if (playerMap == null || uiMap == null)
-            {
-                Debug.LogError("InputActionAsset 必须包含 Player 与 UI 两个 Action Map。", this);
-                return false;
-            }
+            _slotOneAction = _inputActions.FindAction($"{PlayerActionMapName}/{SlotOneActionName}", false);
+            _slotTwoAction = _inputActions.FindAction($"{PlayerActionMapName}/{SlotTwoActionName}", false);
+            _slotThreeAction = _inputActions.FindAction($"{PlayerActionMapName}/{SlotThreeActionName}", false);
+            _primaryUseAction = _inputActions.FindAction($"{PlayerActionMapName}/{AttackActionName}", false);
+            _scrollAction = _inputActions.FindAction($"{UiActionMapName}/{ScrollWheelActionName}", false);
 
-            InputAction previousTemplate = playerMap.FindAction(PreviousActionName, false);
-            InputAction nextTemplate = playerMap.FindAction(NextActionName, false);
-            InputAction attackTemplate = playerMap.FindAction(AttackActionName, false);
-            InputAction scrollTemplate = uiMap.FindAction(ScrollWheelActionName, false);
-            if (previousTemplate == null || nextTemplate == null || attackTemplate == null || scrollTemplate == null)
-            {
-                Debug.LogError("InputActionAsset 必须包含 Player/Previous、Player/Next、Player/Attack 与 UI/ScrollWheel Action。", this);
-                return false;
-            }
+            bool hasSlotOneAction = ValidateInputAction(_slotOneAction, $"{PlayerActionMapName}/{SlotOneActionName}");
+            bool hasSlotTwoAction = ValidateInputAction(_slotTwoAction, $"{PlayerActionMapName}/{SlotTwoActionName}");
+            bool hasSlotThreeAction = ValidateInputAction(_slotThreeAction, $"{PlayerActionMapName}/{SlotThreeActionName}");
+            bool hasPrimaryUseAction = ValidateInputAction(_primaryUseAction, $"{PlayerActionMapName}/{AttackActionName}");
+            bool hasScrollAction = ValidateInputAction(_scrollAction, $"{UiActionMapName}/{ScrollWheelActionName}");
 
-            _slotOneAction = CloneWithSingleBinding(previousTemplate, FirstSlotBindingPath);
-            _slotTwoAction = CloneWithSingleBinding(nextTemplate, SecondSlotBindingPath);
-            _slotThreeAction = CloneWithSingleBinding(previousTemplate, ThirdSlotBindingPath);
-            _scrollAction = CloneWithSingleBinding(scrollTemplate, ScrollBindingPath);
-            _primaryUseAction = CloneWithSingleBinding(attackTemplate, PrimaryUseBindingPath);
-
-            if (_slotOneAction == null || _slotTwoAction == null || _slotThreeAction == null
-                || _scrollAction == null || _primaryUseAction == null)
-            {
-                Debug.LogError("ItemSlotSystem 无法从现有输入资产建立运行时 Action。", this);
-                DisposeInputActions();
-                return false;
-            }
-
-            return true;
+            return hasSlotOneAction && hasSlotTwoAction && hasSlotThreeAction
+                && hasPrimaryUseAction && hasScrollAction;
         }
 
-        private static InputAction CloneWithSingleBinding(InputAction template, string bindingPath)
+        private bool ValidateInputAction(UnityEngine.InputSystem.InputAction action, string actionPath)
         {
-            if (template == null || template.bindings.Count == 0)
+            if (action != null)
             {
-                return null;
+                return true;
             }
 
-            InputAction action = template.Clone();
-            for (int bindingIndex = 0; bindingIndex < action.bindings.Count; bindingIndex++)
-            {
-                action.ApplyBindingOverride(bindingIndex, string.Empty);
-            }
-
-            action.ApplyBindingOverride(0, bindingPath);
-            return action;
+            Debug.LogError($"ItemSlotSystem 在 InputActionAsset 中找不到 {actionPath} Action。", this);
+            return false;
         }
 
         private void SubscribeInputActions()
@@ -262,56 +243,64 @@ namespace Residuum.Items
 
         private void EnableInputActions()
         {
-            _slotOneAction.Enable();
-            _slotTwoAction.Enable();
-            _slotThreeAction.Enable();
-            _scrollAction.Enable();
-            _primaryUseAction.Enable();
+            EnableInputActionIfNeeded(_slotOneAction, ref _slotOneActionEnabledHere);
+            EnableInputActionIfNeeded(_slotTwoAction, ref _slotTwoActionEnabledHere);
+            EnableInputActionIfNeeded(_slotThreeAction, ref _slotThreeActionEnabledHere);
+            EnableInputActionIfNeeded(_scrollAction, ref _scrollActionEnabledHere);
+            EnableInputActionIfNeeded(_primaryUseAction, ref _primaryUseActionEnabledHere);
         }
 
         private void DisableInputActions()
         {
-            _slotOneAction?.Disable();
-            _slotTwoAction?.Disable();
-            _slotThreeAction?.Disable();
-            _scrollAction?.Disable();
-            _primaryUseAction?.Disable();
+            DisableInputActionIfOwned(_slotOneAction, ref _slotOneActionEnabledHere);
+            DisableInputActionIfOwned(_slotTwoAction, ref _slotTwoActionEnabledHere);
+            DisableInputActionIfOwned(_slotThreeAction, ref _slotThreeActionEnabledHere);
+            DisableInputActionIfOwned(_scrollAction, ref _scrollActionEnabledHere);
+            DisableInputActionIfOwned(_primaryUseAction, ref _primaryUseActionEnabledHere);
         }
 
-        private void DisposeInputActions()
+        private static void EnableInputActionIfNeeded(
+            UnityEngine.InputSystem.InputAction action,
+            ref bool actionEnabledHere)
         {
-            _slotOneAction?.Dispose();
-            _slotTwoAction?.Dispose();
-            _slotThreeAction?.Dispose();
-            _scrollAction?.Dispose();
-            _primaryUseAction?.Dispose();
-
-            _slotOneAction = null;
-            _slotTwoAction = null;
-            _slotThreeAction = null;
-            _scrollAction = null;
-            _primaryUseAction = null;
+            actionEnabledHere = action != null && !action.enabled;
+            if (actionEnabledHere)
+            {
+                action.Enable();
+            }
         }
 
-        private void HandleSlotOnePerformed(InputAction.CallbackContext context)
+        private static void DisableInputActionIfOwned(
+            UnityEngine.InputSystem.InputAction action,
+            ref bool actionEnabledHere)
+        {
+            if (actionEnabledHere && action != null)
+            {
+                action.Disable();
+            }
+
+            actionEnabledHere = false;
+        }
+
+        private void HandleSlotOnePerformed(UnityEngine.InputSystem.InputAction.CallbackContext context)
         {
             _ = context;
             SwitchToSlot(FirstSlotIndex);
         }
 
-        private void HandleSlotTwoPerformed(InputAction.CallbackContext context)
+        private void HandleSlotTwoPerformed(UnityEngine.InputSystem.InputAction.CallbackContext context)
         {
             _ = context;
             SwitchToSlot(SecondSlotIndex);
         }
 
-        private void HandleSlotThreePerformed(InputAction.CallbackContext context)
+        private void HandleSlotThreePerformed(UnityEngine.InputSystem.InputAction.CallbackContext context)
         {
             _ = context;
             SwitchToSlot(ThirdSlotIndex);
         }
 
-        private void HandleScrollPerformed(InputAction.CallbackContext context)
+        private void HandleScrollPerformed(UnityEngine.InputSystem.InputAction.CallbackContext context)
         {
             float scrollY = context.ReadValue<Vector2>().y;
             if (Mathf.Abs(scrollY) <= _scrollInputThreshold)
@@ -325,7 +314,7 @@ namespace Residuum.Items
             SwitchToSlot(nextIndex);
         }
 
-        private void HandlePrimaryUsePerformed(InputAction.CallbackContext context)
+        private void HandlePrimaryUsePerformed(UnityEngine.InputSystem.InputAction.CallbackContext context)
         {
             _ = context;
             Current?.OnPrimaryUse();
