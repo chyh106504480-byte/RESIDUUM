@@ -52,7 +52,7 @@ Assets/_Project/Scripts/Core/GameEvents.cs        事件总线
 Assets/_Project/Scripts/Core/RoundResult.cs
 Assets/_Project/Scripts/Evidence/EvidenceType.cs
 Assets/_Project/Scripts/Evidence/IEvidenceSource.cs
-Assets/_Project/Scripts/World/IInteractable.cs
+Assets/_Project/Scripts/Core/IInteractable.cs
 Assets/_Project/Scripts/Items/IHoldable.cs
 Assets/_Project/Scripts/Ghost/GhostDefinition.cs
 ```

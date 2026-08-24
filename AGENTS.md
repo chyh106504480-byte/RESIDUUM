@@ -50,7 +50,7 @@ Assets/_Project/Scripts/Core/GameEvents.cs
 Assets/_Project/Scripts/Core/RoundResult.cs
 Assets/_Project/Scripts/Evidence/EvidenceType.cs
 Assets/_Project/Scripts/Evidence/IEvidenceSource.cs
-Assets/_Project/Scripts/World/IInteractable.cs
+Assets/_Project/Scripts/Core/IInteractable.cs
 Assets/_Project/Scripts/Items/IHoldable.cs
 Assets/_Project/Scripts/Ghost/GhostDefinition.cs
 ```
@@ -82,20 +82,21 @@ Assets/_Project/Scripts/Ghost/GhostDefinition.cs
 编译由 codexctl 统一负责：它在你交付之后跑一次 Unity batchmode，把 `_Project`
 范围的错误逐条喂回给你。你只需要写出你认为正确的代码。
 
-**为什么这条是铁律**：2026-08-23 的 T02 任务里，你在工作目录中另起了一个 Unity
-batchmode 实例。它与 codexctl 的编译争抢同一个 `Library/`，把包解析状态破坏成
-半成品 —— `UnityEngine.PhysicsModule` / `Unity.InputSystem` 等程序集从
-`Assembly-CSharp` 的引用集里整体消失，导致**未被你改动的** `PlayerController.cs`
-也报出 11 条错误。你随后把这些错误判为环境缺陷，方向是对的，但缺陷正是那次
-自行编译造成的。修复它花掉了后面整整一轮任务。
+**为什么这条是铁律**：两个 Unity 实例争抢同一个 `Library/` 会破坏包解析与
+Bee 依赖图，而 codexctl 已经在跑一个了。更要命的是，你所在的执行沙箱无法创建
+UPM socket（`EPERM`），所以你自己起的 Unity **永远**解析不出完整的包集合。
+据此得出的任何编译结论都不可信 —— 包括「在隔离编译中 0 errors」这类陈述，
+那套引用集根本不是本工程的引用集，拿它当证据会把排查引向错误方向。
 
-另外，你所在的执行沙箱无法创建 UPM socket（`EPERM`），所以你自己起的 Unity
-**永远**解析不出完整的包集合。据此得出的任何编译结论都不可信，包括「在隔离
-编译中 0 errors」这类陈述 —— 那套引用集不是本工程的引用集。
+2026-08-23 的 T02 任务就发生过一次：你在工作目录里另起 Unity 做隔离编译，
+并据此断言代码无误、根因在环境。**结论是对的**（真正的根因是本机 Unity 授权
+客户端僵死，导致所有包 entitlement 失效、引擎模块被踢出编译引用集），
+但你给出的证据不成立，反而让排查多绕了两轮。
 
 如果你怀疑失败根因在环境而不在代码：**在最终回复里说明理由，不要自己去验证**。
+把可疑之处指出来（哪些错误出现在你没改过的文件里、缺的是哪些程序集），
 维护者会在受控环境里复现。你上一轮这样做了，判断也是对的 —— 保持这个做法，
-但把动手验证的那一步去掉。
+只去掉动手验证的那一步。
 
 ## 目录与命名
 
@@ -103,7 +104,7 @@ batchmode 实例。它与 codexctl 的编译争抢同一个 `Library/`，把包�
 Assets/
 ├── _Project/            ← 所有自写内容，与第三方彻底隔离
 │   ├── Scripts/
-│   │   ├── Core/        GameManager, GameEvents, RoundResult
+│   │   ├── Core/        GameManager, GameEvents, RoundResult, IInteractable
 │   │   ├── Player/      PlayerController, PlayerSanity, PlayerHiding
 │   │   ├── Ghost/       GhostAI, GhostDefinition, HuntController
 │   │   ├── Evidence/    EvidenceManager, EMFReader, UVLight, GhostWritingBook, Fingerprint

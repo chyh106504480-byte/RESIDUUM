@@ -73,6 +73,25 @@ namespace Residuum.Core
         public static event Action<string> OnInteractPromptChanged;
 
         // ─────────────────────────────────────────────
+        //  环境与道具读数
+        // ─────────────────────────────────────────────
+        /// <summary>
+        /// 玩家所处位置的温度读数变化，单位摄氏度。由 RoomManager 按固定间隔广播，HUD 订阅。
+        /// 温度是氛围与鬼房提示，不是证据 —— 切片只有 EMF / 紫外线指纹 / 鬼影书写三项。
+        /// </summary>
+        public static event Action<float> OnPlayerTemperatureChanged;
+
+        /// <summary>
+        /// 当前装备槽变化。参数：槽位索引 0–2；物品中文名（空槽为 null）。HUD 订阅。
+        /// </summary>
+        public static event Action<int, string> OnSlotChanged;
+
+        /// <summary>
+        /// 手电筒电量变化，参数为归一化电量 0–1。HUD 订阅。
+        /// </summary>
+        public static event Action<float> OnBatteryChanged;
+
+        // ─────────────────────────────────────────────
         //  本回合鬼种的证据配置
         //  由 GameManager 在回合开始时写入，各证据道具只读。
         //  这样道具模块不需要引用 Ghost 模块即可知道自己该不该出证据。
@@ -116,6 +135,9 @@ namespace Residuum.Core
         public static void RaiseGhostEvent(Vector3 pos)       => OnGhostEvent?.Invoke(pos);
         public static void RaiseHidingChanged(bool hiding)    => OnHidingChanged?.Invoke(hiding);
         public static void RaiseInteractPromptChanged(string prompt) => OnInteractPromptChanged?.Invoke(prompt);
+        public static void RaisePlayerTemperatureChanged(float celsius) => OnPlayerTemperatureChanged?.Invoke(celsius);
+        public static void RaiseSlotChanged(int slot, string itemName)  => OnSlotChanged?.Invoke(slot, itemName);
+        public static void RaiseBatteryChanged(float normalized)        => OnBatteryChanged?.Invoke(normalized);
 
         // ─────────────────────────────────────────────
         //  静态状态重置
@@ -140,6 +162,9 @@ namespace Residuum.Core
             OnGhostEvent = null;
             OnHidingChanged = null;
             OnInteractPromptChanged = null;
+            OnPlayerTemperatureChanged = null;
+            OnSlotChanged = null;
+            OnBatteryChanged = null;
 
             GhostHasEMF5 = false;
             GhostHasUVFingerprint = false;
