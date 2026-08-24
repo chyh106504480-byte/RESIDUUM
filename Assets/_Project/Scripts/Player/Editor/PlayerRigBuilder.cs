@@ -26,18 +26,6 @@ namespace Residuum.Player.Editor
         [UnityEditor.MenuItem(MenuPath)]
         private static void BuildPlayerRig()
         {
-            // 用 FindAnyObjectByType 而非 FindFirstObjectByType：后者在 Unity 6000.5 已弃用
-            // （它依赖 instance ID 排序）。这里只是判断"场景里有没有玩家"，不关心是哪一个。
-            PlayerController existingPlayer =
-                UnityEngine.Object.FindAnyObjectByType<PlayerController>(
-                    UnityEngine.FindObjectsInactive.Include);
-            if (existingPlayer != null)
-            {
-                UnityEditor.Selection.activeGameObject = existingPlayer.gameObject;
-                Debug.Log("场景中已经存在 PlayerController，未重复创建玩家装配。", existingPlayer);
-                return;
-            }
-
             UnityEngine.InputSystem.InputActionAsset inputActions =
                 UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.InputSystem.InputActionAsset>(
                     InputActionsAssetPath);
@@ -50,6 +38,39 @@ namespace Residuum.Player.Editor
 
             int undoGroup = UnityEditor.Undo.GetCurrentGroup();
             UnityEditor.Undo.SetCurrentGroupName(UndoLabel);
+
+            // 用 FindAnyObjectByType 而非 FindFirstObjectByType：后者在 Unity 6000.5 已弃用
+            // （它依赖 instance ID 排序）。这里只是判断"场景里有没有玩家"，不关心是哪一个。
+            PlayerController existingPlayer =
+                UnityEngine.Object.FindAnyObjectByType<PlayerController>(
+                    UnityEngine.FindObjectsInactive.Include);
+            if (existingPlayer != null)
+            {
+                try
+                {
+                    Camera sceneCamera = FindSceneCamera();
+                    if (sceneCamera == null)
+                    {
+                        throw new InvalidOperationException(
+                            "场景中已有 PlayerController，但找不到可挂载 PlayerInteractor 的相机。");
+                    }
+
+                    EnsurePlayerInteractor(sceneCamera, inputActions);
+                    UnityEditor.Undo.CollapseUndoOperations(undoGroup);
+                    UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(
+                        UnityEngine.SceneManagement.SceneManager.GetActiveScene());
+                    UnityEditor.Selection.activeGameObject = existingPlayer.gameObject;
+                    Debug.Log("场景中已经存在 PlayerController，未重复创建玩家装配，已检查交互器连接。", existingPlayer);
+                }
+                catch (Exception exception)
+                {
+                    Debug.LogException(exception);
+                    UnityEditor.Undo.RevertAllDownToGroup(undoGroup);
+                    Debug.LogError("玩家装配补全失败，已撤销本次修改。", existingPlayer);
+                }
+
+                return;
+            }
 
             try
             {
@@ -108,6 +129,8 @@ namespace Residuum.Player.Editor
                 sceneCamera.transform.localPosition = Vector3.zero;
                 sceneCamera.transform.localRotation = Quaternion.identity;
 
+                EnsurePlayerInteractor(sceneCamera, inputActions);
+
                 UnityEditor.SerializedObject serializedPlayerController =
                     new UnityEditor.SerializedObject(playerController);
                 serializedPlayerController.Update();
@@ -140,6 +163,38 @@ namespace Residuum.Player.Editor
                 UnityEditor.Undo.RevertAllDownToGroup(undoGroup);
                 Debug.LogError("玩家装配失败，已撤销本次创建的半成品。");
             }
+        }
+
+        private static void EnsurePlayerInteractor(
+            Camera sceneCamera,
+            UnityEngine.InputSystem.InputActionAsset inputActions)
+        {
+            Residuum.World.PlayerInteractor playerInteractor =
+                sceneCamera.GetComponent<Residuum.World.PlayerInteractor>();
+            if (playerInteractor == null)
+            {
+                playerInteractor = UnityEditor.Undo.AddComponent<Residuum.World.PlayerInteractor>(
+                    sceneCamera.gameObject);
+                if (playerInteractor == null)
+                {
+                    throw new InvalidOperationException("无法为 Main Camera 添加 PlayerInteractor。");
+                }
+            }
+
+            UnityEditor.SerializedObject serializedPlayerInteractor =
+                new UnityEditor.SerializedObject(playerInteractor);
+            serializedPlayerInteractor.Update();
+
+            UnityEditor.SerializedProperty inputActionsProperty =
+                serializedPlayerInteractor.FindProperty("_inputActions");
+            if (inputActionsProperty == null)
+            {
+                throw new InvalidOperationException(
+                    "PlayerInteractor 缺少 _inputActions 序列化字段，无法注入工程现有的 Input Action Asset。");
+            }
+
+            inputActionsProperty.objectReferenceValue = inputActions;
+            serializedPlayerInteractor.ApplyModifiedProperties();
         }
 
         private static void EnsureGround()
