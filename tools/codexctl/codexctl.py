@@ -475,8 +475,8 @@ def run_codex(cfg, prompt, out_dir, tag, resume_thread=None,
         # 看门狗：主循环 for line in proc.stdout 是阻塞读，codex 一个字节都不吐时
         # 永远走不到下面的 proc.wait(timeout=...)。所以另起一个线程盯着，
         # 长时间没有新事件就直接把它杀掉，别让一轮任务白挂几个小时。
-        stall_sec = int(cc.get("stall_timeout_sec") or 0)
-        hard_sec = int(cc.get("timeout_sec") or 0)
+        stall_sec = int(cfg["codex"].get("stall_timeout_sec") or 0)
+        hard_sec = int(cfg["codex"].get("timeout_sec") or 0)
         watch = {"last": _time.time(), "start": _time.time(), "killed": ""}
 
         def _watchdog():
