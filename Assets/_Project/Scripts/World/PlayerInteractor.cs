@@ -121,7 +121,7 @@ namespace Residuum.World
             {
                 _lastHitCollider = hit.collider;
                 _cachedInteractable = hit.collider != null
-                    ? hit.collider.GetComponent<IInteractable>()
+                    ? hit.collider.GetComponentInParent<IInteractable>()
                     : null;
             }
 

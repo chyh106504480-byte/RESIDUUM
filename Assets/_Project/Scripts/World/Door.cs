@@ -25,6 +25,7 @@ namespace Residuum.World
         private Quaternion _transitionStartRotation;
         private Quaternion _transitionTargetRotation;
         private float _transitionElapsed;
+        private float _transitionDuration;
         private bool _isTransitioning;
         private bool _targetOpen;
 
@@ -54,8 +55,8 @@ namespace Residuum.World
             }
 
             _transitionElapsed += Time.deltaTime;
-            float normalizedTime = _openCloseDuration > Mathf.Epsilon
-                ? Mathf.Clamp01(_transitionElapsed / _openCloseDuration)
+            float normalizedTime = _transitionDuration > Mathf.Epsilon
+                ? Mathf.Clamp01(_transitionElapsed / _transitionDuration)
                 : 1f;
 
             _hinge.localRotation = Quaternion.Slerp(
@@ -83,6 +84,12 @@ namespace Residuum.World
             IsOpen = _targetOpen;
             _transitionStartRotation = _hinge.localRotation;
             _transitionTargetRotation = _targetOpen ? _openRotation : _closedRotation;
+            float remainingAngle = Quaternion.Angle(_transitionStartRotation, _transitionTargetRotation);
+            float fullTransitionAngle = Mathf.Abs(_openAngle);
+            float remainingRatio = fullTransitionAngle > Mathf.Epsilon
+                ? Mathf.Clamp01(remainingAngle / fullTransitionAngle)
+                : 0f;
+            _transitionDuration = _openCloseDuration * remainingRatio;
             _transitionElapsed = 0f;
             _isTransitioning = true;
             UpdateNavMeshObstacle();
