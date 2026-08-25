@@ -148,7 +148,7 @@ namespace Residuum.Items
                 {
                     if (_holdables[index] != null)
                     {
-                        Debug.LogError($"ItemSlotSystem 第 {index + 1} 槽已有道具，但未指定手持模型。", this);
+                        Debug.LogWarning($"ItemSlotSystem 第 {index + 1} 槽已有道具但未指定手持模型：这是灰盒阶段的预期状态，待美术资源到位后再配置即可。", this);
                     }
 
                     continue;
