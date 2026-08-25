@@ -499,6 +499,7 @@ def run_codex(cfg, prompt, out_dir, tag, resume_thread=None,
             for line in proc.stdout:
                 watch["last"] = _time.time()
                 jf.write(line)
+                jf.flush()   # 逐行落盘，否则运行中 tail 不到，容易把「正在跑」误判成卡死
                 line = line.strip()
                 if not line:
                     continue

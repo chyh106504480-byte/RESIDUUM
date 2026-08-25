@@ -107,7 +107,7 @@
   "audit_checklist": [
     {
       "id": "A01",
-      "text": "除 Residuum.Core / Residuum.Evidence 的枚举与接口外，未 using 或引用其它模块的具体类"
+      "text": "除 Residuum.Core / Residuum.Evidence 的枚举与接口外，未 using 或引用其它模块的具体类。【豁免】Scripts/**/Editor/ 下的编辑器装配工具不受此限：把各模块组件在场景里连起来正是它的职责，用全限定名引用具体类型属于预期，判 n/a"
     },
     {
       "id": "A02",
@@ -155,11 +155,11 @@
     },
     {
       "id": "A13",
-      "text": "没有硬编码数值常量（速度/时长/概率/距离/角度），全部 [SerializeField] private"
+      "text": "没有硬编码数值常量（速度/时长/概率/距离/角度），全部 [SerializeField] private。【豁免】Scripts/**/Editor/ 下的编辑器工具不受此限：它生成物体时用的一次性几何参数不是设计师需要在 Inspector 里调的运行时数值，判 n/a"
     },
     {
       "id": "A14",
-      "text": "每个 [SerializeField] 字段都有 [Tooltip(\"中文说明\")]"
+      "text": "每个 [SerializeField] 字段都有 [Tooltip(\"中文说明\")]。【豁免】Scripts/**/Editor/ 下的编辑器工具判 n/a"
     },
     {
       "id": "A15",
