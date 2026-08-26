@@ -1149,8 +1149,22 @@ def cmd_run(cfg, args):
         ok("已提交到 %s" % branch)
 
     blocked = verification_failed(gate, unity)
+
+    # 零产出必须判失败。闸门和编译对「一个文件都没改」是天然通过的
+    # （没有代码可违反规则，也没有新代码会编译错），于是一次什么都没做的
+    # 运行会被报成「全绿」。2026-08-25 的 T05 就是这样：Codex 正确地拒绝
+    # 交付并停手，codexctl 却报了全绿，差点当成可以终审。
+    produced_nothing = not files
+    if produced_nothing:
+        blocked = True
+
     print("")
-    if blocked:
+    if produced_nothing:
+        fail("状态：本轮零产出 —— Codex 一个文件都没改，不是通过")
+        dim("    先读 %s/impl.final.md：它多半在最终回复里说明了为什么停手，"
+            % os.path.relpath(out_dir, cfg["project_root"]))
+        dim("    常见原因是任务包引用了仓库里并不存在的契约。")
+    elif blocked:
         fail("状态：未通过本地验证，别叫 Claude 终审，先看 report.md")
     else:
         ok("状态：本地验证全绿，可以交 Claude 终审")
