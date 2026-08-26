@@ -32,6 +32,16 @@ namespace Residuum.Core
         /// <summary>首次跌破猎杀阈值时触发一次</summary>
         public static event Action OnSanityCritical;
 
+        /// <summary>
+        /// 理智每跌破 25 的整数倍时触发一次，参数为跨越的那个阈值（75 / 50 / 25）。
+        /// 音频（T17）与后处理据此逐级加强效果——心跳更响、画面更扭曲。
+        ///
+        /// 与 OnSanityCritical 的区别：那个只在首次跌破猎杀阈值时发一次，
+        /// 用于触发「危险状态」这一个开关；这个是连续分级的强度信号。
+        /// 理智回升后再次跌破同一阈值会再次触发。
+        /// </summary>
+        public static event Action<float> OnSanityThresholdCrossed;
+
         // ─────────────────────────────────────────────
         //  猎杀
         // ─────────────────────────────────────────────
@@ -153,6 +163,7 @@ namespace Residuum.Core
         public static void RaiseRoundEnd(RoundResult r)       => OnRoundEnd?.Invoke(r);
         public static void RaiseSanityChanged(float v)        => OnSanityChanged?.Invoke(v);
         public static void RaiseSanityCritical()              => OnSanityCritical?.Invoke();
+        public static void RaiseSanityThresholdCrossed(float threshold) => OnSanityThresholdCrossed?.Invoke(threshold);
         public static void RaiseHuntStart(float duration)     => OnHuntStart?.Invoke(duration);
         public static void RaiseHuntEnd()                     => OnHuntEnd?.Invoke();
         public static void RaisePlayerCaught()                => OnPlayerCaught?.Invoke();
@@ -181,6 +192,7 @@ namespace Residuum.Core
             OnRoundEnd = null;
             OnSanityChanged = null;
             OnSanityCritical = null;
+            OnSanityThresholdCrossed = null;
             OnHuntStart = null;
             OnHuntEnd = null;
             OnPlayerCaught = null;
