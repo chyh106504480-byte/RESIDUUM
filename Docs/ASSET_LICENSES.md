@@ -26,9 +26,18 @@
 - **不入库**：325.9 MB，走 LFS 会在数日内耗尽 GitHub 免费额度。三名成员各自从
   Package Manager「My Assets」导入同一版本（v4.2），资源 GUID 一致，引用不会断。
   仓库中需忽略其导入目录。
-- **必须转 URP**：商店页标注 URP 不兼容（仅 Built-in）。导入后立即执行
-  Edit → Rendering → Materials → Convert Selected Built-in Materials to URP，
-  否则全场粉红。
+- **必须转 URP，每个人各转一次**：商店页标注 URP 不兼容（仅 Built-in），
+  不转则满屏品红。因为包不入库，**每个成员导入后都要在自己机器上转一遍**，
+  转换结果同样不会进仓库。
+  推荐整包一次转完：Window → Rendering → Render Pipeline Converter →
+  选 `Built-in to URP` → 只勾 `Material Upgrade`（不要勾 Rendering Settings，
+  那会动到工程设置）→ Initialize Converters → Convert Assets。
+  备用路径：选中包目录后 Edit → Rendering → Materials →
+  Convert Selected Built-in Materials to URP。
+  转换后仍有零星品红属正常（个别 Built-in 专有着色器转换器处理不了），
+  手动把 Shader 改成 `Universal Render Pipeline/Lit` 即可，灰盒阶段可以先放着。
+- **转换不可逆**：改的是包内材质资产。转坏了直接删掉 `Assets/Brick Project Studio/`
+  从 My Assets 重新导入即可，反正不在仓库里。
 - **碰撞体以灰盒为准**：套件模型作为子物体挂在 `BLK_` 灰盒下，其自带 Collider
   一律删除。碰撞与 NavMesh 只认灰盒那一套。
 
