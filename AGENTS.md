@@ -138,6 +138,8 @@ Assets/
 | `particleSystem.startSpeed` | `particleSystem.main.startSpeed` |
 | 每帧调用 `Camera.main` | 在 `Awake` 中缓存 |
 | 循环内 `new WaitForSeconds(x)` | 缓存为字段复用 |
+| `Navigation Static` 静态标记 | **AI Navigation 2.x 已移除该标记**。烘焙范围由 `NavMeshSurface` 的 `Collect Objects`（All / Volume / Children）+ `Include Layers` 决定；要排除个别物体用 `NavMeshModifier` 勾 `Ignore From Build` |
+| `Window → AI → Navigation` 窗口 | 已废弃。用 `NavMeshSurface` 组件上的 `Bake` |
 
 ---
 
