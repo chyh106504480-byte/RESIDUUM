@@ -92,8 +92,16 @@ namespace Residuum.Core
         public static event Action<float> OnBatteryChanged;
 
         /// <summary>
-        /// EMF 读数器的读数等级变化，范围 1–5。音频（T17）按等级提高蜂鸣频率，HUD 也可订阅。
+        /// EMF 读数器的读数等级变化。音频（T17）按等级提高蜂鸣频率，HUD 也可订阅。
+        ///
+        /// 参数取值：**0 = 无读数（静默）**，1–5 = 读数等级。
+        /// 归零同样会广播，订阅方据此结束蜂鸣与显示——不广播 0 的话，
+        /// 读数结束后音频和 UI 会停在最后一级下不来。
+        ///
         /// 只在等级真正变化时触发，不是每次刷新都发。
+        ///
+        /// 【与 3×3 推理表的关系】能否到达 5 级由 GhostHasEMF5 决定：
+        /// 该鬼种不持有 EMF5 证据时读数封顶 4，这是推理表唯一性的保证，不可绕过。
         /// </summary>
         public static event Action<int> OnEMFReadingChanged;
 
