@@ -140,6 +140,7 @@ Assets/
 | 循环内 `new WaitForSeconds(x)` | 缓存为字段复用 |
 | `Navigation Static` 静态标记 | **AI Navigation 2.x 已移除该标记**。烘焙范围由 `NavMeshSurface` 的 `Collect Objects`（All / Volume / Children）+ `Include Layers` 决定；要排除个别物体用 `NavMeshModifier` 勾 `Ignore From Build` |
 | `Window → AI → Navigation` 窗口 | 已废弃。用 `NavMeshSurface` 组件上的 `Bake` |
+| `NavMeshModifier.ignoreFromBuild` / Inspector 里的 `Ignore From Build` 复选框 | AI Navigation 2.x 已改为 `Mode` 枚举：`Add or Modify Object`（默认）/ **`Remove Object`**（即原来的排除）。配合 `Apply To Children` 排除整枝 |
 
 ---
 
