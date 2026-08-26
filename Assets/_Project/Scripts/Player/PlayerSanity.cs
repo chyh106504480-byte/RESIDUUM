@@ -12,8 +12,7 @@ namespace Residuum.Player
     {
         private const float MinimumSanity = 0f;
         private const float MaximumSanity = 100f;
-        private const float SanityThresholdStep = 25f;
-        private const int MinimumBufferSize = 1;
+        private const float InvalidSanityThresholdFallback = 25f;
 
         [Header("理智数值")]
         [Tooltip("每局开始时的理智值。")]
@@ -43,21 +42,18 @@ namespace Residuum.Player
         [Tooltip("累计理智变化达到此值后才广播一次，避免每帧刷事件总线。")]
         [SerializeField] private float _sanityBroadcastThreshold = 0.1f;
 
+        [Tooltip("理智阈值事件的分级步长。")]
+        [SerializeField] private float _sanityThresholdStep = 25f;
+
         [Header("光照检测")]
-        [Tooltip("启用时定期用物理球检测附近已启用的 Light；关闭时完全依赖 SetInLitRoom。")]
+        [Tooltip("启用时定期检测附近已启用的 Light；关闭时完全依赖 SetInLitRoom。")]
         [SerializeField] private bool _useLightProbe = true;
 
-        [Tooltip("两次附近光源检测之间的间隔秒数。")]
+        [Tooltip("两次附近光源状态检测之间的间隔秒数。")]
         [SerializeField] private float _lightCheckInterval = 0.5f;
 
-        [Tooltip("检测附近已启用 Light 的球形半径，单位：米。")]
-        [SerializeField] private float _lightCheckRadius = 8f;
-
-        [Tooltip("参与附近光源检测的物理层。默认检测全部层。")]
-        [SerializeField] private LayerMask _lightDetectionLayers = ~0;
-
-        [Tooltip("非分配光源检测使用的 Collider 缓冲区大小；场景密集时可适当调大。")]
-        [SerializeField] private int _lightOverlapBufferSize = 32;
+        [Tooltip("重新查找场景 Light 并刷新缓存的间隔秒数。")]
+        [SerializeField] private float _lightCacheRefreshInterval = 5f;
 
         [Header("鬼事件")]
         [Tooltip("鬼事件对理智生效的最大距离，单位：米。")]
@@ -70,22 +66,22 @@ namespace Residuum.Player
         [Tooltip("基地安全区的 Collider；留空表示本场景没有安全区。")]
         [SerializeField] private Collider _safeZone;
 
-        private Collider[] _lightOverlapBuffer;
+        private Light[] _cachedSceneLights;
         private WaitForSeconds _lightCheckWait;
         private Coroutine _lightCheckCoroutine;
+        private float _nextLightCacheRefreshTime;
         private float _lastBroadcastSanity;
         private bool _isInLitRoom;
         private bool _isFlashlightOn;
         private bool _isHuntActive;
         private bool _hasRaisedCriticalThisRound;
-        private bool _lightBufferWarningLogged;
+        private bool _sanityThresholdWarningLogged;
 
         public float Current { get; private set; }
 
         private void Awake()
         {
             ValidateSettings();
-            AllocateLightBuffer();
             CacheLightCheckWait();
             ResetRuntimeState(false);
         }
@@ -143,7 +139,7 @@ namespace Residuum.Player
 
             StopLightCheckCoroutine();
             _lightCheckWait = null;
-            _lightOverlapBuffer = null;
+            _cachedSceneLights = null;
             _safeZone = null;
         }
 
@@ -197,8 +193,8 @@ namespace Residuum.Player
         private void HandleRoundStart()
         {
             ValidateSettings();
-            AllocateLightBuffer();
             CacheLightCheckWait();
+            RefreshLightCache();
             ResetRuntimeState(true);
             RestartLightCheckCoroutine();
         }
@@ -237,9 +233,9 @@ namespace Residuum.Player
             }
 
             // 只根据本次下降方向判断，因此回升越过阈值不会触发，再次下降时可以重触发。
-            for (float threshold = MaximumSanity - SanityThresholdStep;
+            for (float threshold = MaximumSanity - _sanityThresholdStep;
                  threshold > MinimumSanity;
-                 threshold -= SanityThresholdStep)
+                 threshold -= _sanityThresholdStep)
             {
                 if (previous >= threshold && current < threshold)
                 {
@@ -267,42 +263,26 @@ namespace Residuum.Player
         private void RefreshLightState()
         {
             _isInLitRoom = false;
-            if (_lightOverlapBuffer == null)
+            if (_cachedSceneLights == null || Time.time >= _nextLightCacheRefreshTime)
             {
-                return;
+                RefreshLightCache();
             }
 
-            int hitCount = Physics.OverlapSphereNonAlloc(
-                transform.position,
-                _lightCheckRadius,
-                _lightOverlapBuffer,
-                _lightDetectionLayers,
-                QueryTriggerInteraction.Collide);
-
-            if (!_lightBufferWarningLogged && hitCount >= _lightOverlapBuffer.Length)
+            for (int index = 0; index < _cachedSceneLights.Length; index++)
             {
-                _lightBufferWarningLogged = true;
-                Debug.LogWarning(
-                    "PlayerSanity 的非分配光源检测缓冲区已占满，本次检测可能遗漏 Light；请调大缓冲区大小。",
-                    this);
-            }
-
-            for (int index = 0; index < hitCount; index++)
-            {
-                Collider candidate = _lightOverlapBuffer[index];
-                if (candidate == null)
+                Light light = _cachedSceneLights[index];
+                if (light == null || !light.isActiveAndEnabled)
                 {
                     continue;
                 }
 
                 // 手持灯属于玩家自身，只提供手电倍率，不能同时被当作房间光源重复减免。
-                if (candidate.transform == transform || candidate.transform.IsChildOf(transform))
+                if (light.transform == transform || light.transform.IsChildOf(transform))
                 {
                     continue;
                 }
 
-                Light nearbyLight = FindAssociatedLight(candidate);
-                if (nearbyLight != null && nearbyLight.isActiveAndEnabled)
+                if (IsLightAffectingPlayer(light))
                 {
                     _isInLitRoom = true;
                     return;
@@ -310,15 +290,21 @@ namespace Residuum.Player
             }
         }
 
-        private static Light FindAssociatedLight(Collider candidate)
+        private void RefreshLightCache()
         {
-            if (candidate.TryGetComponent(out Light light))
+            _cachedSceneLights = FindObjectsByType<Light>(FindObjectsInactive.Exclude);
+            _nextLightCacheRefreshTime = Time.time + _lightCacheRefreshInterval;
+        }
+
+        private bool IsLightAffectingPlayer(Light light)
+        {
+            if (light.type == LightType.Directional)
             {
-                return light;
+                return true;
             }
 
-            light = candidate.GetComponentInParent<Light>();
-            return light != null ? light : candidate.GetComponentInChildren<Light>(true);
+            float lightRange = light.range;
+            return (transform.position - light.transform.position).sqrMagnitude <= lightRange * lightRange;
         }
 
         private void StartLightCheckCoroutine()
@@ -356,17 +342,11 @@ namespace Residuum.Player
             _isFlashlightOn = false;
             _isHuntActive = false;
             _hasRaisedCriticalThisRound = false;
-            _lightBufferWarningLogged = false;
 
             if (broadcastCurrent)
             {
                 GameEvents.RaiseSanityChanged(Current);
             }
-        }
-
-        private void AllocateLightBuffer()
-        {
-            _lightOverlapBuffer = new Collider[_lightOverlapBufferSize];
         }
 
         private void CacheLightCheckWait()
@@ -385,9 +365,18 @@ namespace Residuum.Player
             _safeZoneRecoveryRate = Mathf.Max(MinimumSanity, _safeZoneRecoveryRate);
             _huntThreshold = Mathf.Clamp(_huntThreshold, MinimumSanity, MaximumSanity);
             _sanityBroadcastThreshold = Mathf.Max(MinimumSanity, _sanityBroadcastThreshold);
+            if (_sanityThresholdStep <= MinimumSanity)
+            {
+                _sanityThresholdStep = InvalidSanityThresholdFallback;
+                if (!_sanityThresholdWarningLogged)
+                {
+                    _sanityThresholdWarningLogged = true;
+                    Debug.LogWarning("PlayerSanity 的理智阈值步长必须大于 0，已按 25 处理。", this);
+                }
+            }
+
             _lightCheckInterval = Mathf.Max(Mathf.Epsilon, _lightCheckInterval);
-            _lightCheckRadius = Mathf.Max(MinimumSanity, _lightCheckRadius);
-            _lightOverlapBufferSize = Mathf.Max(MinimumBufferSize, _lightOverlapBufferSize);
+            _lightCacheRefreshInterval = Mathf.Max(Mathf.Epsilon, _lightCacheRefreshInterval);
             _ghostEventEffectiveDistance = Mathf.Max(MinimumSanity, _ghostEventEffectiveDistance);
         }
     }
