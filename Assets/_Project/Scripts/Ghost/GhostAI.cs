@@ -347,7 +347,7 @@ namespace Residuum.Ghost
 
             if (Definition.leavesFootprints && _footprintPrefab == null)
             {
-                Debug.LogError($"[GhostAI:{name}] 当前鬼种需要脚印，但未注入脚印预制体。", this);
+                Debug.LogWarning($"[GhostAI:{name}] 灰盒阶段预期状态：未注入脚印预制体；该鬼种不会留下脚印，无需处理，待美术资源到位后在 Inspector 中注入即可。", this);
             }
 
             CacheDefinitionWaits();
