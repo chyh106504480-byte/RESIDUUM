@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3f169a27e73a4de2ba396c938f09b7e, type: 3}
+  m_Name: GhostDef_Wraith
+  m_EditorClassIdentifier: Assembly-CSharp::Residuum.Ghost.GhostDefinition
+  ghostName: "\u5E7D\u5F71"
+  displayNameEN: Wraith
+  journalDescription: "\u98D8\u5FFD\u65E0\u8E2A\uFF0C\u4E0D\u5728\u5730\u677F\u7559\u4E0B\u811A\u5370\u3002"
+  evidences: 0100000003000000
+  walkSpeed: 1.7
+  huntSpeed: 1.7
+  leavesFootprints: 0
+  huntDuration: 25
+  huntCooldown: 25
+  sanityDrainMultiplier: 1
+  canSprintBurst: 1
+  sprintBurstInterval: 6
+  massThrowOnHunt: 0
+  interactFrequency: 1
