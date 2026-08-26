@@ -91,6 +91,12 @@ namespace Residuum.Core
         /// </summary>
         public static event Action<float> OnBatteryChanged;
 
+        /// <summary>
+        /// EMF 读数器的读数等级变化，范围 1–5。音频（T17）按等级提高蜂鸣频率，HUD 也可订阅。
+        /// 只在等级真正变化时触发，不是每次刷新都发。
+        /// </summary>
+        public static event Action<int> OnEMFReadingChanged;
+
         // ─────────────────────────────────────────────
         //  本回合鬼种的证据配置
         //  由 GameManager 在回合开始时写入，各证据道具只读。
@@ -138,6 +144,7 @@ namespace Residuum.Core
         public static void RaisePlayerTemperatureChanged(float celsius) => OnPlayerTemperatureChanged?.Invoke(celsius);
         public static void RaiseSlotChanged(int slot, string itemName)  => OnSlotChanged?.Invoke(slot, itemName);
         public static void RaiseBatteryChanged(float normalized)        => OnBatteryChanged?.Invoke(normalized);
+        public static void RaiseEMFReadingChanged(int level)            => OnEMFReadingChanged?.Invoke(level);
 
         // ─────────────────────────────────────────────
         //  静态状态重置
@@ -165,6 +172,7 @@ namespace Residuum.Core
             OnPlayerTemperatureChanged = null;
             OnSlotChanged = null;
             OnBatteryChanged = null;
+            OnEMFReadingChanged = null;
 
             GhostHasEMF5 = false;
             GhostHasUVFingerprint = false;
