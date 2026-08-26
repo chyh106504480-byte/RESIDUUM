@@ -118,3 +118,10 @@ _to_delete/
 # Python 字节码缓存（codexctl）
 __pycache__/
 *.pyc
+
+# ── 第三方付费/免费素材包：不入库 ────────────────────────────
+# 见 Docs/ASSET_LICENSES.md：Apartment Kit 325.9MB，走 LFS 会在数日内耗尽
+# GitHub 免费额度。三名成员各自从 Package Manager「My Assets」导入同一版本
+# （v4.2），资源 GUID 一致，场景引用不会断。
+/Assets/Brick Project Studio/
+/Assets/Brick Project Studio.meta
