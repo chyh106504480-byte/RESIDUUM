@@ -114,6 +114,18 @@ namespace Residuum.Core
         public static bool GhostHasUVFingerprint { get; set; }
         public static bool GhostHasGhostWriting { get; set; }
 
+        /// <summary>
+        /// 本回合鬼房的世界中心与半径。由 GameManager 在回合开始时写入，各模块只读。
+        ///
+        /// 【为什么放在这里】鬼影书（Residuum.Evidence）要判断自己是否被放在鬼房内，
+        /// 但鬼房信息在 Residuum.World.RoomManager —— 铁律不放行跨模块引用具体类。
+        /// 与 GhostHasEMF5 等同理，由 GameManager 统一写入这里，下游只读。
+        ///
+        /// 半径 ≤ 0 表示本回合鬼房尚未设定，读取方应视为「判定不通过」。
+        /// </summary>
+        public static Vector3 GhostRoomCenter { get; set; }
+        public static float GhostRoomRadius { get; set; }
+
         /// <summary>供 GameManager 一次性写入本回合配置。</summary>
         public static void SetGhostEvidence(EvidenceType[] evidences)
         {
@@ -185,6 +197,8 @@ namespace Residuum.Core
             GhostHasEMF5 = false;
             GhostHasUVFingerprint = false;
             GhostHasGhostWriting = false;
+            GhostRoomCenter = Vector3.zero;
+            GhostRoomRadius = 0f;
         }
     }
 }
