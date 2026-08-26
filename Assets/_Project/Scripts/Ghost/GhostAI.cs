@@ -283,7 +283,15 @@ namespace Residuum.Ghost
 
         public GhostState State { get; private set; }
 
-        public GhostDefinition Definition { get; set; }
+        [SerializeField]
+        [Tooltip("本回合鬼种定义；可在 Inspector 预先指定用于单独测试，正式回合由 GameManager 在开始时注入并覆盖。")]
+        private GhostDefinition _definition;
+
+        public GhostDefinition Definition
+        {
+            get => _definition;
+            set => _definition = value;
+        }
 
         private void Awake()
         {
