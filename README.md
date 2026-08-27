@@ -17,7 +17,12 @@
 |---|---|---|
 | 1 | 装 **Unity `6000.5.8f1`**（Hub 列表里没有，用深链 `unityhub://6000.5.8f1/5cb7df797b7d`） | Hub 能添加项目，但点了进不去 |
 | 2 | 装 **Git LFS** 并 `git lfs install`，用 `git clone`（**不要 Download ZIP**） | 3 个贴图/探针文件变成文本指针，导入报错 |
-| 3 | 从 Asset Store 免费领取并导入 **Apartment Kit v4.2**，导入后转 URP | Blockout 场景 171 处引用丢失，一片空白或品红 |
+| 3 | 从 Asset Store 免费领取并导入 **Apartment Kit**，导入后转 URP，然后跑 `python tools/check_kit.py` 对账 | Blockout 场景 171 处引用丢失，只剩线框和飘空的名字标签 |
+
+> **场景打开是空的、只有几个线框盒子？** 那是第 3 步没做。
+> `Blockout.unity` 有 1756 个预制体实例，其中 171 个外部引用指向那个不入库的素材包；
+> 工程自带的可见几何体只有 41 个。**这不是仓库坏了。**
+> 在仓库根目录跑 `python tools/check_kit.py`，它会直接告诉你缺什么。
 
 ---
 
@@ -42,6 +47,8 @@ Assets/_Project/
   ScriptableObjects/Ghosts/   3 种鬼的数据定义
 Docs/               设计文档，见下表
 tools/codexctl/     任务调度与静态闸门工具链
+tools/check_kit.py  Apartment Kit 对账工具（场景空白时先跑这个）
+tools/kit_manifest.txt  场景依赖的 171 项 Kit GUID 清单
 ```
 
 ## 文档索引

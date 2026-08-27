@@ -1,0 +1,182 @@
+# Apartment Kit GUID 对账清单 —— 由 tools/check_kit.py 使用
+# 来源：Assets/_Project/Scenes/Blockout.unity 引用到的、归属于
+#       Assets/Brick Project Studio/ 的全部资产。
+# 只记录 GUID 与相对路径，不含任何素材内容，不涉及再分发。
+# 生成于 macOS 端已验证可用的工程，队友以此为准。
+#
+# 条目数: 171
+# 参考 .unitypackage 指纹（Asset Store 缓存中的原始包）:
+#   size   = 341734961
+#   sha256 = a984753a958350390ec074c6c56146fa68e3826a0e39463c85b398c9dbb5496a
+
+5f469581b50505747a410deecdf8f11d	Assets/Brick Project Studio/Apartment Kit/Common/Materials/Surface/Brushed Metal_Antique.mat
+4580dd49916b3c542b97109c8ca425f3	Assets/Brick Project Studio/Apartment Kit/Common/Materials/Surface/Brushed Metal_Chrome.mat
+84a1ffeca40e4c6439b0a1f93b4d287c	Assets/Brick Project Studio/Apartment Kit/Common/Materials/Surface/Brushed Metal_Gold.mat
+fb7d7a07b2942ca4cb6a6c38d807c8ea	Assets/Brick Project Studio/Apartment Kit/Common/Materials/Surface/White Wood.mat
+7a1dd57bd8b6ca44cbf5f922801b2975	Assets/Brick Project Studio/Apartment Kit/Common/Models/Apt_Furniture_01.fbx
+95cac277c5a04ef43add167566755e63	Assets/Brick Project Studio/Apartment Kit/Common/Models/Apt_Furniture_02.fbx
+cd0bf29c9c9af6f4098b74076d25f0cd	Assets/Brick Project Studio/Apartment Kit/Common/Models/Apt_Kit_01.fbx
+c31198774d98d9f43be2ca79cb0a84dc	Assets/Brick Project Studio/Apartment Kit/Common/Models/Apt_Kit_02.fbx
+34e386a75bb8feb4aa0f48b512cbb268	Assets/Brick Project Studio/Apartment Kit/Common/Models/Apt_Props_01.fbx
+18a06f327a98b134b82b2c13d6c3a3c0	Assets/Brick Project Studio/Apartment Kit/Common/Models/Apt_Props_02.fbx
+7c69e40725f2d1a4687ecf3e80b2dfac	Assets/Brick Project Studio/Apartment Kit/Common/Models/Apt_Rail.fbx
+651d77a525480c84e9327ec0894c0da1	Assets/Brick Project Studio/Apartment Kit/Common/Models/Bathroom_Apt_01.fbx
+e9aeceee86b8ae7408c09bcee860a520	Assets/Brick Project Studio/Apartment Kit/Common/Models/Bathroom_apt_02.fbx
+5a3b2c9f5dcc95944b5769d838a747e6	Assets/Brick Project Studio/Apartment Kit/Common/Models/Corner Wall Cabinet.fbx
+2a83511a782a6aa4dafed1f5a2bd3803	Assets/Brick Project Studio/Apartment Kit/Common/Models/Kitchen_01.fbx
+e501afb3ed5c60243ac1515b7ca1e2be	Assets/Brick Project Studio/Apartment Kit/Common/Models/Lamp 02.fbx
+693cb6a41bc2205409161bed0f51fdca	Assets/Brick Project Studio/Apartment Kit/Common/Models/lamp.fbx
+dc3a1db86c73bb14f8ebd6e2953b7e70	Assets/Brick Project Studio/Apartment Kit/Common/Models/wine bottle 04_LP.fbx
+28ca9505d52f64b408920ffcf4831bc0	Assets/Brick Project Studio/Apartment Kit/Common/Models/wine thin glass W Liquid.fbx
+6a53b8c24a752874da87800383dbdf1e	Assets/Brick Project Studio/Apartment Kit/Common/Scripts & Animation/Closet/ClosetDoor_Base.controller
+469e00e876fb40142af620db2b198643	Assets/Brick Project Studio/Apartment Kit/Common/Scripts & Animation/Closet/ClosetopencloseDoor.cs
+a2f6163588e6e074996614a2b15b04b7	Assets/Brick Project Studio/Apartment Kit/Scenes/DemoSettings.lighting
+bd7983b1a49044746ab3ec58a61d0c4a	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Apt Build Kit/Exteriors/Ext_Apt_01/Ext_Apt_01_Corner_01.prefab
+26ae75b7e5c390d4f8755cadf4903875	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Apt Build Kit/Exteriors/Ext_Apt_01/Ext_Apt_01_Pillar_2x2.prefab
+c132e10714a0f9441993cdd403636ac2	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Apt Build Kit/Exteriors/Ext_Apt_01/Ext_Apt_01_Pillar_4x4.prefab
+44297ac12129a474d89e1b2eb6151936	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Apt Build Kit/Exteriors/Ext_Apt_01/Ext_Apt_01_Roof_01.prefab
+d6b5de5048b779b49847795dabf2dd3a	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Apt Build Kit/Exteriors/Ext_Apt_01/Ext_Apt_01_Roof_02.prefab
+c544bc53359f3e941aed74ee827feff3	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Apt Build Kit/Exteriors/Ext_Apt_01/Ext_Apt_01_Roof_03.prefab
+edb02028d59ccac4ca6641a183fa7346	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Apt Build Kit/Exteriors/Ext_Apt_01/Ext_Apt_01_Wall_01.prefab
+4a111030cf811f542a01c361f491a2b1	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Apt Build Kit/Exteriors/Ext_Apt_01/Ext_Apt_01_Wall_Window_01.prefab
+1804b0ce951149d4f8c62b573d634580	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Apt Build Kit/Exteriors/Special/Ext_apt_01_01.prefab
+ec6a508d43c319f4e9a29995ea6c3489	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Apt Build Kit/Exteriors/Special/Ext_apt_01_02.prefab
+79276710ec62bc64c8249de57cba02e6	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Apt Build Kit/Int into Ext/IntExt_apt_01_02.prefab
+eca1c14fa4f815e4d96961d241f47cfd	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Apt Build Kit/Int into Ext/IntExt_apt_DoorFrame_02_01.prefab
+3106a6f3c2fc2a547b55f8f47ff2e09c	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Apt Build Kit/Interiors/Flooring & Ceilings/Int_apt_01_Ceiling_01.prefab
+bee09117d2231334d90a559b1ff7f323	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Apt Build Kit/Interiors/Flooring & Ceilings/Int_apt_01_Floor_01.prefab
+e92372dbea850d64697e857ecae9484d	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Apt Build Kit/Interiors/Flooring & Ceilings/Int_apt_02_Floor_02.prefab
+57b8e39375d93984895e498850c28ef7	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Apt Build Kit/Interiors/Flooring & Ceilings/Int_apt_03_Floor_01.prefab
+a210596d183602d4f9abc956ba791b9e	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Apt Build Kit/Interiors/Flooring & Ceilings/Int_apt_03_Floor_02.prefab
+e9a47cdb5968d66499f6b4ee53467cd4	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Apt Build Kit/Interiors/Frames Windows Stairs & Doors/DoorFrame_Apt_01.prefab
+46552e96207732c4789f21297738d416	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Apt Build Kit/Interiors/Frames Windows Stairs & Doors/DoorFrame_Apt_02.prefab
+f3e82dc7c471ff447b3ca0e0bfded076	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Apt Build Kit/Interiors/Frames Windows Stairs & Doors/DoorFrame_Apt_03.prefab
+6723febf70d07b7469fbcddd65e8660b	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Apt Build Kit/Interiors/Frames Windows Stairs & Doors/DoorFrame_Apt_04.prefab
+509ac6312e62e5743ae96298947599f7	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Apt Build Kit/Interiors/Frames Windows Stairs & Doors/Frame_Apt_01.prefab
+339af60aba47cba459f763bee7ddb43f	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Apt Build Kit/Interiors/Frames Windows Stairs & Doors/Frame_Apt_02.prefab
+1948577c0f767a2438c3970962e5da19	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Apt Build Kit/Interiors/Frames Windows Stairs & Doors/Int_apt_01_Boarder_01.prefab
+a32793c2d7a973541a705148244340ef	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Apt Build Kit/Interiors/Frames Windows Stairs & Doors/Int_apt_01_EdgeRail_01.prefab
+3cdb710f55b8ba342bfc746fcebede5b	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Apt Build Kit/Interiors/Frames Windows Stairs & Doors/Int_apt_01_Staircase_01.prefab
+ff74a2d207593764ea3699571e28d00a	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Apt Build Kit/Interiors/Frames Windows Stairs & Doors/Window_Frame_Apt_01.prefab
+e9053624939ee2d46b0cde7eff2c0e6e	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Apt Build Kit/Interiors/Special/Collum/Int_Collum_Apt_01.prefab
+6f3fdbc163e80234c908f27761c7c3a9	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Apt Build Kit/Interiors/Special/Wall Modern/Int_WallExtrude_01_01.prefab
+ee40b11b251097744b0b6775756b2dbf	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Apt Build Kit/Interiors/Special/Wall Modern/Int_WallExtrude_02_01.prefab
+9e5c2bb5031891140882f5e81a01c0c7	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Apt Build Kit/Interiors/Special/Wall Tiles/BR_Tile_APT_01_01.prefab
+3a840935b4015fb44b4d247b6f257006	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Apt Build Kit/Interiors/Special/Wall Tiles/BR_Tile_APT_01_02.prefab
+0d13d6d50c15b8147b1bf9fee7d1326d	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Apt Build Kit/Interiors/Special/Wall Tiles/BR_Tile_APT_01_04.prefab
+f65183ca19c1b4448a412998605b2216	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Apt Build Kit/Interiors/Special/Wall Tiles/BR_Tile_APT_02_01.prefab
+6ecb0bf6d9576ac4c9db5a24641bdf73	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Apt Build Kit/Interiors/Special/Wall Tiles/BR_Tile_APT_02_02.prefab
+e7e7231ccdd4c2745a7aee5414cc2d04	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Apt Build Kit/Interiors/Special/Wall Tiles/BR_Tile_APT_02_04.prefab
+898817d0fbc7ec3448ce39efd8267ba2	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Apt Build Kit/Interiors/Walls Frames & Doors/Apt_01/Int_Apt_01_Pillar_2x2.prefab
+c5be39b879c83f54d9bbfebe68c809be	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Apt Build Kit/Interiors/Walls Frames & Doors/Apt_01/Int_Apt_01_Wall_01.prefab
+f01b8dde2f2266c4a9c87acaa4ed6003	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Apt Build Kit/Interiors/Walls Frames & Doors/Apt_01/Int_Apt_01_Wall_02.prefab
+0ef87058d11dd764abf30aefa470c526	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Apt Build Kit/Interiors/Walls Frames & Doors/Apt_01/Int_Apt_01_Wall_03.prefab
+e4a073a915d15da469c414beeb6fef2b	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Apt Build Kit/Interiors/Walls Frames & Doors/Apt_01/Int_Apt_01_Wall_04.prefab
+252cc1d947dc9f34fa0d633f87bbcfc0	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Apt Build Kit/Interiors/Walls Frames & Doors/Apt_01/Int_Apt_01_Wall_Double_01.prefab
+2cf7605246c1a3c4a8bff50e0beb194b	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Apt Build Kit/Interiors/Walls Frames & Doors/Apt_02/Int_Apt_02_Pillar_2x2.prefab
+fb28b01c668360548b1caee1ee42ac7e	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Apt Build Kit/Interiors/Walls Frames & Doors/Apt_02/Int_Apt_02_Wall_01.prefab
+30553bc0887e026448946afaa552d655	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Apt Build Kit/Interiors/Walls Frames & Doors/Apt_02/Int_Apt_02_Wall_02.prefab
+0d62acd7333a2844eb00217800ed1f99	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Apt Build Kit/Interiors/Walls Frames & Doors/Apt_02/Int_Apt_02_Wall_04.prefab
+7536b5cab7fa6894e9909e4f8ec3bd69	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Apt Build Kit/Interiors/Walls Frames & Doors/Apt_03/Int_Apt_03_Pillar_2x2.prefab
+42f30c85f9e074e4eb17ea01048327d2	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Apt Build Kit/Interiors/Walls Frames & Doors/Apt_03/Int_Apt_03_Wall_01.prefab
+1b521e989c39fb544aaf387f9eda3db9	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Apt Build Kit/Interiors/Walls Frames & Doors/Apt_03/Int_Apt_03_Wall_02.prefab
+4fd059785718649499a344b0c22ecd22	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Furniture/Bathroom/BR_Cabinet_01.prefab
+a21b031050e1345409177a5cf15ec3b4	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Furniture/Bathroom/BR_Vanity_01.prefab
+cb533d6f7329a744fb5c0396de1b8b4b	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Furniture/Bathroom/BathTub_Base_01.prefab
+811e6e74b6e3af9468ee8cf92013ce83	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Furniture/Bathroom/Hamper_01.prefab
+75f68a1f4dd36214383ec174a8d8bf67	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Furniture/Bathroom/Shower_Base_01.prefab
+10d4ee2e07ed6c043bcfb109fd37b49a	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Furniture/Bathroom/Toilet_Apt_01.prefab
+bd82980ec0e466d48a84803eba02265f	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Furniture/Bedroom/Bed_Apt_01_01.prefab
+8af73887c9cd7fa47a2f642969b20378	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Furniture/Bedroom/Bed_Apt_01_02.prefab
+79723f7a04c42fa4cb0fefb4f7686381	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Furniture/Bedroom/Bed_Apt_02_01.prefab
+7769b6e68c1a90a458fec4955db6b2fd	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Furniture/Bedroom/Dresser Closet_01.prefab
+3f38091ec14910c4c8b8af3bab31b1bf	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Furniture/Bedroom/Dresser_Apt_01.prefab
+c15f037642a1e1b439d19869e86e1ddf	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Furniture/Bedroom/Table_End_01.prefab
+28f3f85a3fb032b4cbee99b8dd59df44	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Furniture/Bedroom/Table_End_02.prefab
+b9f258a086096d24aa7861fa20deed65	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Furniture/Kitchen/Appliances/Fridge_01.prefab
+add8565ea42029f4abfaa37c7dbe2abf	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Furniture/Kitchen/Appliances/Range_Hood.prefab
+452921da7fe17904da8c1d34c235dee4	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Furniture/Kitchen/Appliances/Stove_01.prefab
+226aa234041d2be48881aab9632ea78e	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Furniture/Kitchen/Cabinets/Cabinet_Base_DD_01.prefab
+d9d9f374cc51a6b4fb75751346d70b83	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Furniture/Kitchen/Cabinets/Cabinet_Base_SD_01.prefab
+1a83256f7767c2c46a1371969648490c	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Furniture/Kitchen/Cabinets/Cabinet_Base_Sink_01.prefab
+48e9669af95ae5746aa4ad24d893f391	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Furniture/Kitchen/Cabinets/Cabinet_Tall_DD_01.prefab
+af872b04269986143906a126ca9ff444	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Furniture/Kitchen/Cabinets/Cabinet_Wall_DD_02.prefab
+36510e737e626954986f2c5112be9091	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Furniture/Kitchen/Cabinets/Cabinet_Wall_SD_01.prefab
+544e2a3365ece1e428837232ca8b768d	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Furniture/Living Room/Bench_Apt_01.prefab
+658e64758890bc24ba679c51e2cd2ab3	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Furniture/Living Room/Shelf_Apt_01.prefab
+266d5a1d00e2ac2479b93bdd1914ad78	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Furniture/Living Room/Sofa_Apt_02.prefab
+8c62e0f64b2956748ab5f5ece60bc90c	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Furniture/Living Room/Table_Coffee_01.prefab
+7699f5af06713974ba61777a8a830f6e	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Furniture/Living Room/Table_Computer_01_Setup.prefab
+8949b4a88fb989e4483115e02dfafc96	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Furniture/Living Room/Table_Dining_Apt_01_Setup Variant.prefab
+54a1d2aa299948d4386f320102e514a9	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Furniture/Living Room/Table_Media_01.prefab
+355f0f3f8c2463f4d8bed401784f063f	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Furniture/Living Room/Table_Side_Apt_01.prefab
+3f867dd7956e96f4a90edce652fc7512	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Furniture/Living Room/WallShelf_Apt_01.prefab
+372a0d77e8005d947bd72f3cf2cbde53	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Furniture/Living Room/WallShelf_Apt_02.prefab
+843e4058e4b291d44bc18a16bdfae4a2	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Furniture/Misc/Bench_Apt_02.prefab
+2e2398df6726e164fb29cbffecf878a0	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Furniture/Wine Cabinet/BarCabinet_Apt_04_Filled.prefab
+ce0bc08e90169b64a82b286ba042f677	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Props/Art/Canvas_Nat_01.prefab
+4d476d9fee396a74db28e7095af9245d	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Props/Art/Canvas_Nat_02.prefab
+340937d0c3254e04b821007b8536c465	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Props/Art/Canvas_Nat_03.prefab
+75b51d9bb1b7e4d4b89e8edc75336c34	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Props/Art/Canvas_Nat_04.prefab
+4f13e2e193b7411478434edd7b149917	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Props/Art/Canvas_Nat_05.prefab
+0bb0235386000d5498a4c894bd92c757	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Props/Art/Canvas_Nat_06.prefab
+c5077b26080c7034cb161dfdaaf22c87	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Props/Art/Canvas_Nat_07.prefab
+81681dbb7b5c6134ba68a4e523911dc4	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Props/Art/Canvas_Nat_08.prefab
+7b8d9613223ef1f448bbe8fc90d8a85d	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Props/Art/Rug_Apt_01.prefab
+c8efa0ebb83f8f9498202481854c76a5	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Props/Art/Rug_Apt_02.prefab
+57c88468704ae69488156b563516783f	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Props/Art/Wall Wine Rack_Apt_01_Filled Variant.prefab
+6ab6af969cb643e44b67269676f36669	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Props/Art/WallArt_Apt_01.prefab
+0d7e3cbd2cdf2e7428aa62ff7966b1ba	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Props/Art/WallArt_Apt_02.prefab
+28452da629c654043bf2718da2d8add6	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Props/Art/WallArt_Apt_03.prefab
+2804d1473f02dbe46804e506168c85ec	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Props/Art/WallArt_Apt_04.prefab
+c39a7487ae8768f46b4f6344ce704453	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Props/Bathroom/BathroomMat_01.prefab
+642a2cb4532c08a4db221317e2019f62	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Props/Bathroom/Shower_Faucet_01.prefab
+2c53d7677acbaf34b81c7da75f0544ff	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Props/Bathroom/Shower_Handel_01.prefab
+708f360dca4c28243813704f811ad080	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Props/Bathroom/Shower_Head_01.prefab
+ba074cf4b261d9a4882932e86021742c	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Props/Bathroom/ToiletPaperHolder_01.prefab
+65acb63846e2c9a429906aa8e2ecdd54	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Props/Bathroom/ToothbrushCup_Filled.prefab
+0c194d566209b524bb98efa3b5f1563e	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Props/Bathroom/TowelRack_Apt_01.prefab
+dd22d3cb5edddc54fb43d88c8b0da7d5	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Props/Bathroom/TowelRack_Apt_02.prefab
+29e76f542ce050b4d8948ddead8c0c46	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Props/Electronics/GameConsole_Apt_01.prefab
+94e4c3350f88fe94ba5e156103abcf1c	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Props/Electronics/GameController_Apt_01_01.prefab
+f3421f20f5f724a4fab68ce9de3753e8	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Props/Electronics/GameController_Apt_01_02.prefab
+f91743800f2ab3740ac9db4eedb46f2d	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Props/Electronics/SS_01.prefab
+70c062c3a7500e7479c9797b6190948e	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Props/Electronics/SS_Stand_01.prefab
+56a93cd127ed0184982c13ec0a61cfa5	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Props/Electronics/TV_Apt_01.prefab
+8b726a9375ea2e442aa068972abf0c08	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Props/Kitchen/Blender_Apt_01.prefab
+143623a82f19a9e49b450142a80c6d52	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Props/Kitchen/Bowl_Apt_01_Stacked.prefab
+46bf299537dbcae4cbccff6784223305	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Props/Kitchen/CoffeeMaker_Apt_01.prefab
+c442118e981d163429716195e7cade2f	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Props/Kitchen/Plate_Apt_02_Stacked.prefab
+a104be747e53b0c4f875ab61494ff9f2	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Props/Kitchen/Toaster_Apt_01.prefab
+046ec50b8328aa54c96774a0cc973a01	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Props/Lighting/Lamp_BR_01.prefab
+09457ce18601f204cbd5799ff191ff9e	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Props/Lighting/Lamp_Ceiling_Apt_01.prefab
+283fe20ffc8ff164080c612ba8cb7b86	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Props/Lighting/Lamp_Ceiling_Apt_02.prefab
+f920163421f537643a94fbbfe25244f9	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Props/Lighting/Lamp_Ceiling_Apt_03.prefab
+36dee4e097ce701479331df2321c1de3	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Props/Lighting/Lamp_Ceiling_Apt_05.prefab
+4850c514825283749bdc56155d7559a9	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Props/Lighting/Lamp_Floor_Apt_01.prefab
+b762b04c7fe35704cbdbf1806a638bf1	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Props/Lighting/Lamp_Floor_Apt_02.prefab
+3e7be61a66e072c44bc2cc6bbee79f45	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Props/Lighting/Lamp_Table_Apt_01.prefab
+142ac07ac204863418a6f3f9b0ac660c	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Props/Lighting/Lamp_Table_Apt_02.prefab
+422f7f767554b114a9a1f54038a5710b	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Props/Lighting/Lamp_Wall_Apt_01.prefab
+ca794718ea2a2e4438e37724e4f6a6cc	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Props/Lighting/Lamp_Wall_Apt_02.prefab
+e2fa05d22ec876745aec3dd263e3622f	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Props/Misc/CandelSetting_apt_01.prefab
+04530b01cfbd5f044a2cc04ba39e91df	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Props/Misc/Chess_Board_Base.prefab
+c0474be4602986b4f9e6342b6b0817e7	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Props/Misc/MirrorPlate_Filled Variant.prefab
+cd4ca976dbf626549971e19d7ef53367	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Props/Misc/Trash_apt_01.prefab
+eeba5b089ee3b4a4cbe7167afae0e4e1	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Props/Misc/Vase_Apt_01.prefab
+7a897a6b060173d41a37261351d86569	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Props/Misc/Vase_Apt_03.prefab
+22a931750861f724a854421dccfa17e0	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Props/Misc/Wall_Mirror_01.prefab
+646857c834326db489fedada3df0bbc5	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Props/Misc/Wall_Mirror_02.prefab
+7ade998a75360c54ca6e55373981e604	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Props/Misc/WelcomeMat_01.prefab
+2d6f3b929468cea46a733cd9fe79f4c9	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Props/Sculptures/Mech_apt_01.prefab
+93aca5305e2fdde45bd10238f67be364	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Props/Sculptures/Sculpture_apt_01_02.prefab
+6ad7ae35911007741856dfec75c6ab59	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Props/Sculptures/Sculpture_apt_02_04.prefab
+40399f95a6f26064ebdd3b08052bb9fc	Assets/Brick Project Studio/Apartment Kit/_Prefabs/Props/Sculptures/Sculpture_apt_02_05.prefab
+3bded00981e95504a8e47f996835ca9a	Assets/Brick Project Studio/_BPS Basic Assets/Common/Materials/Basic Assets/BA_Glass_02.mat
+b06a7002771176e48b2aaba873e28341	Assets/Brick Project Studio/_BPS Basic Assets/Common/Models/BPS_Chair_01.fbx
+8537129dc3fbbe44186add4eea186b85	Assets/Brick Project Studio/_BPS Basic Assets/Common/Models/Build Kits/Build Kit Interior - 01.fbx
+0156872a951ba6e44a3a8596040789c9	Assets/Brick Project Studio/_BPS Basic Assets/Common/Models/Legacy/office chair.fbx
+099e6cc38da8ff74bb68d0bf29e24642	Assets/Brick Project Studio/_BPS Basic Assets/Common/Scripts and Animations/Doors/openandclose.controller
+1e8192f35a44301488ec0f072d9a16fe	Assets/Brick Project Studio/_BPS Basic Assets/Common/Scripts and Animations/Doors/opencloseDoor.cs
+cd8fcc5431d7f7e46be3c7c12ed32513	Assets/Brick Project Studio/_BPS Basic Assets/_Prefabs/Basic Asset/Furniture_Props/BPS_Chair_01.prefab
+e30496263f7ba54488d5cb051756f667	Assets/Brick Project Studio/_BPS Basic Assets/_Prefabs/Restroom/RR Build Kit/Floors Ceilings/Int_RR_01_Floor_01.prefab

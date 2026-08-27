@@ -131,9 +131,26 @@ cd D:\Dev\RESIDUUM && git lfs ls-files
 **这是「工程打开了，但 Blockout 场景里什么都没有 / 一片品红」的唯一原因，
 也是最容易被误认为"项目坏了"的一步。**
 
-`Blockout.unity` 里有 **171 处引用**指向 Apartment Kit 这个素材包。这个包
-325.9 MB，走 Git LFS 会在几天内耗尽 GitHub 免费额度，所以**约定不入库，
-每人各自导入**。资源 GUID 是包自带的，三个人导入同一版本，场景引用就能对上。
+### 先确认你是不是撞上了这个
+
+打开 `Blockout.unity` 之后，如果 Scene 视图里是这样：
+
+- 看不到任何墙、地板、家具，只有几个**青色/白色线框盒子**
+- 空中飘着 `Int_Apt_01_Floor_01 (45)` 之类的**名字标签**，但对应位置什么都没有
+- Hierarchy 里对象都在、层级完整，但图标是断裂的预制体图标
+- 可能还有一两个**品红色**的物体
+
+那就是这一步没做（或者没做对）。**工程本身完全正常。**
+
+原因是硬的：`Blockout.unity` 里有 **1756 个预制体实例**，其中 **171 个外部引用**
+指向 Apartment Kit。工程自带的可见几何体只有 41 个 MeshRenderer。
+换句话说，**没有这个包，场景里 95% 的东西都渲染不出来**，剩下的就是你看到的那几个线框。
+
+### 为什么不干脆把这个包也提交到仓库
+
+它 325.9 MB，走 Git LFS 几天就会耗尽 GitHub 免费额度；而且 Unity Asset Store
+的条款不允许把素材原始文件单独打包分发。所以**约定不入库，每人各自导入**。
+资源 GUID 是包自带的，只要三个人导入的是**同一版本**，场景引用就能对上。
 
 ### 怎么导
 
@@ -164,6 +181,51 @@ cd D:\Dev\RESIDUUM && git lfs ls-files
 
 详见 [`ASSET_LICENSES.md`](ASSET_LICENSES.md)。
 
+### 做完跑一次对账，不要靠肉眼判断
+
+仓库里有一个零依赖的对账脚本，直接告诉你缺什么、以及 URP 转了没有。
+在**仓库根目录**运行：
+
+```bash
+python tools\check_kit.py
+```
+
+（Mac / Linux 上是 `python3 tools/check_kit.py`。Windows 没装 Python 的话，
+在 Microsoft Store 搜 "Python 3" 一键安装，或去 <https://www.python.org/downloads/windows/>。）
+
+它会比对你本地的 `Assets/Brick Project Studio/` 和
+[`tools/kit_manifest.txt`](../tools/kit_manifest.txt)（在已验证可用的 macOS 端工程上生成的
+171 项 GUID 清单），可能的结果：
+
+| 输出 | 含义 | 下一步 |
+|---|---|---|
+| `✓ GUID 对账通过` + `✓ URP 转换已做` | 素材包没问题 | 场景还是空的就截 Console 报错发群里 |
+| `✗ 没有找到 Assets/Brick Project Studio/` | 压根没导入 | 回到本节开头重做 |
+| `✗ GUID 对账失败：缺 171 / 171` | 导入的**版本不对**，GUID 全不一样 | 见下 |
+| `✗ 缺 N / 171`（N < 171） | 导入时取消勾选过内容 | Import 时全选，别取消任何勾 |
+| `✗ 绝大多数材质还是 Built-in` | 忘了转 URP | 跑上面的 Render Pipeline Converter |
+
+### 版本必须完全一致，这是 GUID 对不上的根因
+
+Package Manager 的 `My Assets` **默认给你下最新版**。Apartment Kit 换版本时
+资源 GUID 可能整体变掉，那样 171 项一个都对不上，场景照样空白。
+
+脚本报「缺 171/171」时，先删掉 `Assets/Brick Project Studio/`，再核对
+`.unitypackage` 的指纹。Windows 上在 PowerShell 里跑：
+
+```bash
+Get-FileHash "$env:APPDATA\Unity\Asset Store-5.x\Brick Project Studio\3D ModelsEnvironments\Apartment Kit.unitypackage" -Algorithm SHA256
+```
+
+必须是与工程一致的这一份：
+
+```
+size   = 341734961  （325.9 MB）
+sha256 = A984753A958350390EC074C6C56146FA68E3826A0E39463C85B398C9DBB5496A
+```
+
+对不上就是版本不同，找 Henry 要正确的那一份，不要将就用手上这个。
+
 ---
 
 ## 第 4 步 · 验证你真的装好了
@@ -171,11 +233,12 @@ cd D:\Dev\RESIDUUM && git lfs ls-files
 依次确认这四条，全过才算上手完成：
 
 1. Unity 标题栏版本号是 `6000.5.8f1`
-2. 打开 `Assets/_Project/Scenes/Blockout.unity`，Console 里**没有红色报错**
+2. `python tools\check_kit.py` 输出 **`✓ GUID 对账通过`** 和 **`✓ URP 转换已做`**
+3. 打开 `Assets/_Project/Scenes/Blockout.unity`，Console 里**没有红色报错**
    （黄色警告可以忽略）
-3. Hierarchy 里 `BLK_` 打头的灰盒节点下面**有家具模型**，Scene 视图看得见
-   房间陈设，不是一片空白也不是一片品红
-4. 按 Play，能用 WASD 走动、鼠标转视角
+4. Scene 视图里看得见完整的房间陈设 —— 有墙、有地板、有家具，
+   不是一片空白线框，也不是一片品红
+5. 按 Play，能用 WASD 走动、鼠标转视角
 
 ---
 
@@ -186,7 +249,9 @@ cd D:\Dev\RESIDUUM && git lfs ls-files
 | Hub 里项目版本号是黄的 / 点了没反应 | `6000.5.8f1` 没装 | 第 0 步第 3 条的深链 |
 | Hub 说「不是有效的 Unity 项目」 | 选错了文件夹层级 | 选包含 `Assets` 和 `ProjectSettings` 的那一层 |
 | 打开后进 Safe Mode / 一堆 CS 报错 | 首次导入没跑完就关了 | 删掉 `Library/` 重新打开 |
-| 场景里什么都没有 / 全是品红 | Apartment Kit 没导入或没转 URP | 第 3 步 |
+| 场景只剩线框和飘在空中的名字标签 | Apartment Kit 没导入 | 第 3 步，跑 `check_kit.py` |
+| 场景全是品红 | Apartment Kit 导入了但没转 URP | 第 3 步的 Render Pipeline Converter |
+| 导入了 Kit 但场景还是空的 | 版本不对，GUID 全变了 | 第 3 步末尾的指纹核对 |
 | Console 报某个 `.png` / `.exr` 无法导入 | Git LFS 没装，文件是指针 | `git lfs install` 然后 `git lfs pull` |
 | 导入时报路径过长 | 仓库放得太深 | 挪到 `D:\Dev\RESIDUUM`，并 `core.longpaths true` |
 | Package Manager 一直卡在 Resolving | 网络访问 Unity registry 慢 | 挂代理，或等；不要中途关编辑器 |
@@ -233,7 +298,7 @@ git status --short && git diff --cached --stat
 把下面这条命令的完整输出发到群里，加上 **Unity Console 的红色报错截图**：
 
 ```bash
-git -C D:\Dev\RESIDUUM log --oneline -3 && git -C D:\Dev\RESIDUUM status --short && git lfs version && git lfs ls-files
+git -C D:\Dev\RESIDUUM log --oneline -3 && git -C D:\Dev\RESIDUUM status --short && git lfs version && git lfs ls-files && python D:\Dev\RESIDUUM\tools\check_kit.py
 ```
 
 有这些信息才好判断，光说"打不开"定位不了。
