@@ -11,9 +11,13 @@ namespace Residuum.UI.Editor
     {
         private const string MenuPath = "Residuum/搭建 HUD 与结算界面";
         private const string UndoLabel = "搭建 HUD 与结算界面";
+        private const string JournalMenuPath = "Residuum/搭建判定笔记本";
+        private const string JournalUndoLabel = "搭建判定笔记本";
         private const string EventSystemName = "EventSystem";
         private const string HudCanvasName = "HUD Canvas";
         private const string ResultCanvasName = "Result Canvas";
+        private const string JournalCanvasName = "Journal Canvas";
+        private const string EvidenceManagerName = "EvidenceManager";
         private const string CrosshairName = "Crosshair";
         private const string PromptLabelName = "PromptLabel";
         private const string SanityBarName = "SanityBar";
@@ -29,10 +33,29 @@ namespace Residuum.UI.Editor
         private const string DetailName = "Detail";
         private const string RestartButtonName = "RestartButton";
         private const string RestartButtonTextName = "Text";
+        private const string EvidenceName = "Evidence";
+        private const string DeductionTableName = "DeductionTable";
+        private const string GuessButtonsName = "GuessButtons";
+        private const string LabelName = "Label";
+        private const string RuleButtonName = "RuleButton";
+        private const string ButtonTextName = "Text";
+        private const string GhostNamePrefix = "GhostName";
+        private const string GhostEvidencePrefix = "GhostEvidence";
+        private const string HeaderPrefix = "Header";
+        private const string RowPrefix = "Row";
+        private const string GuessPrefix = "Guess";
+        private const string GameManagerTypeName = "Residuum.Core.GameManager";
+        private const string PlayerControllerTypeName = "Residuum.Player.PlayerController";
+        private const string EvidenceManagerTypeName = "Residuum.Evidence.EvidenceManager";
 
         private const int HudSortingOrder = 0;
         private const int ResultSortingOrder = 100;
+        private const int JournalSortingOrder = 50;
         private const int EvidenceLabelCount = 3;
+        private const int GhostCount = 3;
+        private const int EvidenceColumnsPerGhost = 3;
+        private const int TableColumnCount = 4;
+        private const int GhostEvidenceCellCount = GhostCount * EvidenceColumnsPerGhost;
         private const int ReferenceResolutionWidth = 1920;
         private const int ReferenceResolutionHeight = 1080;
         private const int CrosshairSize = 8;
@@ -44,6 +67,9 @@ namespace Residuum.UI.Editor
         private const int ResultTitleFontSize = 36;
         private const int ResultDetailFontSize = 24;
         private const int RestartButtonFontSize = 24;
+        private const int JournalEvidenceFontSize = 26;
+        private const int JournalTableFontSize = 22;
+        private const int JournalButtonFontSize = 22;
         private const int EvidenceLineHeight = 26;
 
         private const float CanvasMatchWidthOrHeight = 0.5f;
@@ -72,12 +98,30 @@ namespace Residuum.UI.Editor
         private const float RestartButtonWidth = 240f;
         private const float RestartButtonHeight = 56f;
         private const float ResultContentWidth = 900f;
+        private const float JournalLeftMargin = 80f;
+        private const float JournalTopMargin = 160f;
+        private const float JournalEvidenceRowHeight = 44f;
+        private const float JournalEvidenceRowSpacing = 8f;
+        private const float JournalEvidenceLabelWidth = 300f;
+        private const float JournalRuleButtonWidth = 96f;
+        private const float JournalRuleButtonHeight = 36f;
+        private const float JournalEvidenceRowWidth = 420f;
+        private const float JournalTableRightMargin = 80f;
+        private const float JournalTableCellWidth = 150f;
+        private const float JournalTableCellHeight = 44f;
+        private const float JournalTableSpacing = 6f;
+        private const float JournalGuessButtonWidth = 200f;
+        private const float JournalGuessButtonHeight = 52f;
+        private const float JournalGuessButtonSpacing = 24f;
+        private const float JournalGuessButtonBottomMargin = 80f;
 
         private static readonly Color BackgroundColor = new Color(0.04f, 0.04f, 0.04f, 0.9f);
         private static readonly Color BarFillColor = new Color(0.9f, 0.9f, 0.9f, 1f);
         private static readonly Color ResultPanelColor = new Color(0f, 0f, 0f, PanelAlpha);
         private static readonly Color HuntVignetteColor = new Color(1f, 0f, 0f, 0f);
         private static readonly Color RestartButtonColor = new Color(0.25f, 0.25f, 0.25f, 1f);
+        private static readonly Color JournalPanelColor = new Color(0f, 0f, 0f, PanelAlpha);
+        private static readonly Color JournalButtonColor = new Color(0.25f, 0.25f, 0.25f, 1f);
 
         [UnityEditor.MenuItem(MenuPath)]
         private static void BuildUI()
@@ -112,10 +156,9 @@ namespace Residuum.UI.Editor
                     UnityEngine.SceneManagement.SceneManager.GetActiveScene());
                 UnityEditor.Selection.activeGameObject = hudCanvas;
                 Debug.Log(
-                    "HUD Canvas 与 Result Canvas 已搭建并完成界面引用接线。" +
-                    "还需要手动连两项：将玩家物体上的 PlayerController 拖到 " +
-                    "Result Canvas/ResultScreenUI 的 _playerControllerBehaviour；" +
-                    "将 GameManager.StartRound 拖到 Result Canvas/ResultScreenUI 的 onRestartRequested。",
+                    "HUD Canvas 与 Result Canvas 已搭建并完成界面内部引用接线。" +
+                    "请继续运行 Residuum/搭建判定笔记本，它会自动补齐 PlayerController、" +
+                    "GameManager 与结算界面的跨物体接线。",
                     hudCanvas);
             }
             catch (Exception exception)
@@ -123,6 +166,71 @@ namespace Residuum.UI.Editor
                 Debug.LogException(exception);
                 UnityEditor.Undo.RevertAllDownToGroup(undoGroup);
                 Debug.LogError("HUD 与结算界面搭建失败，已撤销本次创建和接线。");
+            }
+        }
+
+        [UnityEditor.MenuItem(JournalMenuPath)]
+        private static void BuildJournal()
+        {
+            int undoGroup = UnityEditor.Undo.GetCurrentGroup();
+            UnityEditor.Undo.SetCurrentGroupName(JournalUndoLabel);
+
+            try
+            {
+                UnityEngine.Object[] ghostDefinitions = FindSortedGhostDefinitions();
+                if (ghostDefinitions == null)
+                {
+                    UnityEditor.Undo.RevertAllDownToGroup(undoGroup);
+                    return;
+                }
+
+                EnsureEventSystem();
+
+                TMPro.TMP_FontAsset defaultFont = TMPro.TMP_Settings.defaultFontAsset;
+                if (defaultFont == null)
+                {
+                    Debug.LogWarning("未找到 TMP 默认字体。需要先导入 TMP Essentials；笔记本层级仍已创建。");
+                }
+
+                GameObject journalCanvas = GetOrCreateRootCanvas(JournalCanvasName);
+                ConfigureCanvas(journalCanvas, JournalSortingOrder);
+                JournalUI journalUI = EnsureComponent<JournalUI>(journalCanvas);
+                JournalReferences journalReferences = BuildJournalHierarchy(journalCanvas.transform, defaultFont);
+                WireJournalUI(journalUI, journalReferences, ghostDefinitions);
+
+                Component evidenceManager = GetOrCreateEvidenceManager();
+                WireGhostDefinitionList(evidenceManager, "_allGhosts", ghostDefinitions);
+                WireEvidenceManager(journalUI, evidenceManager);
+
+                ResultScreenUI resultScreenUI = FindComponentInActiveScene<ResultScreenUI>();
+                Component gameManager = FindComponentInActiveSceneByTypeName(GameManagerTypeName);
+                Component playerController = FindComponentInActiveSceneByTypeName(PlayerControllerTypeName);
+                string missingConnections = WireRemainingSceneConnections(
+                    journalUI,
+                    resultScreenUI,
+                    gameManager,
+                    playerController);
+
+                UnityEditor.Undo.CollapseUndoOperations(undoGroup);
+                UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(
+                    UnityEngine.SceneManagement.SceneManager.GetActiveScene());
+                UnityEditor.Selection.activeGameObject = journalCanvas;
+
+                Debug.Log(
+                    "判定笔记本已搭建并完成可用的场景接线。_ghostEvidenceCells 数组顺序：" +
+                    string.Join("、", journalReferences.GhostEvidenceCellNames),
+                    journalCanvas);
+
+                if (!string.IsNullOrEmpty(missingConnections))
+                {
+                    Debug.LogWarning(missingConnections, journalCanvas);
+                }
+            }
+            catch (Exception exception)
+            {
+                Debug.LogException(exception);
+                UnityEditor.Undo.RevertAllDownToGroup(undoGroup);
+                Debug.LogError("判定笔记本搭建失败，已撤销本次创建和接线。");
             }
         }
 
@@ -454,6 +562,599 @@ namespace Residuum.UI.Editor
                 restartButton);
         }
 
+        private static JournalReferences BuildJournalHierarchy(
+            Transform journalCanvasTransform,
+            TMPro.TMP_FontAsset defaultFont)
+        {
+            UnityEngine.UI.Image panel = EnsureImage(journalCanvasTransform, PanelName);
+            ConfigureStretchRect(panel.rectTransform);
+            ConfigureImage(panel, JournalPanelColor, true);
+
+            GameObject evidence = GetOrCreateUiChild(panel.transform, EvidenceName);
+            SetSiblingIndex(evidence.transform, 0);
+            TMPro.TextMeshProUGUI[] evidenceLabels = new TMPro.TextMeshProUGUI[EvidenceLabelCount];
+            UnityEngine.UI.Button[] evidenceRuleButtons =
+                new UnityEngine.UI.Button[EvidenceLabelCount];
+            for (int rowIndex = 0; rowIndex < EvidenceLabelCount; rowIndex++)
+            {
+                GameObject row = GetOrCreateUiChild(evidence.transform, RowPrefix + rowIndex);
+                SetSiblingIndex(row.transform, rowIndex);
+                ConfigureRect(
+                    RequireRectTransform(row, row.name),
+                    new Vector2(0f, 1f),
+                    new Vector2(0f, 1f),
+                    new Vector2(0f, 1f),
+                    new Vector2(
+                        JournalLeftMargin,
+                        -JournalTopMargin - rowIndex *
+                        (JournalEvidenceRowHeight + JournalEvidenceRowSpacing)),
+                    new Vector2(JournalEvidenceRowWidth, JournalEvidenceRowHeight));
+
+                TMPro.TextMeshProUGUI label = EnsureText(row.transform, LabelName);
+                SetSiblingIndex(label.transform, 0);
+                ConfigureRect(
+                    label.rectTransform,
+                    new Vector2(0f, 0.5f),
+                    new Vector2(0f, 0.5f),
+                    new Vector2(0f, 0.5f),
+                    Vector2.zero,
+                    new Vector2(JournalEvidenceLabelWidth, JournalEvidenceRowHeight));
+                ConfigureText(
+                    label,
+                    defaultFont,
+                    string.Empty,
+                    JournalEvidenceFontSize,
+                    TMPro.TextAlignmentOptions.Left,
+                    false,
+                    false);
+                evidenceLabels[rowIndex] = label;
+
+                UnityEngine.UI.Image ruleButtonImage =
+                    EnsureImage(row.transform, RuleButtonName);
+                SetSiblingIndex(ruleButtonImage.transform, 1);
+                ConfigureRect(
+                    ruleButtonImage.rectTransform,
+                    new Vector2(1f, 0.5f),
+                    new Vector2(1f, 0.5f),
+                    new Vector2(1f, 0.5f),
+                    Vector2.zero,
+                    new Vector2(JournalRuleButtonWidth, JournalRuleButtonHeight));
+                ConfigureImage(ruleButtonImage, JournalButtonColor, true);
+                UnityEngine.UI.Button ruleButton =
+                    EnsureComponent<UnityEngine.UI.Button>(ruleButtonImage.gameObject);
+                UnityEditor.Undo.RecordObject(ruleButton, JournalUndoLabel);
+                ruleButton.targetGraphic = ruleButtonImage;
+                ConfigureButtonText(ruleButtonImage.transform, defaultFont, "排除", JournalButtonFontSize);
+                evidenceRuleButtons[rowIndex] = ruleButton;
+            }
+
+            GameObject deductionTable = GetOrCreateUiChild(panel.transform, DeductionTableName);
+            SetSiblingIndex(deductionTable.transform, 1);
+            UnityEngine.UI.GridLayoutGroup gridLayout =
+                EnsureComponent<UnityEngine.UI.GridLayoutGroup>(deductionTable);
+            ConfigureRect(
+                RequireRectTransform(deductionTable, DeductionTableName),
+                new Vector2(1f, 1f),
+                new Vector2(1f, 1f),
+                new Vector2(1f, 1f),
+                new Vector2(JournalTableRightMargin, -JournalTopMargin),
+                new Vector2(
+                    TableColumnCount * JournalTableCellWidth +
+                    (TableColumnCount - 1) * JournalTableSpacing,
+                    (GhostCount + 1) * JournalTableCellHeight +
+                    GhostCount * JournalTableSpacing));
+            ConfigureGridLayout(gridLayout);
+
+            string[] headerTexts = { "鬼种", "EMF-5", "紫外线", "鬼影书写" };
+            for (int headerIndex = 0; headerIndex < TableColumnCount; headerIndex++)
+            {
+                TMPro.TextMeshProUGUI header = EnsureText(
+                    deductionTable.transform,
+                    HeaderPrefix + headerIndex);
+                SetSiblingIndex(header.transform, headerIndex);
+                ConfigureText(
+                    header,
+                    defaultFont,
+                    headerTexts[headerIndex],
+                    JournalTableFontSize,
+                    TMPro.TextAlignmentOptions.Center,
+                    false,
+                    false);
+            }
+
+            TMPro.TextMeshProUGUI[] ghostNameLabels =
+                new TMPro.TextMeshProUGUI[GhostCount];
+            TMPro.TextMeshProUGUI[] ghostEvidenceCells =
+                new TMPro.TextMeshProUGUI[GhostEvidenceCellCount];
+            for (int ghostIndex = 0; ghostIndex < GhostCount; ghostIndex++)
+            {
+                int rowStartIndex = TableColumnCount + ghostIndex * TableColumnCount;
+                TMPro.TextMeshProUGUI ghostName = EnsureText(
+                    deductionTable.transform,
+                    GhostNamePrefix + ghostIndex);
+                SetSiblingIndex(ghostName.transform, rowStartIndex);
+                ConfigureText(
+                    ghostName,
+                    defaultFont,
+                    string.Empty,
+                    JournalTableFontSize,
+                    TMPro.TextAlignmentOptions.Center,
+                    false,
+                    false);
+                ghostNameLabels[ghostIndex] = ghostName;
+
+                for (int evidenceIndex = 0; evidenceIndex < EvidenceColumnsPerGhost; evidenceIndex++)
+                {
+                    int cellIndex = ghostIndex * EvidenceColumnsPerGhost + evidenceIndex;
+                    TMPro.TextMeshProUGUI evidenceCell = EnsureText(
+                        deductionTable.transform,
+                        GhostEvidencePrefix + cellIndex);
+                    SetSiblingIndex(evidenceCell.transform, rowStartIndex + evidenceIndex + 1);
+                    ConfigureText(
+                        evidenceCell,
+                        defaultFont,
+                        string.Empty,
+                        JournalTableFontSize,
+                        TMPro.TextAlignmentOptions.Center,
+                        false,
+                        false);
+                    ghostEvidenceCells[cellIndex] = evidenceCell;
+                }
+            }
+
+            GameObject guessButtonsObject = GetOrCreateUiChild(panel.transform, GuessButtonsName);
+            SetSiblingIndex(guessButtonsObject.transform, 2);
+            ConfigureRect(
+                RequireRectTransform(guessButtonsObject, GuessButtonsName),
+                new Vector2(0.5f, 0f),
+                new Vector2(0.5f, 0f),
+                new Vector2(0.5f, 0f),
+                new Vector2(0f, JournalGuessButtonBottomMargin),
+                new Vector2(
+                    GhostCount * JournalGuessButtonWidth +
+                    (GhostCount - 1) * JournalGuessButtonSpacing,
+                    JournalGuessButtonHeight));
+            UnityEngine.UI.HorizontalLayoutGroup guessLayout =
+                EnsureComponent<UnityEngine.UI.HorizontalLayoutGroup>(guessButtonsObject);
+            ConfigureGuessButtonLayout(guessLayout);
+
+            UnityEngine.UI.Button[] guessButtons = new UnityEngine.UI.Button[GhostCount];
+            for (int guessIndex = 0; guessIndex < GhostCount; guessIndex++)
+            {
+                UnityEngine.UI.Image guessButtonImage = EnsureImage(
+                    guessButtonsObject.transform,
+                    GuessPrefix + guessIndex);
+                SetSiblingIndex(guessButtonImage.transform, guessIndex);
+                ConfigureRect(
+                    guessButtonImage.rectTransform,
+                    new Vector2(0.5f, 0.5f),
+                    new Vector2(0.5f, 0.5f),
+                    new Vector2(0.5f, 0.5f),
+                    Vector2.zero,
+                    new Vector2(JournalGuessButtonWidth, JournalGuessButtonHeight));
+                ConfigureImage(guessButtonImage, JournalButtonColor, true);
+                UnityEngine.UI.Button guessButton =
+                    EnsureComponent<UnityEngine.UI.Button>(guessButtonImage.gameObject);
+                UnityEditor.Undo.RecordObject(guessButton, JournalUndoLabel);
+                guessButton.targetGraphic = guessButtonImage;
+                ConfigureButtonText(
+                    guessButtonImage.transform,
+                    defaultFont,
+                    "判定 " + (guessIndex + 1),
+                    JournalButtonFontSize);
+                guessButtons[guessIndex] = guessButton;
+            }
+
+            UnityEditor.Undo.RecordObject(panel.gameObject, JournalUndoLabel);
+            panel.gameObject.SetActive(false);
+
+            return new JournalReferences(
+                panel.gameObject,
+                evidenceLabels,
+                evidenceRuleButtons,
+                ghostNameLabels,
+                ghostEvidenceCells,
+                guessButtons);
+        }
+
+        private static void WireJournalUI(
+            JournalUI journalUI,
+            JournalReferences references,
+            UnityEngine.Object[] ghostDefinitions)
+        {
+            UnityEditor.Undo.RecordObject(journalUI, JournalUndoLabel);
+            UnityEditor.SerializedObject serializedJournalUI =
+                new UnityEditor.SerializedObject(journalUI);
+            serializedJournalUI.Update();
+
+            GetRequiredProperty(serializedJournalUI, "_journalRoot").objectReferenceValue =
+                references.PanelRoot;
+            WireObjectArray(
+                GetRequiredProperty(serializedJournalUI, "_evidenceLabels"),
+                references.EvidenceLabels,
+                "JournalUI._evidenceLabels");
+            WireObjectArray(
+                GetRequiredProperty(serializedJournalUI, "_evidenceRuleButtons"),
+                references.EvidenceRuleButtons,
+                "JournalUI._evidenceRuleButtons");
+            WireObjectArray(
+                GetRequiredProperty(serializedJournalUI, "_ghostNameLabels"),
+                references.GhostNameLabels,
+                "JournalUI._ghostNameLabels");
+            WireObjectArray(
+                GetRequiredProperty(serializedJournalUI, "_ghostEvidenceCells"),
+                references.GhostEvidenceCells,
+                "JournalUI._ghostEvidenceCells");
+            WireObjectArray(
+                GetRequiredProperty(serializedJournalUI, "_guessButtons"),
+                references.GuessButtons,
+                "JournalUI._guessButtons");
+            WireObjectArray(
+                GetRequiredProperty(serializedJournalUI, "_allGhosts"),
+                ghostDefinitions,
+                "JournalUI._allGhosts");
+
+            serializedJournalUI.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        private static void WireEvidenceManager(JournalUI journalUI, Component evidenceManager)
+        {
+            UnityEditor.Undo.RecordObject(journalUI, JournalUndoLabel);
+            UnityEditor.SerializedObject serializedJournalUI =
+                new UnityEditor.SerializedObject(journalUI);
+            serializedJournalUI.Update();
+            GetRequiredProperty(serializedJournalUI, "_evidenceManager").objectReferenceValue =
+                evidenceManager;
+            serializedJournalUI.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        private static Component GetOrCreateEvidenceManager()
+        {
+            Type evidenceManagerType = FindLoadedType(EvidenceManagerTypeName);
+            if (evidenceManagerType == null)
+            {
+                throw new InvalidOperationException(
+                    "未找到 Residuum.Evidence.EvidenceManager 类型，无法创建场景依赖。");
+            }
+
+            GameObject evidenceManagerObject = FindSceneObject(EvidenceManagerName);
+            if (evidenceManagerObject == null)
+            {
+                evidenceManagerObject = new GameObject(EvidenceManagerName);
+                UnityEditor.Undo.RegisterCreatedObjectUndo(evidenceManagerObject, JournalUndoLabel);
+            }
+
+            Component evidenceManager = evidenceManagerObject.GetComponent(evidenceManagerType);
+            if (evidenceManager == null)
+            {
+                evidenceManager = UnityEditor.Undo.AddComponent(
+                    evidenceManagerObject,
+                    evidenceManagerType);
+            }
+
+            if (evidenceManager == null)
+            {
+                throw new InvalidOperationException("无法为 EvidenceManager 物体添加 EvidenceManager 组件。");
+            }
+
+            return evidenceManager;
+        }
+
+        private static void WireGhostDefinitionList(
+            Component target,
+            string fieldName,
+            UnityEngine.Object[] ghostDefinitions)
+        {
+            UnityEditor.Undo.RecordObject(target, JournalUndoLabel);
+            UnityEditor.SerializedObject serializedTarget = new UnityEditor.SerializedObject(target);
+            serializedTarget.Update();
+            WireObjectArray(
+                GetRequiredProperty(serializedTarget, fieldName),
+                ghostDefinitions,
+                target.GetType().Name + "." + fieldName);
+            serializedTarget.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        private static string WireRemainingSceneConnections(
+            JournalUI journalUI,
+            ResultScreenUI resultScreenUI,
+            Component gameManager,
+            Component playerController)
+        {
+            System.Text.StringBuilder warnings = new System.Text.StringBuilder();
+
+            if (gameManager == null)
+            {
+                warnings.AppendLine(
+                    "没找到 GameManager：JournalUI.onGuessSubmitted → GameManager.SubmitGuess 未连接。");
+                warnings.AppendLine(
+                    "没找到 GameManager：ResultScreenUI.onRestartRequested → GameManager.StartRound 未连接。");
+            }
+            else
+            {
+                WireJournalGuessEvent(journalUI, gameManager);
+
+                if (resultScreenUI != null)
+                {
+                    WireResultRestartEvent(resultScreenUI, gameManager);
+                }
+                else
+                {
+                    warnings.AppendLine(
+                        "没找到 ResultScreenUI：onRestartRequested → GameManager.StartRound 未连接。");
+                }
+            }
+
+            if (resultScreenUI == null)
+            {
+                warnings.AppendLine(
+                    "没找到 ResultScreenUI：_playerControllerBehaviour 未连接。");
+            }
+            else if (playerController == null)
+            {
+                warnings.AppendLine(
+                    "没找到 PlayerController：ResultScreenUI._playerControllerBehaviour 未连接。");
+            }
+            else
+            {
+                UnityEditor.Undo.RecordObject(resultScreenUI, JournalUndoLabel);
+                UnityEditor.SerializedObject serializedResultScreenUI =
+                    new UnityEditor.SerializedObject(resultScreenUI);
+                serializedResultScreenUI.Update();
+                GetRequiredProperty(serializedResultScreenUI, "_playerControllerBehaviour").objectReferenceValue =
+                    playerController;
+                serializedResultScreenUI.ApplyModifiedPropertiesWithoutUndo();
+            }
+
+            return warnings.ToString().TrimEnd();
+        }
+
+        private static void WireJournalGuessEvent(JournalUI journalUI, Component gameManager)
+        {
+            UnityEditor.Undo.RecordObject(journalUI, JournalUndoLabel);
+            RemovePersistentListeners(journalUI.onGuessSubmitted, "SubmitGuess");
+            UnityEngine.Events.UnityAction<Residuum.Ghost.GhostDefinition> listener =
+                CreatePersistentListener<UnityEngine.Events.UnityAction<Residuum.Ghost.GhostDefinition>>(
+                    gameManager,
+                    "SubmitGuess");
+            if (listener == null)
+            {
+                throw new InvalidOperationException(
+                    "GameManager 缺少 SubmitGuess(GhostDefinition)，无法连接 JournalUI.onGuessSubmitted。");
+            }
+
+            UnityEditor.Events.UnityEventTools.AddPersistentListener(
+                journalUI.onGuessSubmitted,
+                listener);
+        }
+
+        private static void WireResultRestartEvent(ResultScreenUI resultScreenUI, Component gameManager)
+        {
+            UnityEditor.Undo.RecordObject(resultScreenUI, JournalUndoLabel);
+            RemovePersistentListeners(resultScreenUI.onRestartRequested, "StartRound");
+            UnityEngine.Events.UnityAction listener =
+                CreatePersistentListener<UnityEngine.Events.UnityAction>(gameManager, "StartRound");
+            if (listener == null)
+            {
+                throw new InvalidOperationException(
+                    "GameManager 缺少 StartRound()，无法连接 ResultScreenUI.onRestartRequested。");
+            }
+
+            UnityEditor.Events.UnityEventTools.AddPersistentListener(
+                resultScreenUI.onRestartRequested,
+                listener);
+        }
+
+        private static TDelegate CreatePersistentListener<TDelegate>(Component target, string methodName)
+            where TDelegate : Delegate
+        {
+            try
+            {
+                return (TDelegate)Delegate.CreateDelegate(typeof(TDelegate), target, methodName);
+            }
+            catch (ArgumentException)
+            {
+                return null;
+            }
+        }
+
+        private static void RemovePersistentListeners(
+            UnityEngine.Events.UnityEventBase unityEvent,
+            string methodName)
+        {
+            for (int listenerIndex = unityEvent.GetPersistentEventCount() - 1;
+                 listenerIndex >= 0;
+                 listenerIndex--)
+            {
+                if (unityEvent.GetPersistentMethodName(listenerIndex) == methodName)
+                {
+                    UnityEditor.Events.UnityEventTools.RemovePersistentListener(
+                        unityEvent,
+                        listenerIndex);
+                }
+            }
+        }
+
+        private static UnityEngine.Object[] FindSortedGhostDefinitions()
+        {
+            string[] assetGuids = UnityEditor.AssetDatabase.FindAssets("t:GhostDefinition");
+            if (assetGuids == null || assetGuids.Length == 0)
+            {
+                Debug.LogError("未找到任何 GhostDefinition 资产，已中止判定笔记本搭建。");
+                return null;
+            }
+
+            if (assetGuids.Length != GhostCount)
+            {
+                Debug.LogError(
+                    "当前笔记本固定为三行推理表，但找到 " + assetGuids.Length +
+                    " 个 GhostDefinition 资产。请先保持鬼种资产数量为 3，已中止判定笔记本搭建。");
+                return null;
+            }
+
+            string[] assetPaths = new string[assetGuids.Length];
+            for (int assetIndex = 0; assetIndex < assetGuids.Length; assetIndex++)
+            {
+                assetPaths[assetIndex] = UnityEditor.AssetDatabase.GUIDToAssetPath(assetGuids[assetIndex]);
+            }
+
+            Array.Sort(assetPaths, StringComparer.Ordinal);
+            UnityEngine.Object[] ghostDefinitions = new UnityEngine.Object[assetPaths.Length];
+            for (int assetIndex = 0; assetIndex < assetPaths.Length; assetIndex++)
+            {
+                ghostDefinitions[assetIndex] =
+                    UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(assetPaths[assetIndex]);
+                if (ghostDefinitions[assetIndex] == null)
+                {
+                    Debug.LogError(
+                        "无法加载 GhostDefinition 资产：" + assetPaths[assetIndex] + "，已中止判定笔记本搭建。");
+                    return null;
+                }
+            }
+
+            return ghostDefinitions;
+        }
+
+        private static Type FindLoadedType(string typeName)
+        {
+            foreach (System.Reflection.Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                Type type = assembly.GetType(typeName);
+                if (type != null)
+                {
+                    return type;
+                }
+            }
+
+            return null;
+        }
+
+        private static Component FindComponentInActiveSceneByTypeName(string typeName)
+        {
+            Type componentType = FindLoadedType(typeName);
+            if (componentType == null || !typeof(Component).IsAssignableFrom(componentType))
+            {
+                return null;
+            }
+
+            GameObject[] roots = UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects();
+            for (int rootIndex = 0; rootIndex < roots.Length; rootIndex++)
+            {
+                Component[] components = roots[rootIndex].GetComponentsInChildren(componentType, true);
+                if (components.Length > 0)
+                {
+                    return components[0];
+                }
+            }
+
+            return null;
+        }
+
+        private static GameObject FindSceneObject(string objectName)
+        {
+            GameObject[] roots = UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects();
+            for (int rootIndex = 0; rootIndex < roots.Length; rootIndex++)
+            {
+                Transform foundTransform = FindTransformByName(roots[rootIndex].transform, objectName);
+                if (foundTransform != null)
+                {
+                    return foundTransform.gameObject;
+                }
+            }
+
+            return null;
+        }
+
+        private static Transform FindTransformByName(Transform current, string objectName)
+        {
+            if (current.name == objectName)
+            {
+                return current;
+            }
+
+            for (int childIndex = 0; childIndex < current.childCount; childIndex++)
+            {
+                Transform foundTransform = FindTransformByName(current.GetChild(childIndex), objectName);
+                if (foundTransform != null)
+                {
+                    return foundTransform;
+                }
+            }
+
+            return null;
+        }
+
+        private static void WireObjectArray(
+            UnityEditor.SerializedProperty property,
+            UnityEngine.Object[] values,
+            string propertyDescription)
+        {
+            if (!property.isArray)
+            {
+                Debug.LogError(propertyDescription + " 不是数组，无法完成接线。");
+                throw new InvalidOperationException(propertyDescription + " 不是数组。");
+            }
+
+            property.arraySize = values.Length;
+            for (int valueIndex = 0; valueIndex < values.Length; valueIndex++)
+            {
+                property.GetArrayElementAtIndex(valueIndex).objectReferenceValue = values[valueIndex];
+            }
+        }
+
+        private static void ConfigureGridLayout(UnityEngine.UI.GridLayoutGroup gridLayout)
+        {
+            UnityEditor.Undo.RecordObject(gridLayout, JournalUndoLabel);
+            gridLayout.cellSize = new Vector2(JournalTableCellWidth, JournalTableCellHeight);
+            gridLayout.spacing = new Vector2(JournalTableSpacing, JournalTableSpacing);
+            gridLayout.constraint = UnityEngine.UI.GridLayoutGroup.Constraint.FixedColumnCount;
+            gridLayout.constraintCount = TableColumnCount;
+            gridLayout.childAlignment = TextAnchor.UpperLeft;
+            gridLayout.padding = new RectOffset();
+        }
+
+        private static void ConfigureGuessButtonLayout(
+            UnityEngine.UI.HorizontalLayoutGroup layoutGroup)
+        {
+            UnityEditor.Undo.RecordObject(layoutGroup, JournalUndoLabel);
+            layoutGroup.spacing = JournalGuessButtonSpacing;
+            layoutGroup.childAlignment = TextAnchor.MiddleCenter;
+            layoutGroup.childControlWidth = false;
+            layoutGroup.childControlHeight = false;
+            layoutGroup.childForceExpandWidth = false;
+            layoutGroup.childForceExpandHeight = false;
+            layoutGroup.padding = new RectOffset();
+        }
+
+        private static void ConfigureButtonText(
+            Transform buttonTransform,
+            TMPro.TMP_FontAsset defaultFont,
+            string value,
+            float fontSize)
+        {
+            TMPro.TextMeshProUGUI buttonText = EnsureText(buttonTransform, ButtonTextName);
+            ConfigureStretchRect(buttonText.rectTransform);
+            ConfigureText(
+                buttonText,
+                defaultFont,
+                value,
+                fontSize,
+                TMPro.TextAlignmentOptions.Center,
+                false,
+                false);
+        }
+
+        private static void SetSiblingIndex(Transform transform, int siblingIndex)
+        {
+            if (transform.GetSiblingIndex() == siblingIndex)
+            {
+                return;
+            }
+
+            UnityEditor.Undo.RecordObject(transform, JournalUndoLabel);
+            transform.SetSiblingIndex(siblingIndex);
+        }
+
         private static void WireHudController(HUDController hudController, HudReferences references)
         {
             UnityEditor.Undo.RecordObject(hudController, UndoLabel);
@@ -721,6 +1422,39 @@ namespace Residuum.UI.Editor
             public TMPro.TextMeshProUGUI TitleLabel { get; }
             public TMPro.TextMeshProUGUI DetailLabel { get; }
             public UnityEngine.UI.Button RestartButton { get; }
+        }
+
+        private readonly struct JournalReferences
+        {
+            public JournalReferences(
+                GameObject panelRoot,
+                TMPro.TextMeshProUGUI[] evidenceLabels,
+                UnityEngine.UI.Button[] evidenceRuleButtons,
+                TMPro.TextMeshProUGUI[] ghostNameLabels,
+                TMPro.TextMeshProUGUI[] ghostEvidenceCells,
+                UnityEngine.UI.Button[] guessButtons)
+            {
+                PanelRoot = panelRoot;
+                EvidenceLabels = evidenceLabels;
+                EvidenceRuleButtons = evidenceRuleButtons;
+                GhostNameLabels = ghostNameLabels;
+                GhostEvidenceCells = ghostEvidenceCells;
+                GuessButtons = guessButtons;
+
+                GhostEvidenceCellNames = new string[ghostEvidenceCells.Length];
+                for (int cellIndex = 0; cellIndex < ghostEvidenceCells.Length; cellIndex++)
+                {
+                    GhostEvidenceCellNames[cellIndex] = ghostEvidenceCells[cellIndex].gameObject.name;
+                }
+            }
+
+            public GameObject PanelRoot { get; }
+            public TMPro.TextMeshProUGUI[] EvidenceLabels { get; }
+            public UnityEngine.UI.Button[] EvidenceRuleButtons { get; }
+            public TMPro.TextMeshProUGUI[] GhostNameLabels { get; }
+            public TMPro.TextMeshProUGUI[] GhostEvidenceCells { get; }
+            public UnityEngine.UI.Button[] GuessButtons { get; }
+            public string[] GhostEvidenceCellNames { get; }
         }
     }
 }
