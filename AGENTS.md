@@ -137,6 +137,7 @@ Assets/
 | `CinemachineBrain` 的 2.x 属性写法 | 参考 Cinemachine 3.1 API |
 | `particleSystem.startSpeed` | `particleSystem.main.startSpeed` |
 | 每帧调用 `Camera.main` | 在 `Awake` 中缓存 |
+| `Object.GetInstanceID()` | 6.5 已弃用（CS0619）。**但不要改成 `GetEntityId()` 塞进 `HashSet<int>`** —— `EntityId` 到 `int` 的隐式转换同样是弃用的。要去重就直接用对象引用：`HashSet<GameObject>` / `HashSet<T>`，Unity 的 `Object` 有正确的 `Equals`/`GetHashCode` |
 | 循环内 `new WaitForSeconds(x)` | 缓存为字段复用 |
 | `Navigation Static` 静态标记 | **AI Navigation 2.x 已移除该标记**。烘焙范围由 `NavMeshSurface` 的 `Collect Objects`（All / Volume / Children）+ `Include Layers` 决定；要排除个别物体用 `NavMeshModifier` 勾 `Ignore From Build` |
 | `Window → AI → Navigation` 窗口 | 已废弃。用 `NavMeshSurface` 组件上的 `Bake` |

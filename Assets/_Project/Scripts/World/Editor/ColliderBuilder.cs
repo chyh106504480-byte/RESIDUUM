@@ -178,14 +178,15 @@ namespace Residuum.World.Editor
         {
             System.Collections.Generic.List<MeshFilter> meshFilters =
                 new System.Collections.Generic.List<MeshFilter>();
-            System.Collections.Generic.HashSet<int> objectIds = new System.Collections.Generic.HashSet<int>();
+            System.Collections.Generic.HashSet<GameObject> objectIds =
+                new System.Collections.Generic.HashSet<GameObject>();
 
             foreach (GameObject selectedObject in selectedObjects)
             {
                 MeshFilter[] childMeshFilters = selectedObject.GetComponentsInChildren<MeshFilter>(true);
                 foreach (MeshFilter meshFilter in childMeshFilters)
                 {
-                    if (meshFilter != null && objectIds.Add(meshFilter.gameObject.GetInstanceID()))
+                    if (meshFilter != null && objectIds.Add(meshFilter.gameObject))
                     {
                         meshFilters.Add(meshFilter);
                     }
@@ -199,14 +200,15 @@ namespace Residuum.World.Editor
         {
             System.Collections.Generic.List<MeshCollider> meshColliders =
                 new System.Collections.Generic.List<MeshCollider>();
-            System.Collections.Generic.HashSet<int> colliderIds = new System.Collections.Generic.HashSet<int>();
+            System.Collections.Generic.HashSet<MeshCollider> colliderIds =
+                new System.Collections.Generic.HashSet<MeshCollider>();
 
             foreach (GameObject selectedObject in selectedObjects)
             {
                 MeshCollider[] childMeshColliders = selectedObject.GetComponentsInChildren<MeshCollider>(true);
                 foreach (MeshCollider meshCollider in childMeshColliders)
                 {
-                    if (meshCollider != null && colliderIds.Add(meshCollider.GetInstanceID()))
+                    if (meshCollider != null && colliderIds.Add(meshCollider))
                     {
                         meshColliders.Add(meshCollider);
                     }

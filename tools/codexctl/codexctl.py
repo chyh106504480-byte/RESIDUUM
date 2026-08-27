@@ -1158,9 +1158,20 @@ def cmd_run(cfg, args):
     if produced_nothing:
         blocked = True
 
+    # 编译被跳过（Unity 编辑器占用工程）同样不能算通过。
+    # CLAUDE.md 第 6 节：「那一轮就没有编译验证，别把它当成通过」。
+    # 2026-08-26 的 T04F 就是这样溜过去的：自审 11 项全过、闸门 0 error，
+    # 报了「本地验证全绿」，实际编译整个被跳过，合并后才发现 CS0619。
+    compile_skipped = bool(unity) and bool(unity.get("skipped"))
+    if compile_skipped:
+        blocked = True
+
     print("")
     if produced_nothing:
         fail("状态：本轮零产出 —— Codex 一个文件都没改，不是通过")
+    elif compile_skipped:
+        fail("状态：编译被跳过，未通过验证 —— 关掉 Unity 编辑器后重跑 compile")
+        dim("    闸门与自审的结论不能替代编译。CLAUDE.md 第 6 节：别把「跳过」当「通过」。")
         dim("    先读 %s/impl.final.md：它多半在最终回复里说明了为什么停手，"
             % os.path.relpath(out_dir, cfg["project_root"]))
         dim("    常见原因是任务包引用了仓库里并不存在的契约。")
