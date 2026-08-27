@@ -24,10 +24,10 @@ namespace Residuum.Player
 
         [Header("移动")]
         [Tooltip("正常行走速度，单位：米/秒。")]
-        [SerializeField] private float _walkSpeed = 2.8f;
+        [SerializeField] private float _walkSpeed = 2f;
 
         [Tooltip("正常状态下的冲刺速度，单位：米/秒。")]
-        [SerializeField] private float _sprintSpeed = 4.5f;
+        [SerializeField] private float _sprintSpeed = 3.5f;
 
         [Tooltip("猎杀期间肾上腺素加成后的冲刺速度，单位：米/秒。")]
         [SerializeField] private float _huntSprintSpeed = 5.2f;

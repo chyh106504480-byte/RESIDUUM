@@ -63007,14 +63007,14 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1008631337}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0.71620905, z: -0, w: 0.6978859}
   m_LocalPosition: {x: 0, y: 0.1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1553328729}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: -91.485, z: 0}
 --- !u!114 &1008631339
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -63029,16 +63029,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Residuum.Player.PlayerController
   _inputActions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   _cameraPivot: {fileID: 1553328729}
-  _walkSpeed: 2.8
-  _sprintSpeed: 4.5
-  _huntSprintSpeed: 5.2
+  _walkSpeed: 2
+  _sprintSpeed: 3.5
+  _huntSprintSpeed: 3.5
   _crouchSpeed: 1.4
   _gravity: -20
   _groundedVerticalVelocity: -2
   _movingSpeedThreshold: 0.05
-  _staminaDuration: 5
-  _staminaRecoveryDuration: 3
-  _huntStaminaDrainMultiplier: 0.5
+  _staminaDuration: 4.2
+  _staminaRecoveryDuration: 3.5
+  _huntStaminaDrainMultiplier: 0.85
   _standingHeight: 1.8
   _crouchingHeight: 1
   _standingCenter: {x: 0, y: 0.9, z: 0}
@@ -100965,13 +100965,15 @@ MonoBehaviour:
   _renderers:
   - {fileID: 1419571384}
   _footprintPrefab: {fileID: 0}
-  _idleDurationMin: 5
+  _idleDurationMin: 1
   _idleDurationMax: 15
   _roamChance: 0.3
   _ghostRoomRadius: 4
-  _roamWaitMin: 3
-  _roamWaitMax: 8
+  _roamWaitMin: 0.4
+  _roamWaitMax: 1
   _navMeshSampleRadius: 2
+  _minimumRoamDistance: 8
+  _roamPointValidationRadius: 2
   _randomPointSampleAttempts: 8
   _footprintSpacing: 1.5
   _footprintLifetime: 20
@@ -100990,11 +100992,11 @@ MonoBehaviour:
   onFingerprintRequest:
     m_PersistentCalls:
       m_Calls: []
-  _sightCheckInterval: 0.25
-  _lostSightMemoryDuration: 3
+  _sightCheckInterval: 0.1
+  _lostSightMemoryDuration: 4
   _sightBlockMask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 1
   _ghostSightOriginHeight: 1.4
   _fallbackSightMiddleHeight: 0.9
   _fallbackSightUpperHeight: 1.6
@@ -101055,7 +101057,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1419571386}
-  - {fileID: 2134522479}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1574554331
@@ -121070,9 +121071,9 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   _forcedGhost: {fileID: 0}
-  _forceHuntKey: 47
-  _endRoundKey: 49
-  _collectAllEvidenceKey: 48
+  _forceHuntKey: 30
+  _endRoundKey: 26
+  _collectAllEvidenceKey: 25
 --- !u!1001 &1883071175
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -136087,7 +136088,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2134522478}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -136099,7 +136100,7 @@ Transform:
   - {fileID: 111892390}
   - {fileID: 2065005172}
   - {fileID: 1630792577}
-  m_Father: {fileID: 1573739005}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &2135553016 stripped
 Transform:
@@ -144660,5 +144661,6 @@ SceneRoots:
   - {fileID: 1139360675}
   - {fileID: 726923306}
   - {fileID: 140237964}
-  - {fileID: 1023736773}
   - {fileID: 2014203570}
+  - {fileID: 1023736773}
+  - {fileID: 2134522479}

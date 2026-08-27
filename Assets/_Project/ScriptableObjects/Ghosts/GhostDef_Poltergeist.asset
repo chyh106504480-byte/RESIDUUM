@@ -17,7 +17,7 @@ MonoBehaviour:
   journalDescription: "\u66B4\u8E81\u3001\u7834\u574F\uFF0C\u9891\u7E41\u629B\u63B7\u7269\u54C1\u5236\u9020\u5DE8\u54CD\u3002"
   evidences: 0200000003000000
   walkSpeed: 1.7
-  huntSpeed: 1.8
+  huntSpeed: 3.6
   leavesFootprints: 1
   huntDuration: 22
   huntCooldown: 25
