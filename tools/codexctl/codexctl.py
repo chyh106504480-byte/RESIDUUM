@@ -833,7 +833,11 @@ def print_audit(cfg, data):
     by_id = {c["id"]: c["text"] for c in cfg["audit_checklist"]}
     fails = [i for i in data.get("items", []) if i.get("verdict") == "fail"]
     passes = [i for i in data.get("items", []) if i.get("verdict") == "pass"]
-    if data.get("overall") == "pass" and not fails:
+    total = len(data.get("items", []))
+    if total == 0:
+        fail("Codex 自审：一项都没跑 —— 自审未执行，不是通过")
+        dim("    多半是 codex 侧报错（模型容量、鉴权、超时），看 audit.stderr.log")
+    elif data.get("overall") == "pass" and not fails:
         ok("Codex 自审：%d 项全过" % len(passes))
     else:
         fail("Codex 自审：%d 项不通过" % len(fails))
@@ -1166,9 +1170,19 @@ def cmd_run(cfg, args):
     if compile_skipped:
         blocked = True
 
+    # 自审一项都没跑同样不算通过：codex 侧报错（模型容量、鉴权、超时）时
+    # items 会是空列表，而「0 项失败」曾被当成「全过」。
+    # 2026-08-27 的 T14 就是这样：codex 报 "Selected model is at capacity"，
+    # 自审整个没执行，工具却报了「0 项全过 / 本地验证全绿」。
+    audit_empty = bool(audit) and not (audit.get("items") or [])
+    if audit_empty:
+        blocked = True
+
     print("")
     if produced_nothing:
         fail("状态：本轮零产出 —— Codex 一个文件都没改，不是通过")
+    elif audit_empty:
+        fail("状态：自审一项都没跑，未通过验证 —— 看 audit.stderr.log 后重跑")
     elif compile_skipped:
         fail("状态：编译被跳过，未通过验证 —— 关掉 Unity 编辑器后重跑 compile")
         dim("    闸门与自审的结论不能替代编译。CLAUDE.md 第 6 节：别把「跳过」当「通过」。")
