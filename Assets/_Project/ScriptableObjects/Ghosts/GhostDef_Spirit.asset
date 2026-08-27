@@ -20,7 +20,7 @@ MonoBehaviour:
   huntSpeed: 3.3
   leavesFootprints: 1
   huntDuration: 30
-  huntCooldown: 25
+  huntCooldown: 100
   sanityDrainMultiplier: 1
   canSprintBurst: 0
   sprintBurstInterval: 6
