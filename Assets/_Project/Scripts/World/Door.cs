@@ -16,9 +16,16 @@ namespace Residuum.World
         [Tooltip("门的铰链 Transform。留空时使用当前 Door 所在的 Transform。")]
         [SerializeField] private Transform _hinge;
 
+        [Header("猎杀上锁")]
+        [Tooltip("勾上后，这扇门在猎杀期间会自动关闭并锁死。只给通往一楼的楼梯门勾")]
+        [SerializeField] private bool _locksDuringHunt = false;
+
+        [Tooltip("上锁时玩家看到的提示文本")]
+        [SerializeField] private string _lockedPromptText = "门被什么东西抵住了";
+
         public bool IsOpen { get; private set; }
-        public string PromptText => IsOpen ? "[E] 关门" : "[E] 开门";
-        public bool CanInteract => true;
+        public string PromptText => _isLocked ? _lockedPromptText : IsOpen ? "[E] 关门" : "[E] 开门";
+        public bool CanInteract => !_isLocked;
 
         private UnityEngine.AI.NavMeshObstacle _navMeshObstacle;
         private Quaternion _closedRotation;
@@ -29,6 +36,7 @@ namespace Residuum.World
         private float _transitionDuration;
         private bool _isTransitioning;
         private bool _targetOpen;
+        private bool _isLocked;
 
         private void Awake()
         {
@@ -46,6 +54,20 @@ namespace Residuum.World
             IsOpen = false;
             _isTransitioning = false;
             UpdateNavMeshObstacle();
+        }
+
+        private void OnEnable()
+        {
+            GameEvents.OnHuntStart += HandleHuntStart;
+            GameEvents.OnHuntEnd += HandleHuntEnd;
+            GameEvents.OnRoundStart += HandleRoundStart;
+        }
+
+        private void OnDisable()
+        {
+            GameEvents.OnHuntStart -= HandleHuntStart;
+            GameEvents.OnHuntEnd -= HandleHuntEnd;
+            GameEvents.OnRoundStart -= HandleRoundStart;
         }
 
         private void Update()
@@ -96,6 +118,33 @@ namespace Residuum.World
             UpdateNavMeshObstacle();
         }
 
+        private void HandleHuntStart(float duration)
+        {
+            _ = duration;
+
+            if (!_locksDuringHunt)
+            {
+                return;
+            }
+
+            if (IsOpen)
+            {
+                Interact(gameObject);
+            }
+
+            _isLocked = true;
+        }
+
+        private void HandleHuntEnd()
+        {
+            _isLocked = false;
+        }
+
+        private void HandleRoundStart()
+        {
+            _isLocked = false;
+        }
+
         private void UpdateNavMeshObstacle()
         {
             if (_navMeshObstacle != null)
@@ -118,6 +167,7 @@ namespace Residuum.World
             _hinge = null;
             _navMeshObstacle = null;
             _isTransitioning = false;
+            _isLocked = false;
         }
     }
 }

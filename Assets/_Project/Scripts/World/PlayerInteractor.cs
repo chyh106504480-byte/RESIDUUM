@@ -126,7 +126,6 @@ namespace Residuum.World
             }
 
             IInteractable nextInteractable = IsInteractableAlive(_cachedInteractable)
-                && _cachedInteractable.CanInteract
                 ? _cachedInteractable
                 : null;
 
@@ -139,7 +138,6 @@ namespace Residuum.World
 
             if (!IsInteractableAlive(_currentInteractable) || !_currentInteractable.CanInteract)
             {
-                SetCurrentInteractable(null);
                 return;
             }
 
