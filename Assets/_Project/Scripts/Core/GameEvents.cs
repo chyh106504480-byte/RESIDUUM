@@ -80,6 +80,18 @@ namespace Residuum.Core
         /// <summary>参数：true = 已进入藏匿点</summary>
         public static event Action<bool> OnHidingChanged;
 
+        /// <summary>
+        /// 视角控制是否被界面接管。参数 true 表示界面正在使用鼠标，玩家不应转头。
+        ///
+        /// 【和 OnHidingChanged 的区别】躲藏会连移动一起停掉，这个只停视角——
+        /// 玩家翻笔记本的时候照样能走动、照样会被鬼摸到，打开界面不是安全屋。
+        ///
+        /// 【谁管光标】只有 PlayerController。它收到这个事件后按自己的
+        /// _lockCursorOnStart 决定解锁与恢复。界面一方**不要**自己写
+        /// Cursor.lockState 或 Cursor.visible，两处同时写必然打架。
+        /// </summary>
+        public static event Action<bool> OnLookSuspendedChanged;
+
         // ─────────────────────────────────────────────
         //  玩家交互
         // ─────────────────────────────────────────────
@@ -183,6 +195,7 @@ namespace Residuum.Core
         public static void RaiseGhostInteract(Vector3 pos)    => OnGhostInteract?.Invoke(pos);
         public static void RaiseGhostEvent(Vector3 pos)       => OnGhostEvent?.Invoke(pos);
         public static void RaiseHidingChanged(bool hiding)    => OnHidingChanged?.Invoke(hiding);
+        public static void RaiseLookSuspendedChanged(bool suspended) => OnLookSuspendedChanged?.Invoke(suspended);
         public static void RaiseInteractPromptChanged(string prompt) => OnInteractPromptChanged?.Invoke(prompt);
         public static void RaisePlayerTemperatureChanged(float celsius) => OnPlayerTemperatureChanged?.Invoke(celsius);
         public static void RaiseSlotChanged(int slot, string itemName)  => OnSlotChanged?.Invoke(slot, itemName);
@@ -213,6 +226,7 @@ namespace Residuum.Core
             OnGhostInteract = null;
             OnGhostEvent = null;
             OnHidingChanged = null;
+            OnLookSuspendedChanged = null;
             OnInteractPromptChanged = null;
             OnPlayerTemperatureChanged = null;
             OnSlotChanged = null;
