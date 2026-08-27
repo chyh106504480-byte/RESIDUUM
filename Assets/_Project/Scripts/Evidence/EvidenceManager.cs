@@ -27,6 +27,29 @@ namespace Residuum.Evidence
         public int FoundCount => _foundEvidence.Count;
         public bool IsConclusive => _candidates.Count == 1;
 
+        /// <summary>该项证据是否已被实际采集到。</summary>
+        public bool IsFound(EvidenceType type)
+        {
+            return IsValidEvidence(type) && _foundEvidence.Contains(type);
+        }
+
+        /// <summary>
+        /// 该项证据是否被玩家手动标记为「确认不存在」。
+        /// 已发现的证据永远返回 false。
+        /// </summary>
+        public bool IsRuled(EvidenceType type)
+        {
+            return IsValidEvidence(type) &&
+                   !_foundEvidence.Contains(type) &&
+                   _ruledEvidence.Contains(type);
+        }
+
+        /// <summary>
+        /// 候选鬼种为空——玩家的手动排除与实际发现互相矛盾。
+        /// 界面应提示玩家撤销某项排除。
+        /// </summary>
+        public bool HasContradiction => _candidates.Count == 0;
+
         private void Awake()
         {
             if (!ValidateGhostDefinitions())
@@ -119,6 +142,9 @@ namespace Residuum.Evidence
 
         private void RebuildCandidates()
         {
+            if (_allGhosts == null)
+                return;
+
             var nextCandidates = new List<Residuum.Ghost.GhostDefinition>(_allGhosts.Length);
 
             for (int i = 0; i < _allGhosts.Length; i++)
