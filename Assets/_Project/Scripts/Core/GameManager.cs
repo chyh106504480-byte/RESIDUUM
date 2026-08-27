@@ -422,6 +422,12 @@ namespace Residuum.Core
                 this);
 
             GameEvents.RaiseRoundEnd(result);
+            GameEvents.RaiseRoundSummary(new RoundSummary(
+                result,
+                _selectedGhost != null ? _selectedGhost.ghostName : string.Empty,
+                _submittedGuess != null ? _submittedGuess.ghostName : null,
+                FoundCount,
+                elapsedSeconds));
         }
 
         private void AbortRoundStart()
