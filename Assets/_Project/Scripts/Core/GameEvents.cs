@@ -24,6 +24,17 @@ namespace Residuum.Core
         public static event Action OnRoundStart;
         public static event Action<RoundResult> OnRoundEnd;
 
+        /// <summary>
+        /// 结算明细。**在 OnRoundEnd 之后触发**，供结算界面展示真凶与玩家判定。
+        /// 只关心成败等级的模块订阅 OnRoundEnd 即可，不必订阅这个。
+        ///
+        /// 【顺序为什么是「之后」】判定笔记本在 OnRoundEnd 里会关闭自己并
+        /// 重新启用 PlayerController（连带把光标锁回去）。结算面板要禁用
+        /// PlayerController 才能让玩家点到按钮，必须排在笔记本后面执行，
+        /// 否则会被笔记本的还原动作覆盖，玩家点不到「再来一局」。
+        /// </summary>
+        public static event Action<RoundSummary> OnRoundSummary;
+
         // ─────────────────────────────────────────────
         //  理智
         // ─────────────────────────────────────────────
@@ -161,6 +172,7 @@ namespace Residuum.Core
         // ─────────────────────────────────────────────
         public static void RaiseRoundStart()                  => OnRoundStart?.Invoke();
         public static void RaiseRoundEnd(RoundResult r)       => OnRoundEnd?.Invoke(r);
+        public static void RaiseRoundSummary(RoundSummary s)  => OnRoundSummary?.Invoke(s);
         public static void RaiseSanityChanged(float v)        => OnSanityChanged?.Invoke(v);
         public static void RaiseSanityCritical()              => OnSanityCritical?.Invoke();
         public static void RaiseSanityThresholdCrossed(float threshold) => OnSanityThresholdCrossed?.Invoke(threshold);
@@ -190,6 +202,7 @@ namespace Residuum.Core
         {
             OnRoundStart = null;
             OnRoundEnd = null;
+            OnRoundSummary = null;
             OnSanityChanged = null;
             OnSanityCritical = null;
             OnSanityThresholdCrossed = null;
