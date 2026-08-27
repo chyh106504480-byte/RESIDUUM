@@ -164,6 +164,8 @@ namespace Residuum.Player
         private bool _isHiding;
         private bool _sprintLockedUntilFull;
         private bool _isTryingToStand;
+        private bool _standRequested;
+        private bool _crouchActionSubscribed;
 
         private float _verticalVelocity;
         private float _yaw;
@@ -222,6 +224,12 @@ namespace Residuum.Player
             GameEvents.OnHuntEnd += HandleHuntEnd;
             GameEvents.OnHidingChanged += HandleHidingChanged;
 
+            if (_crouchAction != null)
+            {
+                _crouchAction.performed += HandleCrouchPerformed;
+                _crouchActionSubscribed = true;
+            }
+
             if (_isInitialized)
             {
                 EnableInputActions();
@@ -233,6 +241,13 @@ namespace Residuum.Player
             GameEvents.OnHuntStart -= HandleHuntStart;
             GameEvents.OnHuntEnd -= HandleHuntEnd;
             GameEvents.OnHidingChanged -= HandleHidingChanged;
+
+            if (_crouchActionSubscribed && _crouchAction != null)
+            {
+                _crouchAction.performed -= HandleCrouchPerformed;
+            }
+
+            _crouchActionSubscribed = false;
 
             DisableInputActions();
             IsSprinting = false;
@@ -373,29 +388,60 @@ namespace Residuum.Player
             }
         }
 
+        private void HandleCrouchPerformed(InputAction.CallbackContext context)
+        {
+            if (_isHiding)
+            {
+                return;
+            }
+
+            if (IsCrouched)
+            {
+                _standRequested = !_standRequested;
+                if (!_standRequested)
+                {
+                    _isTryingToStand = false;
+                    _heightSmoothVelocity = Mathf.Min(_heightSmoothVelocity, 0f);
+                }
+
+                return;
+            }
+
+            IsCrouched = true;
+            _standRequested = false;
+            _isTryingToStand = false;
+            _heightSmoothVelocity = Mathf.Min(_heightSmoothVelocity, 0f);
+        }
+
         private void UpdateCrouch(float deltaTime)
         {
-            bool crouchRequested = _isHiding ? IsCrouched : _crouchAction.IsPressed();
-            if (crouchRequested)
+            if (_isHiding)
             {
                 if (_isTryingToStand)
                 {
                     _heightSmoothVelocity = Mathf.Min(_heightSmoothVelocity, 0f);
                 }
 
-                IsCrouched = true;
+                _standRequested = false;
                 _isTryingToStand = false;
             }
             else if (IsCrouched)
             {
-                // 起身不是一次性判定：过渡全程每帧检查，途中进入低顶区域会立即停止增高。
-                bool canContinueStanding = CanStandUp();
-                if (_isTryingToStand && !canContinueStanding)
+                if (_standRequested)
                 {
-                    _heightSmoothVelocity = Mathf.Min(_heightSmoothVelocity, 0f);
-                }
+                    // 起身不是一次性判定：过渡全程每帧检查，途中进入低顶区域会立即停止增高。
+                    bool canContinueStanding = CanStandUp();
+                    if (_isTryingToStand && !canContinueStanding)
+                    {
+                        _heightSmoothVelocity = Mathf.Min(_heightSmoothVelocity, 0f);
+                    }
 
-                _isTryingToStand = canContinueStanding;
+                    _isTryingToStand = canContinueStanding;
+                }
+                else
+                {
+                    _isTryingToStand = false;
+                }
             }
 
             float targetHeight = IsCrouched && !_isTryingToStand
@@ -422,6 +468,7 @@ namespace Residuum.Player
                 _characterController.height = _standingHeight;
                 _characterController.center = _standingCenter;
                 IsCrouched = false;
+                _standRequested = false;
                 _isTryingToStand = false;
             }
         }
