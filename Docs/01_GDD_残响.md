@@ -28,6 +28,28 @@
 
 | 鬼种 | EMF-5 电磁读数 | 紫外线指纹 | 鬼影书写 |
 |------|:---:|:---:|:---:|
+### 速度基准（2026-08-27 由 Henry 重新定标，以本表为准）
+
+三种鬼的猎杀速度刻意压在玩家常态冲刺附近，让「跑」成为一个有代价的选择
+而不是稳赢的答案。
+
+| 谁 | 速度 | 在哪调 |
+|---|---|---|
+| 玩家 行走 | 2.0 m/s | `PlayerController._walkSpeed` |
+| 玩家 冲刺 | 3.5 m/s | `PlayerController._sprintSpeed` |
+| 玩家 蹲行 | 1.4 m/s | `PlayerController._crouchSpeed` |
+| 玩家 猎杀期冲刺 | 5.2 m/s | `PlayerController._huntSprintSpeed` |
+| 怨灵 猎杀 | 3.3 m/s | `GhostDef_Spirit.huntSpeed` |
+| 幽影 猎杀 | 3.4 m/s | `GhostDef_Wraith.huntSpeed` |
+| 骚灵 猎杀 | 3.6 m/s | `GhostDef_Poltergeist.huntSpeed` |
+
+**猎杀期冲刺 5.2 是刻意高于所有鬼的。**逃跑的约束不是速度而是体力：
+体力耗尽后玩家掉回行走 2.0，任何一种鬼都追得上。所以猎杀的紧张感来自
+「体力还够不够撑到藏身处」，不是来自「跑不跑得过」。
+
+猎杀结束后有 100 秒安全期（三个鬼的 `huntCooldown`），
+期间不会触发第二次猎杀。
+
 | **怨灵 Spirit** | ✓ | ✓ | — |
 | **幽影 Wraith** | ✓ | — | ✓ |
 | **骚灵 Poltergeist** | — | ✓ | ✓ |

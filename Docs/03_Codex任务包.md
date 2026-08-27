@@ -55,9 +55,10 @@ Player map 下：Move(Vector2)、Look(Vector2)、Sprint(Button)、Crouch(Button)
 要求：
 
 - 使用 CharacterController 组件做移动
-- 移动：WASD 行走(默认2.8 m/s)、Shift 冲刺(4.5 m/s，有体力条：满值5秒，
-  耗尽后需3秒恢复才能再冲刺)、Ctrl 蹲下(1.4 m/s，同时把 CharacterController
+- 移动：WASD 行走(默认 2.0 m/s)、Shift 冲刺(3.5 m/s，有体力条：满值5秒，
+  耗尽后需3秒恢复才能再冲刺)、C 键切换蹲下(1.4 m/s，同时把 CharacterController
   height 从 1.8 平滑插值到 1.0，摄像机跟随)
+  - 猎杀期间冲刺速度另有一档「肾上腺素」加成，见 `01_GDD` §速度基准
 - 视角：鼠标控制，灵敏度可调，垂直角度限制 ±85 度，支持在 Inspector 中开关反转Y轴
 - 头部摆动(head bob)：行走和冲刺时摄像机做正弦上下+左右摆动，振幅和频率分别可调，
   蹲下时振幅减半。静止时平滑回中。
