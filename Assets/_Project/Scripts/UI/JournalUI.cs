@@ -37,10 +37,6 @@ namespace Residuum.UI
         [SerializeField] private UnityEngine.InputSystem.Key _toggleKey =
             UnityEngine.InputSystem.Key.Tab;
 
-        [Tooltip("拖入玩家身上的 PlayerController 组件。笔记本打开时会禁用它，" +
-                 "从而同时停掉移动、视角与光标锁定；关闭时恢复")]
-        [SerializeField] private MonoBehaviour _playerControllerBehaviour;
-
         [Tooltip("场景里的 EvidenceManager")]
         [SerializeField] private Residuum.Evidence.EvidenceManager _evidenceManager;
 
@@ -287,10 +283,7 @@ namespace Residuum.UI
             _isJournalOpen = shouldOpen;
             _journalRoot.SetActive(shouldOpen);
 
-            if (_playerControllerBehaviour != null)
-            {
-                _playerControllerBehaviour.enabled = !shouldOpen;
-            }
+            GameEvents.RaiseLookSuspendedChanged(shouldOpen);
 
             if (shouldOpen)
             {
@@ -521,12 +514,6 @@ namespace Residuum.UI
             {
                 return DisableWithError(
                     "[JournalUI] _journalRoot 不能是 JournalUI 所在对象或其父对象，否则关闭界面后无法再检测 Tab。组件已禁用。");
-            }
-
-            if (_playerControllerBehaviour == this)
-            {
-                return DisableWithError(
-                    "[JournalUI] _playerControllerBehaviour 不能引用 JournalUI 自身。组件已禁用。");
             }
 
             int ghostCount = _allGhosts == null ? 0 : _allGhosts.Length;
