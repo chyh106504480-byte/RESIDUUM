@@ -135,6 +135,7 @@ namespace Residuum.World.Editor
             hingeTransform.rotation = firstDoorTransform.rotation;
             hingeTransform.localScale = Vector3.one;
 
+            DetachExcludedChildren(doorObjects, originalParent, undoLabel);
             foreach (GameObject doorObject in doorObjects)
             {
                 UnityEditor.Undo.SetTransformParent(doorObject.transform, hingeTransform, true, undoLabel);
@@ -154,6 +155,33 @@ namespace Residuum.World.Editor
 
             AddNavMeshObstacle(hingeObject, hingeTransform, worldBounds, undoLabel);
             return hingeObject;
+        }
+
+        private static void DetachExcludedChildren(
+            System.Collections.Generic.List<GameObject> doorObjects,
+            Transform originalParent,
+            string undoLabel)
+        {
+            System.Collections.Generic.HashSet<Transform> excludedTransforms =
+                new System.Collections.Generic.HashSet<Transform>();
+
+            foreach (GameObject doorObject in doorObjects)
+            {
+                Transform[] childTransforms = doorObject.GetComponentsInChildren<Transform>(true);
+                foreach (Transform childTransform in childTransforms)
+                {
+                    if (childTransform != doorObject.transform
+                        && ContainsExcludedKeyword(childTransform.name))
+                    {
+                        excludedTransforms.Add(childTransform);
+                    }
+                }
+            }
+
+            foreach (Transform excludedTransform in excludedTransforms)
+            {
+                UnityEditor.Undo.SetTransformParent(excludedTransform, originalParent, true, undoLabel);
+            }
         }
 
         private static Vector3 GetHingePosition(Bounds worldBounds, HingeSide hingeSide)
