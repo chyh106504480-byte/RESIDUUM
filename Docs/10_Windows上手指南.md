@@ -1,84 +1,177 @@
-# 10 · Windows 端上手指南
+# 10 · Windows 端上手指南（零基础版）
 
-**给谁看**：拿到 GitHub 仓库、在 Windows 上第一次打开《残响》的成员。
-**结论先行**：仓库本身没有问题，Unity Hub 一定能识别这个工程。打不开 / 打开是空的，
-只可能是下面三件事之一没做对。照这份文档从头走一遍，不要跳步。
-
----
-
-## 为什么说仓库没问题
-
-以下几项已在 macOS 端逐条核对过，都是正常的（列在这里是为了你不用再怀疑仓库）：
-
-- `ProjectSettings/ProjectVersion.txt` 已入库 —— Unity Hub 靠它识别项目版本
-- `Packages/manifest.json` 与 `packages-lock.json` 已入库，没有任何 `file:` 本地路径依赖
-- `Assets/` 下 137 个入库文件，`.meta` 一个不缺（含文件夹 meta）
-- 没有符号链接、没有大小写重名、没有 Windows 非法字符（`: * ? " < > |`）的文件名
-- 最长路径 85 字符，远低于 Windows 260 限制
-- 本地 `main` 与 `origin/main` 完全同步
-
-所以：**你遇到的问题在你这一侧的环境，不在代码里。**
+**给谁看**：第一次拿到《残响》仓库、在 Windows 上要把工程跑起来的成员。
+**假设你什么都不会**：没用过 Git、没用过 Unity Hub 也没关系，照着做就行。
 
 ---
 
-## 第 0 步 · 装对三样东西
+## 这份文档怎么用
 
-### 1. Git for Windows + Git LFS
+- **从头到尾按顺序做，一步都别跳。** 每一步依赖前一步。
+- 每步末尾有一行 **✅ 做对了你会看到……**，对不上就别往下走，先解决。
+- 全程大概 **1.5～3 小时**，其中绝大部分是等下载和等 Unity 导入。
+- 卡住了看最后的 [第 10 节 · 卡住了怎么办](#10-卡住了怎么办)。
 
-从 <https://git-scm.com/download/win> 装 Git。安装向导里勾上 Git LFS（默认勾选）。
-装完开一个 PowerShell 确认：
+**先说一件事，免得你怀疑人生**：如果你已经打开了工程，但场景里空空荡荡，
+只有几个青色线框盒子和飘在空中的名字——**工程没坏，是第 7 节没做**。
+直接跳到那一节。
+
+---
+
+## 1. 你要装的四样东西，各是干什么的
+
+新手最容易懵的是"为什么要装这么多"。花两分钟看懂，后面就不会乱点。
+
+| 东西 | 是什么 | 不装会怎样 |
+|---|---|---|
+| **Git** | 版本管理工具。三个人改同一个项目不互相覆盖，靠它 | 拿不到代码，也没法把你的改动交上来 |
+| **Git LFS** | Git 的大文件插件（Large File Storage） | 仓库里 3 个图片文件会变成一堆乱码文本，Unity 报错 |
+| **Unity Hub** | 一个启动器。管理"装了哪几个版本的 Unity"和"有哪些项目" | 没法打开项目 |
+| **Unity 编辑器 6000.5.8f1** | 真正干活的软件本体，4 GB 多 | Hub 里能看到项目，但点了打不开 |
+
+还有第五样，不是"装"的，是"导入"的：
+
+| **Apartment Kit** | 美术素材包（墙、地板、家具模型）。**不在仓库里**，每人自己领 | 场景一片空白，只剩线框 |
+
+> **为什么素材包不放进仓库？** 它 325.9 MB。GitHub 免费账号的大文件额度很小，
+> 放进去几天就爆了。而且 Unity 商店的条款不允许把素材原始文件单独打包分发。
+> 所以约定：每人用自己的 Unity 账号免费领一份、各自导入。
+
+---
+
+## 2. 装 Git 和 Git LFS
+
+1. 打开 <https://git-scm.com/download/win>，会自动开始下载（约 60 MB）
+2. 双击安装。**一路点 Next 就行，不用改任何选项** ——
+   默认已经勾上了 Git LFS 和 Git Bash
+3. 装完，按 `Win` 键搜索 **PowerShell**，打开它
+
+> **PowerShell 是什么？** Windows 自带的命令行窗口，就是那个黑框框。
+> 后面所有命令都在这里敲。**复制粘贴就行，不用手打。**
+> 粘贴用 `Ctrl+V`（右键点一下也能粘贴），敲完按回车执行。
+
+在 PowerShell 里粘贴这条，回车：
 
 ```bash
-git --version && git lfs version
+git --version
 ```
 
-两条都要有输出。然后**必须**执行一次（每台机器只需一次）：
+```bash
+git lfs version
+```
+
+两条都要有版本号输出。然后**必须**执行这一条（每台电脑只需要做一次）：
 
 ```bash
 git lfs install
 ```
 
-**没装 LFS 的后果**：仓库里 3 个文件（`Assets/TutorialInfo/Icons/URP.png`、
-两个反射探针 `.exr`）会变成 130 字节左右的文本文件，Unity 导入时报错。
+✅ **做对了你会看到**：三条命令都有输出，最后一条显示 `Git LFS initialized.`
 
-### 2. Unity Hub
+❌ 如果提示 `git 不是内部或外部命令` / `not recognized`：
+把 PowerShell 关掉重新开一个再试（安装程序改了环境变量，旧窗口读不到）。
+还不行就重启电脑。
 
-<https://unity.com/download>
+---
 
-### 3. Unity 编辑器 —— 必须是 `6000.5.8f1`，一个字都不能差
+## 3. 装 Unity Hub
 
-这是最常见的「Hub 里能添加、点了进不去」的原因：**Hub 的 Installs 列表默认只列
-LTS 和推荐版，不会列出 6000.5.8f1**，所以你在 Hub 里手动找是找不到的，必须用深链。
+1. 打开 <https://unity.com/download>，点 **Download for Windows**
+2. 双击安装，一路 Next
+3. 打开 Unity Hub，它会让你**登录 Unity 账号**
 
-装好 Unity Hub 之后，在浏览器地址栏粘贴这个链接并回车，Hub 会自动接管：
+> **必须登录，而且要记住这个账号。** 第 7 节领素材包用的是同一个账号。
+> 没有就注册一个，免费。
+
+4. 登录后 Hub 可能提示需要 **License（许可证）**。
+   点 `Manage licenses` → `Add license` → `Get a free personal license`，
+   选个人版，免费。
+
+✅ **做对了你会看到**：Unity Hub 左侧有 `Projects` / `Installs` 等菜单，
+右上角显示你的头像，没有红色的许可证警告。
+
+---
+
+## 4. 装 Unity 编辑器 —— 必须是 `6000.5.8f1`
+
+**这是"Hub 里能添加项目，但点了进不去"的头号原因，请特别认真读这一节。**
+
+### 为什么不能在 Hub 里自己找
+
+Unity Hub 的 `Installs` → `Install Editor` 列表**只列长期支持版和推荐版，
+不会列出 6000.5.8f1**。你在里面翻是翻不到的，必须用专用链接。
+
+### 怎么装
+
+**方法一（推荐）**：在浏览器地址栏里粘贴下面这串，回车。
+浏览器会问"是否打开 Unity Hub"，点允许，Hub 会自动开始下载安装。
 
 ```
 unityhub://6000.5.8f1/5cb7df797b7d
 ```
 
-深链不生效的话，用直链下载安装器（4.06 GB，已验证可下载）：
+**方法二**：方法一没反应的话，直接下安装包（4.06 GB，已验证可下载）：
 
 ```
 https://download.unity3d.com/download_unity/5cb7df797b7d/Windows64EditorInstaller/UnitySetup64-6000.5.8f1.exe
 ```
 
-安装时**模块只需要勾** `Microsoft Visual Studio Community` 或 `Visual Studio Editor`
-（二选一，用于写 C#）。Android / iOS / WebGL 全都不要勾，工程不需要，能省十几个 GB。
+### 安装时勾什么模块
 
-> **不要用别的版本"凑合打开"。** Unity Hub 允许你用更高版本打开旧工程，但那会
-> 不可逆地升级 `ProjectSettings` 和场景文件，一提交就把所有人炸掉。工程锁定
-> 6000.5.8f1，不降 LTS，也不升。
+安装向导会让你选附加模块（Add modules）：
+
+- ✅ **勾** `Microsoft Visual Studio Community` 或 `Visual Studio Editor`（二选一，写代码用）
+- ❌ **不要勾** Android Build Support、iOS Build Support、WebGL、Linux、Mac
+  —— 这个项目只在 Windows/Mac 上跑，勾了白白多下十几个 GB
+
+下载 + 安装大概 **20～40 分钟**，取决于网速。可以先去做第 5 节，两边并行。
+
+### 千万别用别的版本"凑合打开"
+
+Unity Hub 允许你用更高版本打开旧项目，还会弹窗劝你升级。**一定要拒绝。**
+一旦用更高版本打开，它会**不可逆地**改写工程配置和场景文件，你一提交，
+全组的工程一起废掉。工程锁死在 `6000.5.8f1`，不升也不降。
+
+✅ **做对了你会看到**：Unity Hub → `Installs` 里有一行 `6000.5.8f1`。
 
 ---
 
-## 第 1 步 · 克隆仓库
+## 5. 把项目代码下载到本地
 
-### 不要用 GitHub 网页的「Download ZIP」
+### 先说：不要用 GitHub 网页上的绿色按钮「Download ZIP」
 
-ZIP 包里的 LFS 文件是指针文本，不是真文件，而且没有 `.git` 目录，你没法拉更新、
-没法提交。**必须用 git clone。**
+三个原因：
 
-先做两条全局配置（每台机器一次）：
+1. ZIP 里的大文件是**假的**（只是几行文字占位），Unity 会报错
+2. 没有 `.git` 文件夹，你**拿不到别人的更新**，也**提交不了自己的改动**
+3. 等于脱离了团队协作
+
+正确做法是 `git clone`（克隆）。
+
+### 选一个存放位置，这个很重要
+
+新手最常踩的坑就是位置选错。**四条硬要求**：
+
+| 要求 | 为什么 |
+|---|---|
+| 路径**全英文**，不要有中文和空格 | Unity 和一些工具处理中文路径会出莫名其妙的错 |
+| **不要放在 OneDrive / 百度网盘 / 坚果云同步目录里** | 同步软件会锁住文件，Unity 导入随机失败，而且会疯狂上传几 GB 垃圾 |
+| **不要放桌面、不要放"我的文档"** | 这两个位置在中文用户名下就是中文路径，而且常被 OneDrive 接管 |
+| 路径**别太深** | Windows 有 260 字符路径长度限制 |
+
+**推荐就用 `D:\Dev`。** 没有 D 盘就用 `C:\Dev`。
+
+在 PowerShell 里依次执行：
+
+```bash
+mkdir D:\Dev
+```
+
+```bash
+cd D:\Dev
+```
+
+### 两条全局配置（每台电脑做一次）
 
 ```bash
 git config --global core.longpaths true
@@ -88,217 +181,333 @@ git config --global core.longpaths true
 git config --global core.autocrlf true
 ```
 
-然后克隆。**路径要求**（很重要）：
-
-- 全英文路径，不要有中文、空格
-- **不要放在 OneDrive / 百度网盘 / 坚果云等同步目录里** —— 同步软件会锁住
-  `Library/` 里的文件，Unity 导入会随机失败
-- 不要放在桌面（桌面在中文用户名下就是中文路径）
-- 建议直接放盘符根附近，例如 `D:\Dev\`
+### 克隆
 
 ```bash
-cd /d D:\Dev && git clone https://github.com/chyh106504480-byte/RESIDUUM.git
+git clone https://github.com/chyh106504480-byte/RESIDUUM.git
 ```
 
-克隆完确认 LFS 文件是真文件而不是指针：
+第一次可能会弹窗让你登录 GitHub，按提示登录即可。
+下载完成后进入项目目录：
 
 ```bash
-cd D:\Dev\RESIDUUM && git lfs ls-files
+cd D:\Dev\RESIDUUM
 ```
 
-应该列出 3 个文件。如果这条命令输出为空，说明 `git lfs install` 没生效，
-补跑一次然后 `git lfs pull`。
+### 确认大文件是真的下下来了
+
+```bash
+git lfs ls-files
+```
+
+✅ **做对了你会看到**：列出 **3 个文件**（一个 `.png` 和两个 `.exr`）。
+
+❌ **输出是空的**：说明第 2 节的 `git lfs install` 没生效。补跑一次，然后：
+
+```bash
+git lfs pull
+```
 
 ---
 
-## 第 2 步 · Unity Hub 添加项目
+## 6. 在 Unity Hub 里添加项目
 
-1. Unity Hub → `Projects` → 右上角 `Add` → `Add project from disk`
-2. 选 **`D:\Dev\RESIDUUM`** 这一层 —— 就是**直接包含 `Assets` 和 `ProjectSettings`
-   两个文件夹的那一层**。不要选它的父目录，也不要选进 `Assets` 里面。
-3. 添加后看项目那一行右侧的 **Editor Version** 列：
-   - 显示 `6000.5.8f1` 且是普通颜色 → 正常，点项目名打开
-   - 显示黄色感叹号 / 带下载图标 / 点了没反应 → **版本没装，回第 0 步第 3 条**
+1. 打开 Unity Hub → 左侧 `Projects`
+2. 右上角 `Add` 旁边的小箭头 → **`Add project from disk`**
+3. 选文件夹：**`D:\Dev\RESIDUUM`**
 
-**首次打开要 15–40 分钟**（Unity 要把 `Assets` 全量导入、生成 `Library/`）。
-进度条走到一半像卡死是正常的，**不要中途关掉**，关掉会留下半截 `Library/`，
-下次打开更慢甚至报错。真要重来就把 `Library/` 整个删掉重新打开。
+> **选哪一层？** 就是**直接装着 `Assets` 和 `ProjectSettings` 两个文件夹的那一层**。
+> 不要选它外面的 `D:\Dev`，也不要点进 `Assets` 里面去选。
+> 选中 `RESIDUUM` 文件夹后直接点"选择文件夹"，不用双击进去。
+
+4. 添加成功后，项目列表里会出现一行 `RESIDUUM`。**先看这一行右边的
+   `Editor Version` 那一列**：
+
+| 你看到的 | 说明 | 怎么办 |
+|---|---|---|
+| `6000.5.8f1`，正常颜色 | 一切正常 | 点项目名打开 |
+| 黄色感叹号 / 带下载图标 / 点了没反应 | **编辑器版本没装** | 回第 4 节 |
+| 提示"不是有效的 Unity 项目" | 文件夹层级选错了 | 回本节第 3 步重选 |
+
+### 第一次打开会很久，不要中途关掉
+
+Unity 要把所有素材导入一遍、生成 `Library` 缓存文件夹，**15～40 分钟**是正常的。
+进度条会在某处停很久看起来像卡死，**那是正常的，耐心等**。
+
+⚠️ **中途关掉的后果**：会留下半截 `Library`，下次打开更慢，甚至直接报错。
+真的需要重来，就把 `D:\Dev\RESIDUUM\Library` 整个文件夹删掉，再重新打开。
+（删 `Library` 是安全的，它是本地缓存，不是你的工作成果。）
+
+✅ **做对了你会看到**：Unity 编辑器窗口打开了，标题栏里有 `RESIDUUM`。
 
 ---
 
-## 第 3 步 · 导入 Apartment Kit（不做这步，场景是空的）
-
-**这是「工程打开了，但 Blockout 场景里什么都没有 / 一片品红」的唯一原因，
-也是最容易被误认为"项目坏了"的一步。**
+## 7. 导入素材包 Apartment Kit（不做这步场景就是空的）
 
 ### 先确认你是不是撞上了这个
 
-打开 `Blockout.unity` 之后，如果 Scene 视图里是这样：
+打开场景 `Blockout.unity` 之后，如果 Scene 视图里是这样：
 
-- 看不到任何墙、地板、家具，只有几个**青色/白色线框盒子**
-- 空中飘着 `Int_Apt_01_Floor_01 (45)` 之类的**名字标签**，但对应位置什么都没有
-- Hierarchy 里对象都在、层级完整，但图标是断裂的预制体图标
-- 可能还有一两个**品红色**的物体
+- 看不到任何墙、地板、家具，只有几个**青色 / 白色的线框盒子**
+- 空中飘着 `Int_Apt_01_Floor_01 (45)` 这样的**名字标签**，但对应位置什么都没有
+- Hierarchy（左边的对象列表）里对象都在、层级完整，但图标是断裂的
+- 可能还有一两个**品红色（粉紫色）**的物体
 
-那就是这一步没做（或者没做对）。**工程本身完全正常。**
+**那就是这一步没做（或者没做对）。工程本身完全正常，不用怀疑。**
 
-原因是硬的：`Blockout.unity` 里有 **1756 个预制体实例**，其中 **171 个外部引用**
-指向 Apartment Kit。工程自带的可见几何体只有 41 个 MeshRenderer。
-换句话说，**没有这个包，场景里 95% 的东西都渲染不出来**，剩下的就是你看到的那几个线框。
+原因很硬：`Blockout.unity` 里有 **1756 个预制体实例**，其中 **171 个引用**
+指向 Apartment Kit。工程自带的可见模型只有 41 个。
+**没有这个包，场景里 95% 的东西渲染不出来**，剩下的就是你看到的那几个线框。
 
-### 为什么不干脆把这个包也提交到仓库
+> **名词解释 · 预制体（Prefab）**：可以理解成"模板"。场景里摆了 1756 个
+> 家具/墙体，它们本身不存模型数据，只存一句"我是某某模板的一份拷贝"。
+> 模板不在，就只剩一个空壳——有名字、有位置，但没有形状。
 
-它 325.9 MB，走 Git LFS 几天就会耗尽 GitHub 免费额度；而且 Unity Asset Store
-的条款不允许把素材原始文件单独打包分发。所以**约定不入库，每人各自导入**。
-资源 GUID 是包自带的，只要三个人导入的是**同一版本**，场景引用就能对上。
+### 第一步：用你自己的 Unity 账号领取
 
-### 怎么导
-
-1. 用**你自己的 Unity 账号**登录，打开
+1. 浏览器打开
    <https://assetstore.unity.com/packages/3d/environments/apartment-kit-124055>
-2. 这是**免费**资源，点 `Add to My Assets`（加入我的资源）
-3. 回到 Unity 编辑器 → `Window` → `Package Manager` → 左上角下拉切到 `My Assets`
-   → 找到 `Apartment Kit` → `Download` → `Import`
-4. **版本必须是 v4.2**，和其他人保持一致
-5. 导入路径保持默认，最终必须落在 **`Assets/Brick Project Studio/`**，
-   这个目录已在 `.gitignore` 里排除，不会被你误提交。**不要改名、不要挪位置**，
-   改了 GUID 对得上但路径对不上，场景照样报丢失。
+2. **右上角登录**，用的必须是**第 3 节 Unity Hub 里登录的同一个账号**
+3. 点 **`Add to My Assets`**（加入我的资源）—— 这是**免费**的，不用付钱
+4. 会弹一个条款确认，点 `Accept`
 
-### 导入后必须转 URP，否则满屏品红
+> ⚠️ 账号不一致是新手常犯的错。Asset Store 和 Unity 编辑器必须是同一个账号，
+> 否则第二步里你在 `My Assets` 中找不到这个包。
 
-商店页标注该包只兼容 Built-in 渲染管线，工程用的是 URP。因为包不入库，
-**每个人在自己机器上都要各转一次**：
+### 第二步：在 Unity 里下载并导入
 
-`Window` → `Rendering` → `Render Pipeline Converter` → 选 `Built-in to URP`
-→ **只勾 `Material Upgrade`**（千万不要勾 `Rendering Settings`，那会改动工程设置）
-→ `Initialize Converters` → `Convert Assets`
+1. 回到 Unity 编辑器 → 菜单 **`Window`** → **`Package Manager`**
+2. 窗口左上角有个下拉框（默认写着 `In Project` 或 `Unity Registry`），
+   **切换成 `My Assets`**
+3. 左边列表里找到 **`Apartment Kit`**（可以用右上角搜索框搜）
+4. 点右下角 **`Download`**，等它下完（325.9 MB）
+5. 变成 **`Import`** 后点它
+6. 弹出一个文件勾选窗口 —— **全部保持勾选，一个都别取消**，点 `Import`
+7. 导入过程几分钟，Unity 会卡住不动，正常，等着
 
-转完仍有零星品红是正常的（个别 Built-in 专有 Shader 转换器处理不了），
-手动把 Shader 改成 `Universal Render Pipeline/Lit` 即可，灰盒阶段可以先放着。
+> **导入路径不要改。** 它会自动落在 `Assets/Brick Project Studio/`，
+> 这个位置已经配置好被 Git 忽略，不会被你误提交。
+> **改名或挪位置都会导致对不上。**
 
-转换改的是包内材质资产，**不可逆**。转坏了直接删掉 `Assets/Brick Project Studio/`
-重新导入，反正不在仓库里。
+### 第三步：转换成 URP（不转就满屏品红）
 
-详见 [`ASSET_LICENSES.md`](ASSET_LICENSES.md)。
+这个素材包是给 Unity 老的渲染方式做的，我们工程用的是新的 URP。
+**因为包不入库，每个人在自己电脑上都要各转一次。**
 
-### 做完跑一次对账，不要靠肉眼判断
+1. 菜单 **`Window`** → **`Rendering`** → **`Render Pipeline Converter`**
+2. 顶部下拉选 **`Built-in to URP`**
+3. **只勾 `Material Upgrade` 这一项**
 
-仓库里有一个零依赖的对账脚本，直接告诉你缺什么、以及 URP 转了没有。
-在**仓库根目录**运行：
+   ⚠️ **千万不要勾 `Rendering Settings`** —— 那会改动整个工程的设置，
+   一提交就把全组炸了。
+
+4. 点 `Initialize Converters`，等它扫描完
+5. 点 `Convert Assets`，等它转完（几分钟）
+
+转完还剩零星几个品红色物体是**正常**的（个别特殊材质转换器处理不了），
+灰盒阶段先放着不管。
+
+> **转坏了怎么办？** 转换改的是包里的材质文件，不可逆。但没关系——
+> 直接把 `Assets/Brick Project Studio/` 整个文件夹删掉，回到第二步重新导入即可。
+> 这个包不在仓库里，删了不影响任何人。
+
+### 第四步：跑对账脚本确认，别靠肉眼
+
+仓库里有个脚本能直接告诉你缺什么。**在 PowerShell 里**，先进到项目目录：
+
+```bash
+cd D:\Dev\RESIDUUM
+```
 
 ```bash
 python tools\check_kit.py
 ```
 
-（Mac / Linux 上是 `python3 tools/check_kit.py`。Windows 没装 Python 的话，
-在 Microsoft Store 搜 "Python 3" 一键安装，或去 <https://www.python.org/downloads/windows/>。）
+> **提示 `python 不是内部或外部命令`？** 说明没装 Python。
+> 按 `Win` 键搜 `Microsoft Store`，在里面搜 `Python 3`，点安装（免费，一分钟）。
+> 装完关掉 PowerShell 重开一个再试。
 
-它会比对你本地的 `Assets/Brick Project Studio/` 和
-[`tools/kit_manifest.txt`](../tools/kit_manifest.txt)（在已验证可用的 macOS 端工程上生成的
-171 项 GUID 清单），可能的结果：
+脚本可能给你这几种结果：
 
 | 输出 | 含义 | 下一步 |
 |---|---|---|
-| `✓ GUID 对账通过` + `✓ URP 转换已做` | 素材包没问题 | 场景还是空的就截 Console 报错发群里 |
-| `✗ 没有找到 Assets/Brick Project Studio/` | 压根没导入 | 回到本节开头重做 |
-| `✗ GUID 对账失败：缺 171 / 171` | 导入的**版本不对**，GUID 全不一样 | 见下 |
-| `✗ 缺 N / 171`（N < 171） | 导入时取消勾选过内容 | Import 时全选，别取消任何勾 |
-| `✗ 绝大多数材质还是 Built-in` | 忘了转 URP | 跑上面的 Render Pipeline Converter |
+| `✓ GUID 对账通过` + `✓ URP 转换已做` | 素材包没问题 | 去第 8 节验证 |
+| `✗ 没有找到 Assets/Brick Project Studio/` | 压根没导入成功 | 回本节第二步重做 |
+| `✗ 缺 171 / 171` | 你导入的**版本不对** | 见下面「版本必须一致」 |
+| `✗ 缺 N / 171`（N 小于 171） | 导入时取消过勾选 | 重新 Import，这次全选 |
+| `✗ 绝大多数材质还是 Built-in` | 忘了转 URP | 回本节第三步 |
 
-### 版本必须完全一致，这是 GUID 对不上的根因
+### 版本必须完全一致
 
-Package Manager 的 `My Assets` **默认给你下最新版**。Apartment Kit 换版本时
-资源 GUID 可能整体变掉，那样 171 项一个都对不上，场景照样空白。
+Package Manager 的 `My Assets` **默认给你下最新版**。这个素材包换版本时，
+内部的资源编号（GUID）可能整体变掉，那样 171 项一个都对不上，场景照样空白。
 
-脚本报「缺 171/171」时，先删掉 `Assets/Brick Project Studio/`，再核对
-`.unitypackage` 的指纹。Windows 上在 PowerShell 里跑：
+脚本报「缺 171/171」时，按这个顺序处理：
+
+1. 删掉 `D:\Dev\RESIDUUM\Assets\Brick Project Studio\` 整个文件夹
+2. 在 PowerShell 里核对你下载的安装包指纹：
 
 ```bash
 Get-FileHash "$env:APPDATA\Unity\Asset Store-5.x\Brick Project Studio\3D ModelsEnvironments\Apartment Kit.unitypackage" -Algorithm SHA256
 ```
 
-必须是与工程一致的这一份：
+3. 结果必须是这一份（和工程用的完全一致）：
 
 ```
-size   = 341734961  （325.9 MB）
-sha256 = A984753A958350390EC074C6C56146FA68E3826A0E39463C85B398C9DBB5496A
+大小   = 341734961 字节（325.9 MB）
+SHA256 = A984753A958350390EC074C6C56146FA68E3826A0E39463C85B398C9DBB5496A
 ```
 
-对不上就是版本不同，找 Henry 要正确的那一份，不要将就用手上这个。
+4. **对不上就找 Henry 要正确的那一份**，把它放到上面那个路径下覆盖，
+   然后在 Unity 里重新 Import。不要将就用手上这个版本。
 
 ---
 
-## 第 4 步 · 验证你真的装好了
+## 8. 验证你真的装好了
 
-依次确认这四条，全过才算上手完成：
+五条全过才算完成：
 
-1. Unity 标题栏版本号是 `6000.5.8f1`
+1. Unity 标题栏 / Hub 里显示的版本是 **`6000.5.8f1`**
 2. `python tools\check_kit.py` 输出 **`✓ GUID 对账通过`** 和 **`✓ URP 转换已做`**
-3. 打开 `Assets/_Project/Scenes/Blockout.unity`，Console 里**没有红色报错**
-   （黄色警告可以忽略）
-4. Scene 视图里看得见完整的房间陈设 —— 有墙、有地板、有家具，
-   不是一片空白线框，也不是一片品红
-5. 按 Play，能用 WASD 走动、鼠标转视角
+3. 在 Project 窗口双击打开 `Assets/_Project/Scenes/Blockout.unity`，
+   下方 Console 面板里**没有红色报错**（黄色警告可以忽略）
+4. Scene 视图里能看见**完整的房间**：有墙、有地板、有家具。
+   不是空白线框，也不是一片品红
+5. 点顶部的 ▶ **Play** 按钮，能用 `WASD` 走动、鼠标转视角。再点一次 ▶ 停止
+
+✅ 五条都过 → **你上手完成了，去群里说一声。**
 
 ---
 
-## 常见现象对照表
+## 9. 日常怎么干活（比上手更重要，务必读完）
 
-| 现象 | 原因 | 解法 |
-|---|---|---|
-| Hub 里项目版本号是黄的 / 点了没反应 | `6000.5.8f1` 没装 | 第 0 步第 3 条的深链 |
-| Hub 说「不是有效的 Unity 项目」 | 选错了文件夹层级 | 选包含 `Assets` 和 `ProjectSettings` 的那一层 |
-| 打开后进 Safe Mode / 一堆 CS 报错 | 首次导入没跑完就关了 | 删掉 `Library/` 重新打开 |
-| 场景只剩线框和飘在空中的名字标签 | Apartment Kit 没导入 | 第 3 步，跑 `check_kit.py` |
-| 场景全是品红 | Apartment Kit 导入了但没转 URP | 第 3 步的 Render Pipeline Converter |
-| 导入了 Kit 但场景还是空的 | 版本不对，GUID 全变了 | 第 3 步末尾的指纹核对 |
-| Console 报某个 `.png` / `.exr` 无法导入 | Git LFS 没装，文件是指针 | `git lfs install` 然后 `git lfs pull` |
-| 导入时报路径过长 | 仓库放得太深 | 挪到 `D:\Dev\RESIDUUM`，并 `core.longpaths true` |
-| Package Manager 一直卡在 Resolving | 网络访问 Unity registry 慢 | 挂代理，或等；不要中途关编辑器 |
+### 9.1 每天开工前，先拉最新代码
 
----
+**在 Unity 关闭的状态下**做这件事（Unity 开着时文件被占用，容易出问题）：
 
-## 日常协作纪律（比上手更重要，请读完）
-
-### 1. 场景文件同一时间只能一个人改
-
-`Assets/_Project/Scenes/Blockout.unity` 现在 **5.7 MB**。Unity 场景是 YAML，
-两个人同时改**必然冲突，而且几乎无法手工合并**——合错了就是整个关卡报废。
-
-约定：**要改场景先在群里喊一声，改完提交推送再喊一声。** 没拿到"令牌"就不要动场景。
-改脚本、改预制体、改 ScriptableObject 不受此限制。
-
-### 2. 拉取之前先提交自己的改动
+```bash
+cd D:\Dev\RESIDUUM
+```
 
 ```bash
 git status --short
 ```
 
-有改动先 `git add` + `git commit`，再 `git pull`。**不要在有未提交改动时 pull**，
-Unity 的二进制/YAML 资产在 stash 里来回滚很容易出事。
-
-### 3. 这些本地文件不入库，看到它们别慌
-
-`Library/`、`Temp/`、`Logs/`、`obj/`、`UserSettings/`、`*.csproj`、`*.sln`、
-`Assets/Brick Project Studio/` 全都在 `.gitignore` 里。它们是每台机器各自生成的，
-**永远不要用 `git add -f` 强加进去**。
-
-### 4. 提交前扫一眼你到底提交了什么
+- **输出是空的** → 你没有未提交的改动，可以直接拉：
 
 ```bash
-git status --short && git diff --cached --stat
+git pull
 ```
 
-看到 `Library/` 或 `Brick Project Studio` 出现在里面，立刻停下来问。
+- **输出有内容** → 你手上有没提交的改动，**先提交再拉**，见 9.2。
+  ⚠️ **绝对不要在有未提交改动时 `git pull`**，Unity 的场景文件冲突起来很难收拾。
+
+拉完再打开 Unity。
+
+### 9.2 干完活怎么交上去
+
+```bash
+git status --short
+```
+
+先**看一眼这里列出的东西是不是你真的改的**。看到 `Library/`、`Temp/`、
+`Brick Project Studio` 出现在里面，**停下来问群里**，不要继续。
+
+确认没问题后：
+
+```bash
+git add -A
+```
+
+```bash
+git commit -m "写清楚你改了什么"
+```
+
+```bash
+git pull
+```
+
+```bash
+git push
+```
+
+> **提交信息怎么写？** 一句话说清楚改了什么就行，比如
+> `修复二楼楼梯碰撞体` 比 `update` 有用一百倍。
+
+### 9.3 ⚠️ 场景文件同一时间只能一个人改
+
+`Assets/_Project/Scenes/Blockout.unity` 现在 **5.7 MB**，里面 1756 个对象。
+Unity 的场景文件是一种特殊格式，**两个人同时改必然冲突，而且几乎无法手工合并**
+——合错了就是整个关卡报废，几天的工作没了。
+
+**约定**：
+
+- 要改场景 → **先在群里喊"我改场景"**
+- 改完提交推送 → **再喊一声"场景我放开了"**
+- 没拿到"令牌"就不要动场景，哪怕只是挪一个物体
+
+改脚本（`.cs`）、改预制体、改数据文件不受这条限制，可以并行。
+
+### 9.4 这些文件夹不入库，看到了别慌
+
+`Library/`、`Temp/`、`Logs/`、`obj/`、`UserSettings/`、`Assets/Brick Project Studio/`、
+各种 `.csproj` 和 `.sln` —— 这些都是你的电脑上自己生成的，已经配置了忽略。
+
+**永远不要用 `git add -f` 强行提交它们。**
+
+### 9.5 遇到冲突（conflict）怎么办
+
+新手不要自己解，**直接在群里喊**，附上 `git status` 的输出。
+场景文件的冲突尤其不要自己动手。
 
 ---
 
-## 还是打不开怎么办
+## 10. 卡住了怎么办
 
-把下面这条命令的完整输出发到群里，加上 **Unity Console 的红色报错截图**：
+### 常见现象速查
+
+| 现象 | 原因 | 去哪一节 |
+|---|---|---|
+| Hub 里项目版本号是黄的 / 点了没反应 | `6000.5.8f1` 没装 | 第 4 节 |
+| Hub 说「不是有效的 Unity 项目」 | 添加时选错了文件夹层级 | 第 6 节 |
+| 打开后进 Safe Mode / 一堆红色 CS 报错 | 首次导入没跑完就关了 | 删掉 `Library` 重开，第 6 节 |
+| **场景只剩线框和飘空的名字标签** | **素材包没导入** | **第 7 节** |
+| 场景全是品红（粉紫色） | 素材包导入了但没转 URP | 第 7 节第三步 |
+| 导入了素材包但场景还是空的 | 版本不对，GUID 全变了 | 第 7 节「版本必须一致」 |
+| Console 报某个 `.png` / `.exr` 无法导入 | Git LFS 没装好 | 第 2 节 + `git lfs pull` |
+| 导入时报路径过长 | 项目放得太深 | 挪到 `D:\Dev\RESIDUUM`，第 5 节 |
+| Package Manager 一直卡在 Resolving | 网络访问 Unity 服务器慢 | 挂代理，或者等；**别中途关编辑器** |
+| `git` / `python` 不是内部或外部命令 | 装完没重开命令行 | 关掉 PowerShell 重开，或重启电脑 |
+
+### 还是不行，就这样求助
+
+**不要只说"打不开"**，那没法定位。把下面这条命令的完整输出复制到群里：
 
 ```bash
-git -C D:\Dev\RESIDUUM log --oneline -3 && git -C D:\Dev\RESIDUUM status --short && git lfs version && git lfs ls-files && python D:\Dev\RESIDUUM\tools\check_kit.py
+cd D:\Dev\RESIDUUM; git log --oneline -3; git status --short; git lfs version; git lfs ls-files; python tools\check_kit.py
 ```
 
-有这些信息才好判断，光说"打不开"定位不了。
+再加上 **Unity 里 Console 面板的红色报错截图**（点一下报错能展开详情，一起截）。
+
+有这些信息，五分钟就能给你定位。
+
+---
+
+## 附录 · 名词表
+
+| 词 | 人话解释 |
+|---|---|
+| **仓库 / repo** | 存放项目全部代码和历史的地方，这里指 GitHub 上那个 RESIDUUM |
+| **clone（克隆）** | 把仓库完整下载到本地，同时带上历史和提交能力 |
+| **commit（提交）** | 把你的改动打包存成一个"存档点"，只存在你本地 |
+| **push（推送）** | 把本地的提交传到 GitHub，别人才能看到 |
+| **pull（拉取）** | 把别人推上去的改动拉到你本地 |
+| **conflict（冲突）** | 两个人改了同一处，Git 不知道该听谁的 |
+| **LFS** | Git 处理大文件（图片、模型、音频）的插件 |
+| **Prefab（预制体）** | 可复用的对象模板，场景里摆的是它的拷贝 |
+| **GUID** | Unity 给每个资源分配的唯一编号。场景靠它找资源，编号对不上就"丢失引用" |
+| **URP** | Unity 的一套渲染方式。材质不匹配就显示成品红 |
+| **Scene（场景）** | 一个关卡文件，这个项目主场景是 `Blockout.unity` |
+| **Hierarchy** | Unity 左边那个对象层级列表 |
+| **Console** | Unity 下方的日志面板，报错都在这儿 |
+| **Library 文件夹** | Unity 的本地缓存，可以随便删，删了会重新生成 |

@@ -86,6 +86,16 @@ namespace Residuum.Ghost
         private float _navMeshSampleRadius = 2f;
 
         [SerializeField]
+        [Min(0f)]
+        [Tooltip("随机巡逻点与鬼当前位置的最小距离，避免抽到脚边的点导致鬼原地打转。")]
+        private float _minimumRoamDistance = 8f;
+
+        [SerializeField]
+        [Min(0f)]
+        [Tooltip("开局校验巡逻点是否能映射到 NavMesh 时允许搜索的最大距离。")]
+        private float _roamPointValidationRadius = 2f;
+
+        [SerializeField]
         [Min(1)]
         [Tooltip("为鬼房与搜索游走点尝试 NavMesh 采样的次数。")]
         private int _randomPointSampleAttempts = 8;
@@ -274,6 +284,10 @@ namespace Residuum.Ghost
 
         private readonly List<Transform> _interactionCandidates = new List<Transform>();
         private readonly List<GameObject> _spawnedFootprints = new List<GameObject>();
+        private readonly List<Transform> _validRoamPoints = new List<Transform>();
+        private readonly List<Transform> _roamPointCandidates = new List<Transform>();
+        private readonly Dictionary<Transform, Vector3> _roamPointNavMeshPositions =
+            new Dictionary<Transform, Vector3>();
         private readonly Vector3[] _lastSightTargets = new Vector3[SightSampleCount];
         private readonly bool[] _lastSightBlocked = new bool[SightSampleCount];
 
@@ -315,6 +329,7 @@ namespace Residuum.Ghost
 
         private IInteractable _lastOpenedInteractable;
         private Transform _lastOpenedInteractableTransform;
+        private Transform _lastRoamPoint;
 
         private Coroutine _sprintBurstCoroutine;
         private Coroutine _ghostEventCoroutine;
@@ -382,6 +397,8 @@ namespace Residuum.Ghost
                 Debug.LogError($"[GhostAI:{name}] 未配置任何 Roam Point，Roam 会回退到 Idle。", this);
             }
 
+            ValidateRoamPoints();
+
             if (_renderers == null || _renderers.Length == 0)
             {
                 Debug.LogError($"[GhostAI:{name}] 未注入 Renderer，显形状态不会有可见模型。", this);
@@ -441,6 +458,10 @@ namespace Residuum.Ghost
             StopAllCoroutines();
             ClearSpawnedFootprints();
             _interactionCandidates.Clear();
+            _validRoamPoints.Clear();
+            _roamPointCandidates.Clear();
+            _roamPointNavMeshPositions.Clear();
+            _lastRoamPoint = null;
             ClearBlockedDoorState();
             Definition = null;
         }
@@ -1266,25 +1287,106 @@ namespace Residuum.Ghost
 
         private bool TryChooseRoamPoint(out Vector3 point)
         {
-            if (_roamPoints == null || _roamPoints.Length == 0)
+            _roamPointCandidates.Clear();
+
+            float minimumDistance = Mathf.Max(_minimumRoamDistance, 0f);
+            float minimumSqrDistance = minimumDistance * minimumDistance;
+            float farthestSqrDistance = -1f;
+            Transform farthestPoint = null;
+            Transform lastPointCandidate = null;
+
+            for (int i = 0; i < _validRoamPoints.Count; i++)
             {
-                point = transform.position;
-                return false;
+                Transform roamPoint = _validRoamPoints[i];
+                if (roamPoint == null)
+                {
+                    continue;
+                }
+
+                float sqrDistance = (roamPoint.position - transform.position).sqrMagnitude;
+                if (sqrDistance > farthestSqrDistance)
+                {
+                    farthestSqrDistance = sqrDistance;
+                    farthestPoint = roamPoint;
+                }
+
+                if (sqrDistance < minimumSqrDistance)
+                {
+                    continue;
+                }
+
+                if (roamPoint == _lastRoamPoint)
+                {
+                    lastPointCandidate = roamPoint;
+                    continue;
+                }
+
+                _roamPointCandidates.Add(roamPoint);
             }
 
-            int startIndex = Random.Range(0, _roamPoints.Length);
-            for (int offset = 0; offset < _roamPoints.Length; offset++)
+            if (_roamPointCandidates.Count > 0)
             {
-                int index = (startIndex + offset) % _roamPoints.Length;
-                if (_roamPoints[index] != null)
-                {
-                    point = _roamPoints[index].position;
-                    return true;
-                }
+                Transform selectedPoint = _roamPointCandidates[Random.Range(0, _roamPointCandidates.Count)];
+                _lastRoamPoint = selectedPoint;
+                point = _roamPointNavMeshPositions[selectedPoint];
+                return true;
+            }
+
+            if (lastPointCandidate != null)
+            {
+                _lastRoamPoint = lastPointCandidate;
+                point = _roamPointNavMeshPositions[lastPointCandidate];
+                return true;
+            }
+
+            if (farthestPoint != null)
+            {
+                _lastRoamPoint = farthestPoint;
+                point = _roamPointNavMeshPositions[farthestPoint];
+                return true;
             }
 
             point = transform.position;
             return false;
+        }
+
+        private void ValidateRoamPoints()
+        {
+            _validRoamPoints.Clear();
+            _roamPointNavMeshPositions.Clear();
+
+            if (_roamPoints == null || _roamPoints.Length == 0)
+            {
+                return;
+            }
+
+            float validationRadius = Mathf.Max(_roamPointValidationRadius, 0f);
+            int areaMask = _agent != null ? _agent.areaMask : NavMesh.AllAreas;
+
+            for (int i = 0; i < _roamPoints.Length; i++)
+            {
+                Transform roamPoint = _roamPoints[i];
+                if (roamPoint == null)
+                {
+                    continue;
+                }
+
+                if (NavMesh.SamplePosition(roamPoint.position, out NavMeshHit hit, validationRadius, areaMask))
+                {
+                    _validRoamPoints.Add(roamPoint);
+                    _roamPointNavMeshPositions[roamPoint] = hit.position;
+                    continue;
+                }
+
+                Debug.LogError(
+                    $"[GhostAI:{name}] 巡逻点“{roamPoint.name}”的世界坐标 {roamPoint.position} 不在导航网格上，鬼永远到不了。",
+                    roamPoint);
+            }
+
+            if (_validRoamPoints.Count == 0)
+            {
+                Debug.LogError($"[GhostAI:{name}] 没有任何可用的巡逻点，鬼将无法巡逻。", this);
+            }
         }
 
         private void UpdateFootprints()
@@ -1421,6 +1523,8 @@ namespace Residuum.Ghost
             _fingerprintChance = Mathf.Clamp01(_fingerprintChance);
             _hidingCheckChance = Mathf.Clamp01(_hidingCheckChance);
             _randomPointSampleAttempts = Mathf.Max(_randomPointSampleAttempts, 1);
+            _minimumRoamDistance = Mathf.Max(_minimumRoamDistance, 0f);
+            _roamPointValidationRadius = Mathf.Max(_roamPointValidationRadius, 0f);
 
             if (Application.isPlaying)
             {

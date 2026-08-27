@@ -192,7 +192,11 @@ namespace Residuum.Core
             }
 
             GameEvents.GhostRoomCenter = ghostRoomCollider.bounds.center;
-            GameEvents.GhostRoomRadius = ghostRoomCollider.bounds.extents.magnitude;
+            // 用水平方向的较小半边长，而不是 extents.magnitude。
+            // 后者是含 Y 分量的半对角线，对 7.2 x 2.5 x 9.7 的房间会算出 6.1 米，
+            // 导致 GhostAI 在鬼房内撒随机点时撒到墙外，NavMesh 采样反复失败。
+            Vector3 ghostRoomExtents = ghostRoomCollider.bounds.extents;
+            GameEvents.GhostRoomRadius = Mathf.Min(ghostRoomExtents.x, ghostRoomExtents.z);
             if (GameEvents.GhostRoomRadius <= 0f)
             {
                 Debug.LogError(
