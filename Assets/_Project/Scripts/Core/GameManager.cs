@@ -453,27 +453,70 @@ namespace Residuum.Core
 
             if (WasKeyPressed(keyboard, _forceHuntKey))
             {
-                if (_huntController == null)
-                {
-                    Debug.LogError("[GameManager] HuntController 引用已丢失，F9 无法触发猎杀。", this);
-                }
-                else
-                {
-                    _huntController.ForceHunt();
-                }
+                DebugForceHunt();
             }
 
             if (WasKeyPressed(keyboard, _collectAllEvidenceKey))
             {
-                _foundEvidence.Add(EvidenceType.EMF5);
-                _foundEvidence.Add(EvidenceType.UVFingerprint);
-                _foundEvidence.Add(EvidenceType.GhostWriting);
+                DebugCollectAllEvidence();
             }
 
             if (WasKeyPressed(keyboard, _endRoundKey))
             {
-                EndRound(EvaluateAliveResult());
+                DebugEndRound();
             }
+        }
+
+        [ContextMenu("调试：强制触发猎杀")]
+        private void DebugForceHunt()
+        {
+            if (!CanUseDebugActions())
+            {
+                return;
+            }
+
+            if (_huntController == null)
+            {
+                Debug.LogError("[GameManager] HuntController 引用已丢失，无法触发猎杀。", this);
+                return;
+            }
+
+            _huntController.ForceHunt();
+        }
+
+        [ContextMenu("调试：结束本局")]
+        private void DebugEndRound()
+        {
+            if (!CanUseDebugActions())
+            {
+                return;
+            }
+
+            EndRound(EvaluateAliveResult());
+        }
+
+        [ContextMenu("调试：一键集齐证据")]
+        private void DebugCollectAllEvidence()
+        {
+            if (!CanUseDebugActions())
+            {
+                return;
+            }
+
+            _foundEvidence.Add(EvidenceType.EMF5);
+            _foundEvidence.Add(EvidenceType.UVFingerprint);
+            _foundEvidence.Add(EvidenceType.GhostWriting);
+        }
+
+        private bool CanUseDebugActions()
+        {
+            if (Application.isPlaying && _isRoundActive)
+            {
+                return true;
+            }
+
+            Debug.LogWarning("[GameManager] 调试操作需要在播放模式下、回合开始后使用。", this);
+            return false;
         }
 
         private static bool WasKeyPressed(

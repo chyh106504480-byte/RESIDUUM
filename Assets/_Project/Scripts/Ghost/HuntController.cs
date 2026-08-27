@@ -123,6 +123,7 @@ namespace Residuum.Ghost
         }
 
         /// <summary>无视理智、阈值与冷却，立即开始一次猎杀。</summary>
+        [ContextMenu("强制触发猎杀")]
         public void ForceHunt()
         {
             if (_ghostAI == null)
