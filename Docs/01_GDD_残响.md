@@ -38,14 +38,20 @@
 | 玩家 行走 | 2.0 m/s | `PlayerController._walkSpeed` |
 | 玩家 冲刺 | 3.5 m/s | `PlayerController._sprintSpeed` |
 | 玩家 蹲行 | 1.4 m/s | `PlayerController._crouchSpeed` |
-| 玩家 猎杀期冲刺 | 5.2 m/s | `PlayerController._huntSprintSpeed` |
+| 玩家 猎杀期冲刺 | 3.5 m/s | `PlayerController._huntSprintSpeed` |
 | 怨灵 猎杀 | 3.3 m/s | `GhostDef_Spirit.huntSpeed` |
 | 幽影 猎杀 | 3.4 m/s | `GhostDef_Wraith.huntSpeed` |
 | 骚灵 猎杀 | 3.6 m/s | `GhostDef_Poltergeist.huntSpeed` |
 
-**猎杀期冲刺 5.2 是刻意高于所有鬼的。**逃跑的约束不是速度而是体力：
-体力耗尽后玩家掉回行走 2.0，任何一种鬼都追得上。所以猎杀的紧张感来自
-「体力还够不够撑到藏身处」，不是来自「跑不跑得过」。
+**猎杀期不再有肾上腺素加成**——冲刺就是 3.5，和平时一样。
+于是怨灵（3.3）与幽影（3.4）你勉强跑得过，**骚灵（3.6）比你快**。
+
+体力只有 4.2 秒，耗尽后需要 3.5 秒回满才能再冲刺，期间掉回行走 2.0。
+所以逃跑不是答案：唯一可靠的手段是**切断视线**——`GhostAI` 丢失视线后
+只会去最后消失点附近搜索，绕过拐角、关上身后的门就能甩掉它。
+
+2026-08-27 决定不做躲藏点（衣柜），理由是地图角落本身就够躲，
+且猎杀持续时间不长（22–30 秒）。
 
 猎杀结束后有 100 秒安全期（三个鬼的 `huntCooldown`），
 期间不会触发第二次猎杀。

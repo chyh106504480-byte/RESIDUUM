@@ -30,7 +30,7 @@ namespace Residuum.Player
         [SerializeField] private float _sprintSpeed = 3.5f;
 
         [Tooltip("猎杀期间肾上腺素加成后的冲刺速度，单位：米/秒。")]
-        [SerializeField] private float _huntSprintSpeed = 5.2f;
+        [SerializeField] private float _huntSprintSpeed = 3.5f;
 
         [Tooltip("蹲伏移动速度，单位：米/秒。")]
         [SerializeField] private float _crouchSpeed = 1.4f;
@@ -46,10 +46,10 @@ namespace Residuum.Player
 
         [Header("体力")]
         [Tooltip("满体力可连续冲刺的秒数。体力数值以可用冲刺秒数表示。")]
-        [SerializeField] private float _staminaDuration = 5f;
+        [SerializeField] private float _staminaDuration = 4.2f;
 
         [Tooltip("体力从完全耗尽恢复到满值所需秒数。")]
-        [SerializeField] private float _staminaRecoveryDuration = 3f;
+        [SerializeField] private float _staminaRecoveryDuration = 3.5f;
 
         [Tooltip("猎杀期间的体力消耗倍率；0.5 表示消耗速率减半。")]
         [SerializeField] private float _huntStaminaDrainMultiplier = 0.5f;
