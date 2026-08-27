@@ -572,6 +572,7 @@ namespace Residuum.UI.Editor
 
             GameObject evidence = GetOrCreateUiChild(panel.transform, EvidenceName);
             SetSiblingIndex(evidence.transform, 0);
+            ConfigureStretchRect(RequireRectTransform(evidence, EvidenceName));
             TMPro.TextMeshProUGUI[] evidenceLabels = new TMPro.TextMeshProUGUI[EvidenceLabelCount];
             UnityEngine.UI.Button[] evidenceRuleButtons =
                 new UnityEngine.UI.Button[EvidenceLabelCount];
@@ -637,7 +638,7 @@ namespace Residuum.UI.Editor
                 new Vector2(1f, 1f),
                 new Vector2(1f, 1f),
                 new Vector2(1f, 1f),
-                new Vector2(JournalTableRightMargin, -JournalTopMargin),
+                new Vector2(-JournalTableRightMargin, -JournalTopMargin),
                 new Vector2(
                     TableColumnCount * JournalTableCellWidth +
                     (TableColumnCount - 1) * JournalTableSpacing,
@@ -1230,15 +1231,23 @@ namespace Residuum.UI.Editor
         private static GameObject GetOrCreateUiChild(Transform parent, string childName)
         {
             Transform existingChild = FindDirectChild(parent, childName);
-            if (existingChild != null)
+            GameObject child;
+            if (existingChild == null)
             {
-                RequireRectTransform(existingChild.gameObject, childName);
-                return existingChild.gameObject;
+                child = new GameObject(childName, typeof(RectTransform));
+                UnityEditor.Undo.RegisterCreatedObjectUndo(child, UndoLabel);
+                UnityEditor.Undo.SetTransformParent(child.transform, parent, UndoLabel);
+            }
+            else
+            {
+                child = existingChild.gameObject;
             }
 
-            GameObject child = new GameObject(childName, typeof(RectTransform));
-            UnityEditor.Undo.RegisterCreatedObjectUndo(child, UndoLabel);
-            UnityEditor.Undo.SetTransformParent(child.transform, parent, UndoLabel);
+            RequireRectTransform(child, childName);
+            UnityEditor.Undo.RecordObject(child.transform, UndoLabel);
+            child.transform.localScale = Vector3.one;
+            child.transform.localRotation = Quaternion.identity;
+            child.transform.localPosition = Vector3.zero;
             return child;
         }
 
