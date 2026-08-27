@@ -220,6 +220,42 @@ namespace Residuum.Ghost
         [Tooltip("NavMesh 警告重复输出的最短间隔，防止错误配置刷屏。")]
         private float _navMeshWarningInterval = 2f;
 
+        [Header("受阻开门")]
+        [SerializeField]
+        [Min(0f)]
+        [Tooltip("Roam 与 Hunt 状态检查导航受阻的间隔秒数，默认 0.5 秒。")]
+        private float _blockedDoorCheckInterval = 0.5f;
+
+        [SerializeField]
+        [Min(0f)]
+        [Tooltip("判定走不动的速度阈值，单位米/秒；代码使用其平方与速度平方比较，默认 0.1。")]
+        private float _blockedDoorSpeedThreshold = 0.1f;
+
+        [SerializeField]
+        [Min(0f)]
+        [Tooltip("有路径但低速状态持续多久才判定被挡住，默认 0.6 秒。")]
+        private float _blockedDoorDuration = 0.6f;
+
+        [SerializeField]
+        [Min(0f)]
+        [Tooltip("鬼受阻时在周围搜索门等 IInteractable 的半径，默认 1.5 米。")]
+        private float _blockedDoorInteractionRadius = 1.5f;
+
+        [SerializeField]
+        [Range(-1f, 1f)]
+        [Tooltip("受阻互动目标相对鬼前方的最小方向点积，默认 0，仅允许正前方半球。")]
+        private float _blockedDoorForwardDotThreshold;
+
+        [SerializeField]
+        [Min(0f)]
+        [Tooltip("鬼推开目标后再次允许开门的冷却秒数，默认 1.5 秒。")]
+        private float _blockedDoorInteractionCooldown = 1.5f;
+
+        [SerializeField]
+        [Min(0f)]
+        [Tooltip("鬼离开自己刚打开的目标多远后清除防重复记录，默认 2.5 米。")]
+        private float _openedInteractableReleaseDistance = 2.5f;
+
         [Header("显形与调试")]
         [SerializeField]
         [Min(0f)]
@@ -257,6 +293,9 @@ namespace Residuum.Ghost
         private float _nextDestinationUpdateTime;
         private float _nextNavMeshWarningTime;
         private float _distanceSinceFootprint;
+        private float _nextBlockedDoorCheckTime;
+        private float _blockedMovementStartTime = -1f;
+        private float _nextBlockedDoorInteractionTime;
 
         private bool _initialized;
         private bool _idleWaiting;
@@ -273,6 +312,9 @@ namespace Residuum.Ghost
         private bool _huntVisible;
         private bool _ghostEventVisible;
         private int _lastSightSampleCount;
+
+        private IInteractable _lastOpenedInteractable;
+        private Transform _lastOpenedInteractableTransform;
 
         private Coroutine _sprintBurstCoroutine;
         private Coroutine _ghostEventCoroutine;
@@ -390,6 +432,7 @@ namespace Residuum.Ghost
             SetVisible(false);
             ClearSpawnedFootprints();
             ClearPathAndStop();
+            ClearBlockedDoorState();
             State = GhostState.Idle;
         }
 
@@ -398,6 +441,7 @@ namespace Residuum.Ghost
             StopAllCoroutines();
             ClearSpawnedFootprints();
             _interactionCandidates.Clear();
+            ClearBlockedDoorState();
             Definition = null;
         }
 
@@ -455,6 +499,8 @@ namespace Residuum.Ghost
             _hasRequestedDestination = false;
             _lastMovementPosition = position;
             _distanceSinceFootprint = 0f;
+            _blockedMovementStartTime = -1f;
+            _nextBlockedDoorCheckTime = 0f;
         }
 
         /// <summary>触发短暂显形和跨模块鬼事件。</summary>
@@ -481,6 +527,8 @@ namespace Residuum.Ghost
             State = nextState;
             _hasCurrentTarget = false;
             _hasRequestedDestination = false;
+            _blockedMovementStartTime = -1f;
+            _nextBlockedDoorCheckTime = 0f;
 
             switch (State)
             {
@@ -608,6 +656,7 @@ namespace Residuum.Ghost
             {
                 TrySetDestination(_currentTarget, false);
                 UpdateFootprints();
+                UpdateBlockedDoorInteraction();
 
                 if (!HasReachedDestination())
                 {
@@ -754,6 +803,8 @@ namespace Residuum.Ghost
                     UpdateLostPlayerSearch();
                 }
             }
+
+            UpdateBlockedDoorInteraction();
 
             if (!_playerCaughtRaised
                 && !_isPlayerHiding
@@ -1008,6 +1059,173 @@ namespace Residuum.Ghost
             float arrivalDistance = _agent.stoppingDistance + Mathf.Max(_arrivalTolerance, 0f);
             return !float.IsInfinity(_agent.remainingDistance)
                 && _agent.remainingDistance <= arrivalDistance;
+        }
+
+        private void UpdateBlockedDoorInteraction()
+        {
+            if (State != GhostState.Roam && State != GhostState.Hunt)
+            {
+                _blockedMovementStartTime = -1f;
+                return;
+            }
+
+            ReleaseOpenedInteractableWhenFarEnough();
+
+            if (!_agent.enabled || !_agent.isOnNavMesh || _agent.pathPending)
+            {
+                _blockedMovementStartTime = -1f;
+                return;
+            }
+
+            if (Time.time < _nextBlockedDoorCheckTime)
+            {
+                return;
+            }
+
+            _nextBlockedDoorCheckTime = Time.time + Mathf.Max(_blockedDoorCheckInterval, 0f);
+
+            float speedThreshold = Mathf.Max(_blockedDoorSpeedThreshold, 0f);
+            bool hasPathButStopped = _agent.hasPath
+                && _agent.velocity.sqrMagnitude < speedThreshold * speedThreshold;
+
+            if (hasPathButStopped)
+            {
+                if (_blockedMovementStartTime < 0f)
+                {
+                    _blockedMovementStartTime = Time.time;
+                }
+            }
+            else
+            {
+                _blockedMovementStartTime = -1f;
+            }
+
+            bool stoppedLongEnough = hasPathButStopped
+                && _blockedMovementStartTime >= 0f
+                && Time.time - _blockedMovementStartTime >= Mathf.Max(_blockedDoorDuration, 0f);
+            bool pathIsPartial = _agent.pathStatus == NavMeshPathStatus.PathPartial;
+
+            if ((!stoppedLongEnough && !pathIsPartial)
+                || Time.time < _nextBlockedDoorInteractionTime)
+            {
+                return;
+            }
+
+            if (TryOpenInteractableAhead())
+            {
+                _nextBlockedDoorInteractionTime = Time.time
+                    + Mathf.Max(_blockedDoorInteractionCooldown, 0f);
+                _blockedMovementStartTime = -1f;
+            }
+        }
+
+        private bool TryOpenInteractableAhead()
+        {
+            float searchRadius = Mathf.Max(_blockedDoorInteractionRadius, 0f);
+            Collider[] nearbyColliders = Physics.OverlapSphere(
+                transform.position,
+                searchRadius,
+                _interactableMask,
+                QueryTriggerInteraction.Collide);
+
+            IInteractable nearestInteractable = null;
+            Transform nearestTransform = null;
+            float nearestSqrDistance = float.PositiveInfinity;
+
+            for (int i = 0; i < nearbyColliders.Length; i++)
+            {
+                Collider nearbyCollider = nearbyColliders[i];
+                if (nearbyCollider == null)
+                {
+                    continue;
+                }
+
+                IInteractable interactable = nearbyCollider.GetComponentInParent<IInteractable>();
+                Component interactableComponent = interactable as Component;
+                if (interactable == null
+                    || interactableComponent == null
+                    || !interactable.CanInteract
+                    || ReferenceEquals(interactable, _lastOpenedInteractable)
+                    || PromptIndicatesCloseAction(interactable.PromptText))
+                {
+                    continue;
+                }
+
+                Vector3 targetPoint = nearbyCollider.ClosestPoint(transform.position);
+                Vector3 toTarget = targetPoint - transform.position;
+                if (toTarget.sqrMagnitude <= Mathf.Epsilon)
+                {
+                    toTarget = nearbyCollider.bounds.center - transform.position;
+                }
+
+                if (toTarget.sqrMagnitude <= Mathf.Epsilon)
+                {
+                    toTarget = interactableComponent.transform.position - transform.position;
+                }
+
+                float forwardDot = toTarget.sqrMagnitude > Mathf.Epsilon
+                    ? Vector3.Dot(transform.forward, toTarget.normalized)
+                    : -1f;
+                if (forwardDot <= Mathf.Clamp(_blockedDoorForwardDotThreshold, -1f, 1f))
+                {
+                    continue;
+                }
+
+                float sqrDistance = toTarget.sqrMagnitude;
+                if (sqrDistance >= nearestSqrDistance)
+                {
+                    continue;
+                }
+
+                nearestInteractable = interactable;
+                nearestTransform = interactableComponent.transform;
+                nearestSqrDistance = sqrDistance;
+            }
+
+            if (nearestInteractable == null || nearestTransform == null)
+            {
+                return false;
+            }
+
+            string targetName = nearestTransform.name;
+            _lastOpenedInteractable = nearestInteractable;
+            _lastOpenedInteractableTransform = nearestTransform;
+            nearestInteractable.Interact(gameObject);
+            Debug.Log($"[GhostAI:{name}] 状态 {State} 推开交互目标 {targetName}。", this);
+            return true;
+        }
+
+        private static bool PromptIndicatesCloseAction(string promptText)
+        {
+            // 门处于打开状态时提示的是“关闭”动作；只识别动作关键字，不绑定完整 UI 文案。
+            return !string.IsNullOrEmpty(promptText) && promptText.Contains("关");
+        }
+
+        private void ReleaseOpenedInteractableWhenFarEnough()
+        {
+            if (_lastOpenedInteractable == null || _lastOpenedInteractableTransform == null)
+            {
+                _lastOpenedInteractable = null;
+                _lastOpenedInteractableTransform = null;
+                return;
+            }
+
+            float releaseDistance = Mathf.Max(_openedInteractableReleaseDistance, 0f);
+            if ((transform.position - _lastOpenedInteractableTransform.position).sqrMagnitude
+                > releaseDistance * releaseDistance)
+            {
+                _lastOpenedInteractable = null;
+                _lastOpenedInteractableTransform = null;
+            }
+        }
+
+        private void ClearBlockedDoorState()
+        {
+            _blockedMovementStartTime = -1f;
+            _nextBlockedDoorCheckTime = 0f;
+            _nextBlockedDoorInteractionTime = 0f;
+            _lastOpenedInteractable = null;
+            _lastOpenedInteractableTransform = null;
         }
 
         private void ClearPathAndStop()
