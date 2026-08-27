@@ -125,3 +125,10 @@ __pycache__/
 # （v4.2），资源 GUID 一致，场景引用不会断。
 /Assets/Brick Project Studio/
 /Assets/Brick Project Studio.meta
+
+# 商业字体，不可随游戏分发（Arial Unicode 是 Monotype 的，苹果只授权本机使用）
+# 换成思源黑体 / Noto Sans SC（SIL OFL，可商用）之后再解除忽略
+/Assets/_Project/Fonts/Arial Unicode.ttf
+/Assets/_Project/Fonts/Arial Unicode.ttf.meta
+/Assets/_Project/Fonts/Arial Unicode SDF.asset
+/Assets/_Project/Fonts/Arial Unicode SDF.asset.meta
