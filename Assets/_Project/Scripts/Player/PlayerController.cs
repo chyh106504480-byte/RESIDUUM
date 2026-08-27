@@ -162,6 +162,7 @@ namespace Residuum.Player
         private bool _isInitialized;
         private bool _isHuntActive;
         private bool _isHiding;
+        private bool _isLookSuspended;
         private bool _sprintLockedUntilFull;
         private bool _isTryingToStand;
         private bool _standRequested;
@@ -223,6 +224,7 @@ namespace Residuum.Player
             GameEvents.OnHuntStart += HandleHuntStart;
             GameEvents.OnHuntEnd += HandleHuntEnd;
             GameEvents.OnHidingChanged += HandleHidingChanged;
+            GameEvents.OnLookSuspendedChanged += HandleLookSuspendedChanged;
 
             if (_crouchAction != null)
             {
@@ -241,6 +243,7 @@ namespace Residuum.Player
             GameEvents.OnHuntStart -= HandleHuntStart;
             GameEvents.OnHuntEnd -= HandleHuntEnd;
             GameEvents.OnHidingChanged -= HandleHidingChanged;
+            GameEvents.OnLookSuspendedChanged -= HandleLookSuspendedChanged;
 
             if (_crouchActionSubscribed && _crouchAction != null)
             {
@@ -251,6 +254,7 @@ namespace Residuum.Player
 
             DisableInputActions();
             IsSprinting = false;
+            _isLookSuspended = false;
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
         }
@@ -268,7 +272,11 @@ namespace Residuum.Player
             }
 
             float deltaTime = Time.deltaTime;
-            UpdateLook(deltaTime);
+            if (!_isLookSuspended)
+            {
+                UpdateLook(deltaTime);
+            }
+
             UpdateGroundedState();
             UpdateCrouch(deltaTime);
 
@@ -668,6 +676,24 @@ namespace Residuum.Player
         private void HandleHuntEnd()
         {
             _isHuntActive = false;
+        }
+
+        private void HandleLookSuspendedChanged(bool isSuspended)
+        {
+            _isLookSuspended = isSuspended;
+
+            if (isSuspended)
+            {
+                Cursor.lockState = CursorLockMode.None;
+                Cursor.visible = true;
+                return;
+            }
+
+            if (_lockCursorOnStart)
+            {
+                Cursor.lockState = CursorLockMode.Locked;
+                Cursor.visible = false;
+            }
         }
 
         private void HandleHidingChanged(bool isHiding)
