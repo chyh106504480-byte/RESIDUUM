@@ -49,66 +49,51 @@ namespace Residuum.World.Editor
                 return;
             }
 
-            System.Collections.Generic.List<MeshFilter> meshFilters = GetUniqueMeshFilters(selectedObjects);
+            System.Collections.Generic.List<GameObject> doorObjects = GetDoorObjects(
+                selectedObjects,
+                out int skippedFrameCount);
+            if (doorObjects.Count == 0)
+            {
+                Debug.LogError(
+                    "选中物体均为门框或已在 Door 层级下，无法转换可交互门。未转换任何物体。",
+                    selectedObjects[0]);
+                return;
+            }
+
+            if (!AreInSameScene(doorObjects))
+            {
+                Debug.LogError("选中的门组件不在同一个场景中，无法合并为一扇可交互门。未转换任何物体。", selectedObjects[0]);
+                return;
+            }
+
+            if (!TryCalculateCombinedRendererBounds(doorObjects, out Bounds worldBounds))
+            {
+                Debug.LogError(
+                    "选中物体及其子物体中没有可用的 Renderer，无法计算整扇门的包围盒。未转换任何物体。",
+                    selectedObjects[0]);
+                return;
+            }
+
+            System.Collections.Generic.List<MeshFilter> meshFilters = GetUniqueMeshFilters(doorObjects);
             int undoGroup = UnityEditor.Undo.GetCurrentGroup();
             UnityEditor.Undo.SetCurrentGroupName(undoLabel);
 
             try
             {
-                int convertedCount = 0;
-                int skippedMissingMeshCount = 0;
-                int skippedFrameCount = 0;
-                int skippedExistingDoorCount = 0;
-                int skippedMissingRendererCount = 0;
-
-                foreach (MeshFilter meshFilter in meshFilters)
-                {
-                    if (meshFilter == null || meshFilter.sharedMesh == null)
-                    {
-                        skippedMissingMeshCount++;
-                        continue;
-                    }
-
-                    GameObject doorPanel = meshFilter.gameObject;
-                    if (ContainsExcludedKeyword(doorPanel.name))
-                    {
-                        skippedFrameCount++;
-                        continue;
-                    }
-
-                    if (HasDoorOnSelfOrAncestor(doorPanel.transform))
-                    {
-                        skippedExistingDoorCount++;
-                        continue;
-                    }
-
-                    Renderer doorRenderer = doorPanel.GetComponent<Renderer>();
-                    if (doorRenderer == null)
-                    {
-                        skippedMissingRendererCount++;
-                        continue;
-                    }
-
-                    ConvertDoorPanel(meshFilter, doorRenderer, hingeSide, undoLabel);
-                    convertedCount++;
-                }
+                GameObject hingeObject = ConvertDoorGroup(
+                    doorObjects,
+                    selectedObjects[0].name,
+                    meshFilters,
+                    worldBounds,
+                    hingeSide,
+                    undoLabel);
 
                 UnityEditor.Undo.CollapseUndoOperations(undoGroup);
-                if (convertedCount > 0)
-                {
-                    MarkSelectedScenesDirty(selectedObjects);
-                }
-
-                int skippedCount = skippedMissingMeshCount
-                    + skippedFrameCount
-                    + skippedExistingDoorCount
-                    + skippedMissingRendererCount;
+                MarkSelectedScenesDirty(selectedObjects);
                 Debug.Log(
-                    $"可交互门转换完成：转换 {convertedCount} 扇，跳过 {skippedCount} 个"
-                    + $"（MeshFilter 无 sharedMesh：{skippedMissingMeshCount}，"
-                    + $"门框名称：{skippedFrameCount}，已在 Door 层级下：{skippedExistingDoorCount}，"
-                    + $"缺少 Renderer：{skippedMissingRendererCount}）。",
-                    selectedObjects[0]);
+                    $"已将 {doorObjects.Count} 个选中物体合并为一扇可交互门：{hingeObject.name}。"
+                    + $"跳过 {skippedFrameCount} 个门框。",
+                    hingeObject);
             }
             catch (Exception exception)
             {
@@ -118,19 +103,19 @@ namespace Residuum.World.Editor
             }
         }
 
-        private static void ConvertDoorPanel(
-            MeshFilter meshFilter,
-            Renderer doorRenderer,
+        private static GameObject ConvertDoorGroup(
+            System.Collections.Generic.List<GameObject> doorObjects,
+            string hingeNameSource,
+            System.Collections.Generic.List<MeshFilter> meshFilters,
+            Bounds worldBounds,
             HingeSide hingeSide,
             string undoLabel)
         {
-            GameObject doorPanel = meshFilter.gameObject;
-            Transform doorPanelTransform = doorPanel.transform;
-            Transform originalParent = doorPanelTransform.parent;
-            Bounds worldBounds = doorRenderer.bounds;
             Vector3 hingePosition = GetHingePosition(worldBounds, hingeSide);
+            Transform firstDoorTransform = doorObjects[0].transform;
+            Transform originalParent = firstDoorTransform.parent;
 
-            GameObject hingeObject = new GameObject(doorPanel.name + HingeNameSuffix);
+            GameObject hingeObject = new GameObject(hingeNameSource + HingeNameSuffix);
             UnityEditor.Undo.RegisterCreatedObjectUndo(hingeObject, undoLabel);
 
             Transform hingeTransform = hingeObject.transform;
@@ -142,15 +127,18 @@ namespace Residuum.World.Editor
             {
                 UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene(
                     hingeObject,
-                    doorPanel.scene);
+                    firstDoorTransform.gameObject.scene);
             }
 
             UnityEditor.Undo.RecordObject(hingeTransform, undoLabel);
             hingeTransform.position = hingePosition;
-            hingeTransform.rotation = doorPanelTransform.rotation;
+            hingeTransform.rotation = firstDoorTransform.rotation;
             hingeTransform.localScale = Vector3.one;
 
-            UnityEditor.Undo.SetTransformParent(doorPanelTransform, hingeTransform, true, undoLabel);
+            foreach (GameObject doorObject in doorObjects)
+            {
+                UnityEditor.Undo.SetTransformParent(doorObject.transform, hingeTransform, true, undoLabel);
+            }
 
             Residuum.World.Door door = UnityEditor.Undo.AddComponent<Residuum.World.Door>(hingeObject);
             if (door == null)
@@ -159,8 +147,13 @@ namespace Residuum.World.Editor
             }
 
             AssignHingeReference(door, hingeTransform, undoLabel);
-            EnsureBoxCollider(meshFilter, undoLabel);
+            foreach (MeshFilter meshFilter in meshFilters)
+            {
+                EnsureBoxCollider(meshFilter, undoLabel);
+            }
+
             AddNavMeshObstacle(hingeObject, hingeTransform, worldBounds, undoLabel);
+            return hingeObject;
         }
 
         private static Vector3 GetHingePosition(Bounds worldBounds, HingeSide hingeSide)
@@ -202,6 +195,11 @@ namespace Residuum.World.Editor
 
         private static void EnsureBoxCollider(MeshFilter meshFilter, string undoLabel)
         {
+            if (meshFilter == null || meshFilter.sharedMesh == null)
+            {
+                return;
+            }
+
             GameObject doorPanel = meshFilter.gameObject;
             if (doorPanel.GetComponent<Collider>() != null)
             {
@@ -282,19 +280,96 @@ namespace Residuum.World.Editor
             return sceneObjects.ToArray();
         }
 
-        private static System.Collections.Generic.List<MeshFilter> GetUniqueMeshFilters(GameObject[] selectedObjects)
+        private static System.Collections.Generic.List<GameObject> GetDoorObjects(
+            GameObject[] selectedObjects,
+            out int skippedFrameCount)
+        {
+            skippedFrameCount = 0;
+            System.Collections.Generic.HashSet<GameObject> eligibleObjects =
+                new System.Collections.Generic.HashSet<GameObject>();
+            System.Collections.Generic.List<GameObject> eligibleObjectOrder =
+                new System.Collections.Generic.List<GameObject>();
+
+            foreach (GameObject selectedObject in selectedObjects)
+            {
+                if (ContainsExcludedKeyword(selectedObject.name))
+                {
+                    skippedFrameCount++;
+                    continue;
+                }
+
+                if (HasDoorOnSelfOrAncestor(selectedObject.transform))
+                {
+                    continue;
+                }
+
+                if (eligibleObjects.Add(selectedObject))
+                {
+                    eligibleObjectOrder.Add(selectedObject);
+                }
+            }
+
+            System.Collections.Generic.List<GameObject> doorObjects =
+                new System.Collections.Generic.List<GameObject>();
+            foreach (GameObject eligibleObject in eligibleObjectOrder)
+            {
+                if (!HasSelectedAncestor(eligibleObject.transform, eligibleObjects))
+                {
+                    doorObjects.Add(eligibleObject);
+                }
+            }
+
+            return doorObjects;
+        }
+
+        private static bool TryCalculateCombinedRendererBounds(
+            System.Collections.Generic.List<GameObject> doorObjects,
+            out Bounds combinedBounds)
+        {
+            combinedBounds = new Bounds();
+            bool hasRenderer = false;
+
+            foreach (GameObject doorObject in doorObjects)
+            {
+                Renderer[] renderers = doorObject.GetComponentsInChildren<Renderer>(true);
+                foreach (Renderer renderer in renderers)
+                {
+                    if (renderer == null || ContainsExcludedKeyword(renderer.gameObject.name))
+                    {
+                        continue;
+                    }
+
+                    if (!hasRenderer)
+                    {
+                        combinedBounds = renderer.bounds;
+                        hasRenderer = true;
+                    }
+                    else
+                    {
+                        combinedBounds.Encapsulate(renderer.bounds);
+                    }
+                }
+            }
+
+            return hasRenderer;
+        }
+
+        private static System.Collections.Generic.List<MeshFilter> GetUniqueMeshFilters(
+            System.Collections.Generic.List<GameObject> doorObjects)
         {
             System.Collections.Generic.List<MeshFilter> meshFilters =
                 new System.Collections.Generic.List<MeshFilter>();
             System.Collections.Generic.HashSet<GameObject> processedObjects =
                 new System.Collections.Generic.HashSet<GameObject>();
 
-            foreach (GameObject selectedObject in selectedObjects)
+            foreach (GameObject doorObject in doorObjects)
             {
-                MeshFilter[] childMeshFilters = selectedObject.GetComponentsInChildren<MeshFilter>(true);
+                MeshFilter[] childMeshFilters = doorObject.GetComponentsInChildren<MeshFilter>(true);
                 foreach (MeshFilter meshFilter in childMeshFilters)
                 {
-                    if (meshFilter != null && processedObjects.Add(meshFilter.gameObject))
+                    if (meshFilter != null
+                        && !ContainsExcludedKeyword(meshFilter.gameObject.name)
+                        && processedObjects.Add(meshFilter.gameObject))
                     {
                         meshFilters.Add(meshFilter);
                     }
@@ -302,6 +377,38 @@ namespace Residuum.World.Editor
             }
 
             return meshFilters;
+        }
+
+        private static bool HasSelectedAncestor(
+            Transform targetTransform,
+            System.Collections.Generic.HashSet<GameObject> selectedObjects)
+        {
+            Transform currentTransform = targetTransform.parent;
+            while (currentTransform != null)
+            {
+                if (selectedObjects.Contains(currentTransform.gameObject))
+                {
+                    return true;
+                }
+
+                currentTransform = currentTransform.parent;
+            }
+
+            return false;
+        }
+
+        private static bool AreInSameScene(System.Collections.Generic.List<GameObject> doorObjects)
+        {
+            UnityEngine.SceneManagement.Scene firstScene = doorObjects[0].scene;
+            foreach (GameObject doorObject in doorObjects)
+            {
+                if (doorObject.scene != firstScene)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         private static bool ContainsExcludedKeyword(string objectName)
