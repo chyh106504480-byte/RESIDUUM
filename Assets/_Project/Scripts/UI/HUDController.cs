@@ -15,6 +15,10 @@ namespace Residuum.UI
     public sealed class HUDController : MonoBehaviour
     {
         private const int EvidenceCount = 3;
+        private const int EmfHiddenState = -1;
+        private const int EmfOffState = -2;
+        private const int EmfMidReading = 3;
+        private const int EmfHighReading = 5;
 
         [Header("显示开关")]
         [Tooltip("是否显示准星与交互提示。")]
@@ -103,6 +107,28 @@ namespace Residuum.UI
         [Tooltip("接近鬼房的低温提示颜色。")]
         [SerializeField] private Color _temperatureColdColor = new Color(0.35f, 0.8f, 1f, 1f);
 
+        [Header("EMF 读数")]
+        [Tooltip("显示 EMF 状态的文本。没拿读数器时隐藏")]
+        [SerializeField] private TextMeshProUGUI _emfLabel;
+
+        [Tooltip("开机时的文本模板，{0} 是 0–5 的读数")]
+        [SerializeField] private string _emfOnFormat = "EMF  {0}";
+
+        [Tooltip("关机时显示的文本")]
+        [SerializeField] private string _emfOffText = "EMF  OFF";
+
+        [Tooltip("关机时的颜色")]
+        [SerializeField] private Color _emfOffColor = new Color(0.45f, 0.45f, 0.45f, 1f);
+
+        [Tooltip("读数 0–2 时的颜色")]
+        [SerializeField] private Color _emfLowColor = new Color(0.7f, 0.7f, 0.7f, 1f);
+
+        [Tooltip("读数 3–4 时的颜色")]
+        [SerializeField] private Color _emfMidColor = new Color(1f, 0.75f, 0.2f, 1f);
+
+        [Tooltip("读数 5 时的颜色")]
+        [SerializeField] private Color _emfHighColor = new Color(1f, 0.25f, 0.2f, 1f);
+
         [Header("猎杀视觉")]
         [Tooltip("覆盖画面的猎杀暗角 UI 图形。")]
         [SerializeField] private Graphic _huntVignette;
@@ -130,6 +156,7 @@ namespace Residuum.UI
         private float _currentTemperature;
         private float _huntFadeAmount;
         private int _currentSlotIndex;
+        private int _currentEmfReading = EmfHiddenState;
         private string _currentPrompt;
         private string _currentItemName;
         private bool _hasSlotUpdate;
@@ -165,6 +192,7 @@ namespace Residuum.UI
             GameEvents.OnSlotChanged += HandleSlotChanged;
             GameEvents.OnBatteryChanged += HandleBatteryChanged;
             GameEvents.OnPlayerTemperatureChanged += HandleTemperatureChanged;
+            GameEvents.OnEMFReadingChanged += HandleEmfReadingChanged;
             GameEvents.OnHuntStart += HandleHuntStart;
             GameEvents.OnHuntEnd += HandleHuntEnd;
             GameEvents.OnRoundStart += HandleRoundStart;
@@ -181,6 +209,7 @@ namespace Residuum.UI
             GameEvents.OnSlotChanged -= HandleSlotChanged;
             GameEvents.OnBatteryChanged -= HandleBatteryChanged;
             GameEvents.OnPlayerTemperatureChanged -= HandleTemperatureChanged;
+            GameEvents.OnEMFReadingChanged -= HandleEmfReadingChanged;
             GameEvents.OnHuntStart -= HandleHuntStart;
             GameEvents.OnHuntEnd -= HandleHuntEnd;
             GameEvents.OnRoundStart -= HandleRoundStart;
@@ -260,6 +289,12 @@ namespace Residuum.UI
             RefreshTemperature();
         }
 
+        private void HandleEmfReadingChanged(int reading)
+        {
+            _currentEmfReading = reading;
+            RefreshEmfLabel();
+        }
+
         private void HandleHuntStart(float duration)
         {
             _ = duration;
@@ -282,6 +317,7 @@ namespace Residuum.UI
             _hasSlotUpdate = false;
             _hasBatteryUpdate = false;
             _hasTemperatureUpdate = false;
+            _currentEmfReading = EmfHiddenState;
             _isHunting = false;
             _huntFadeAmount = 0f;
             ResetEvidence();
@@ -313,6 +349,7 @@ namespace Residuum.UI
             RefreshItemLabel();
             RefreshBattery();
             RefreshTemperature();
+            RefreshEmfLabel();
             RefreshHuntVignette();
         }
 
@@ -575,6 +612,38 @@ namespace Residuum.UI
             _temperatureLabel.enabled = true;
         }
 
+        private void RefreshEmfLabel()
+        {
+            if (_emfLabel == null)
+            {
+                return;
+            }
+
+            if (!_roundActive || _currentEmfReading == EmfHiddenState
+                || _currentEmfReading < EmfOffState)
+            {
+                _emfLabel.gameObject.SetActive(false);
+                return;
+            }
+
+            _emfLabel.gameObject.SetActive(true);
+            _emfLabel.enabled = true;
+            if (_currentEmfReading == EmfOffState)
+            {
+                _emfLabel.text = _emfOffText;
+                _emfLabel.color = _emfOffColor;
+                return;
+            }
+
+            int reading = Mathf.Clamp(_currentEmfReading, 0, EmfHighReading);
+            _emfLabel.text = string.Format(_emfOnFormat, reading);
+            _emfLabel.color = reading >= EmfHighReading
+                ? _emfHighColor
+                : reading >= EmfMidReading
+                    ? _emfMidColor
+                    : _emfLowColor;
+        }
+
         private void RefreshHuntVignette()
         {
             if (!_roundActive || !_showHuntVignette)
@@ -676,6 +745,10 @@ namespace Residuum.UI
             SetGraphicEnabled(_itemLabel, false);
             HideBatteryFill();
             SetGraphicEnabled(_temperatureLabel, false);
+            if (_emfLabel != null)
+            {
+                _emfLabel.gameObject.SetActive(false);
+            }
             SetGraphicEnabled(_huntVignette, false);
 
             for (int index = 0; index < EvidenceCount; index++)

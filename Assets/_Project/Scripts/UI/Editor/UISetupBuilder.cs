@@ -27,6 +27,7 @@ namespace Residuum.UI.Editor
         private const string ItemLabelName = "ItemLabel";
         private const string BatteryBarName = "BatteryBar";
         private const string TemperatureLabelName = "TemperatureLabel";
+        private const string EmfLabelName = "EMFLabel";
         private const string HuntVignetteName = "HuntVignette";
         private const string FillName = "Fill";
         private const string PanelName = "Panel";
@@ -75,6 +76,7 @@ namespace Residuum.UI.Editor
         private const int EvidenceFontSize = 20;
         private const int ItemFontSize = 22;
         private const int TemperatureFontSize = 20;
+        private const int EmfFontSize = 28;
         private const int GradeFontSize = 140;
         private const int ResultTitleFontSize = 36;
         private const int ResultDetailFontSize = 24;
@@ -105,6 +107,9 @@ namespace Residuum.UI.Editor
         private const float BatteryBarOffsetY = 82f;
         private const float TemperatureOffsetY = 80f;
         private const float TemperatureLabelHeight = 30f;
+        private const float EmfLabelOffsetY = 80f;
+        private const float EmfLabelWidth = 240f;
+        private const float EmfLabelHeight = 40f;
         private const float GradeOffsetY = 170f;
         private const float GradeHeight = 160f;
         private const float ResultTitleOffsetY = 55f;
@@ -540,6 +545,25 @@ namespace Residuum.UI.Editor
                 false,
                 false);
 
+            TMPro.TextMeshProUGUI emfLabel = EnsureText(hudCanvasTransform, EmfLabelName);
+            ConfigureRect(
+                emfLabel.rectTransform,
+                Vector2.zero,
+                Vector2.zero,
+                Vector2.zero,
+                new Vector2(HudHorizontalMargin, EmfLabelOffsetY),
+                new Vector2(EmfLabelWidth, EmfLabelHeight));
+            ConfigureText(
+                emfLabel,
+                defaultFont,
+                string.Empty,
+                EmfFontSize,
+                TMPro.TextAlignmentOptions.Left,
+                false,
+                false);
+            UnityEditor.Undo.RecordObject(emfLabel.gameObject, UndoLabel);
+            emfLabel.gameObject.SetActive(false);
+
             UnityEngine.UI.Image huntVignette = EnsureImage(hudCanvasTransform, HuntVignetteName);
             ConfigureStretchRect(huntVignette.rectTransform);
             ConfigureImage(huntVignette, HuntVignetteColor, false);
@@ -554,6 +578,7 @@ namespace Residuum.UI.Editor
                 itemLabel,
                 batteryFill,
                 temperatureLabel,
+                emfLabel,
                 huntVignette);
         }
 
@@ -1511,6 +1536,7 @@ namespace Residuum.UI.Editor
             GetRequiredProperty(serializedHudController, "_itemLabel").objectReferenceValue = references.ItemLabel;
             GetRequiredProperty(serializedHudController, "_batteryFill").objectReferenceValue = references.BatteryFill;
             GetRequiredProperty(serializedHudController, "_temperatureLabel").objectReferenceValue = references.TemperatureLabel;
+            GetRequiredProperty(serializedHudController, "_emfLabel").objectReferenceValue = references.EmfLabel;
             GetRequiredProperty(serializedHudController, "_huntVignette").objectReferenceValue = references.HuntVignette;
 
             UnityEditor.SerializedProperty evidenceLabelsProperty =
@@ -1779,6 +1805,7 @@ namespace Residuum.UI.Editor
                 TMPro.TextMeshProUGUI itemLabel,
                 UnityEngine.UI.Image batteryFill,
                 TMPro.TextMeshProUGUI temperatureLabel,
+                TMPro.TextMeshProUGUI emfLabel,
                 UnityEngine.UI.Image huntVignette)
             {
                 Crosshair = crosshair;
@@ -1788,6 +1815,7 @@ namespace Residuum.UI.Editor
                 ItemLabel = itemLabel;
                 BatteryFill = batteryFill;
                 TemperatureLabel = temperatureLabel;
+                EmfLabel = emfLabel;
                 HuntVignette = huntVignette;
             }
 
@@ -1798,6 +1826,7 @@ namespace Residuum.UI.Editor
             public TMPro.TextMeshProUGUI ItemLabel { get; }
             public UnityEngine.UI.Image BatteryFill { get; }
             public TMPro.TextMeshProUGUI TemperatureLabel { get; }
+            public TMPro.TextMeshProUGUI EmfLabel { get; }
             public UnityEngine.UI.Image HuntVignette { get; }
         }
 

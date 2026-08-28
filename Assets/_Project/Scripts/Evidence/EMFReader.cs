@@ -13,6 +13,8 @@ namespace Residuum.Evidence
         private const int MinimumActiveReading = 1;
         private const int MaximumEvidenceReading = 5;
         private const int MaximumNonEvidenceReading = 4;
+        private const int HiddenReading = -1;
+        private const int PoweredOffReading = -2;
         private const float MinimumPositiveSetting = 0.01f;
 
         private static readonly int EmissionColorProperty = Shader.PropertyToID("_EmissionColor");
@@ -37,6 +39,25 @@ namespace Residuum.Evidence
         [Tooltip("按数组顺序代表各级读数的指示灯 Renderer；材质需预先启用 Emission，留空时不显示指示灯。")]
         [SerializeField] private Renderer[] _indicatorLights;
 
+        [Header("音效")]
+        [Tooltip("滴滴声的音源。建议挂在读数器手持模型上，Spatial Blend 设 0")]
+        [SerializeField] private AudioSource _beepSource;
+
+        [Tooltip("单次滴声")]
+        [SerializeField] private AudioClip _beepClip;
+
+        [Tooltip("滴声音量")]
+        [Range(0f, 1f)]
+        [SerializeField] private float _beepVolume = 0.7f;
+
+        [Tooltip("读数为 0 时两次滴声的间隔秒数")]
+        [Min(0.05f)]
+        [SerializeField] private float _beepIntervalAtZero = 1.5f;
+
+        [Tooltip("读数为 5 时两次滴声的间隔秒数")]
+        [Min(0.02f)]
+        [SerializeField] private float _beepIntervalAtMax = 0.12f;
+
         public string ItemName => DisplayName;
         public int Reading { get; private set; }
 
@@ -46,13 +67,16 @@ namespace Residuum.Evidence
         private Coroutine _readingCoroutine;
         private Vector3 _interactionPosition;
         private float _readingEndTime;
+        private float _beepElapsedTime;
         private bool _isEquipped;
+        private bool _isPoweredOn;
         private bool _evidenceReportedThisRound;
         private bool _missingDisplayWarningLogged;
 
         private void Awake()
         {
             ValidateSettings();
+            _isPoweredOn = true;
             _refreshWait = new WaitForSeconds(_readingRefreshInterval);
             _materialPropertyBlock = new MaterialPropertyBlock();
             CacheIndicatorEmissionColors();
@@ -72,6 +96,7 @@ namespace Residuum.Evidence
             GameEvents.OnRoundStart -= HandleRoundStart;
             _isEquipped = false;
             StopReading();
+            StopBeeping();
         }
 
         private void OnDestroy()
@@ -81,6 +106,7 @@ namespace Residuum.Evidence
             GameEvents.OnRoundStart -= HandleRoundStart;
             StopAllCoroutines();
             _readingCoroutine = null;
+            StopBeeping();
             _refreshWait = null;
             _materialPropertyBlock = null;
             _indicatorOnEmissionColors = null;
@@ -91,27 +117,71 @@ namespace Residuum.Evidence
             ValidateSettings();
         }
 
+        private void Update()
+        {
+            if (!_isEquipped || !_isPoweredOn)
+            {
+                return;
+            }
+
+            _beepElapsedTime += Time.deltaTime;
+            float currentInterval = Mathf.Lerp(
+                _beepIntervalAtZero,
+                _beepIntervalAtMax,
+                Mathf.InverseLerp(IdleReading, MaximumEvidenceReading, Reading));
+
+            if (_beepElapsedTime < currentInterval)
+            {
+                return;
+            }
+
+            _beepElapsedTime = 0f;
+            if (_beepSource != null && _beepClip != null)
+            {
+                _beepSource.PlayOneShot(_beepClip, _beepVolume);
+            }
+        }
+
         public void OnEquip()
         {
             _isEquipped = true;
             WarnIfDisplayMissing();
             UpdateDisplay();
+            _beepElapsedTime = 0f;
+            GameEvents.RaiseEMFReadingChanged(_isPoweredOn ? Reading : PoweredOffReading);
         }
 
         public void OnUnequip()
         {
             _isEquipped = false;
             StopReading();
+            StopBeeping();
+            GameEvents.RaiseEMFReadingChanged(HiddenReading);
         }
 
         public void OnPrimaryUse()
         {
-            // EMF 读数器是被动设备，主使用键不触发额外行为。
+            if (!_isEquipped)
+            {
+                return;
+            }
+
+            _isPoweredOn = !_isPoweredOn;
+            if (!_isPoweredOn)
+            {
+                StopReading();
+                StopBeeping();
+                GameEvents.RaiseEMFReadingChanged(PoweredOffReading);
+                return;
+            }
+
+            _beepElapsedTime = 0f;
+            GameEvents.RaiseEMFReadingChanged(Reading);
         }
 
         private void HandleGhostInteract(Vector3 interactionPosition)
         {
-            if (!_isEquipped)
+            if (!_isEquipped || !_isPoweredOn)
             {
                 return;
             }
@@ -209,6 +279,15 @@ namespace Residuum.Evidence
             StopAllCoroutines();
             _readingCoroutine = null;
             SetReading(IdleReading);
+        }
+
+        private void StopBeeping()
+        {
+            _beepElapsedTime = 0f;
+            if (_beepSource != null)
+            {
+                _beepSource.Stop();
+            }
         }
 
         private void UpdateDisplay()
