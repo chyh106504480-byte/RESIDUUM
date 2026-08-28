@@ -700,10 +700,18 @@ namespace Residuum.Items
         private void SetHeldModelActive(int slotIndex, bool isActive)
         {
             GameObject heldModel = GetHeldModel(slotIndex);
-            if (heldModel != null && heldModel.transform != _handAnchor)
+            if (heldModel == null || heldModel.transform == _handAnchor)
             {
-                heldModel.SetActive(isActive);
+                return;
             }
+
+            // 已经脱离手持挂点的模型（例如放到地上的鬼影书）不归物品栏管显隐。
+            if (!isActive && _handAnchor != null && !heldModel.transform.IsChildOf(_handAnchor))
+            {
+                return;
+            }
+
+            heldModel.SetActive(isActive);
         }
 
         private GameObject GetHeldModel(int slotIndex)
