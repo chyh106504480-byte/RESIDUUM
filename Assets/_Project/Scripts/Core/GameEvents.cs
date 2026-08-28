@@ -45,6 +45,15 @@ namespace Residuum.Core
         /// </summary>
         public static event Action OnEvacuatePromptRequested;
 
+        /// <summary>
+        /// 全场停电状态变化。true 表示灯全灭了，玩家需要自己去开关处重新打开。
+        ///
+        /// 【谁来广播 false】LightManager 定期检查它管辖的灯里还有没有亮着的，
+        /// 玩家在任意一个开关上把灯打开就算停电结束。这样 LightSwitch 不需要
+        /// 认识 LightManager。
+        /// </summary>
+        public static event Action<bool> OnBlackoutChanged;
+
         // ─────────────────────────────────────────────
         //  理智
         // ─────────────────────────────────────────────
@@ -52,6 +61,16 @@ namespace Residuum.Core
         public static event Action<float> OnSanityChanged;
         /// <summary>首次跌破猎杀阈值时触发一次</summary>
         public static event Action OnSanityCritical;
+
+        /// <summary>
+        /// 外部对理智施加一次性惩罚。参数：扣除的理智点数，0–100 标度上的绝对值，
+        /// 传正数表示扣减。
+        ///
+        /// 【为什么由触发方决定数值】OnGhostEvent 那种「事件在别处、数值配在
+        /// PlayerSanity 上」的写法，每多一条规则就要往 PlayerSanity 加一个字段。
+        /// 停电扣理智只是第一条，后面还会有更多，所以数值跟着触发方走。
+        /// </summary>
+        public static event Action<float> OnSanityPenalty;
 
         /// <summary>
         /// 理智每跌破 25 的整数倍时触发一次，参数为跨越的那个阈值（75 / 50 / 25）。
@@ -198,6 +217,8 @@ namespace Residuum.Core
         public static void RaiseEvacuatePromptRequested()     => OnEvacuatePromptRequested?.Invoke();
         public static void RaiseSanityChanged(float v)        => OnSanityChanged?.Invoke(v);
         public static void RaiseSanityCritical()              => OnSanityCritical?.Invoke();
+        public static void RaiseSanityPenalty(float points)   => OnSanityPenalty?.Invoke(points);
+        public static void RaiseBlackoutChanged(bool b)       => OnBlackoutChanged?.Invoke(b);
         public static void RaiseSanityThresholdCrossed(float threshold) => OnSanityThresholdCrossed?.Invoke(threshold);
         public static void RaiseHuntStart(float duration)     => OnHuntStart?.Invoke(duration);
         public static void RaiseHuntEnd()                     => OnHuntEnd?.Invoke();
@@ -230,6 +251,8 @@ namespace Residuum.Core
             OnEvacuatePromptRequested = null;
             OnSanityChanged = null;
             OnSanityCritical = null;
+            OnSanityPenalty = null;
+            OnBlackoutChanged = null;
             OnSanityThresholdCrossed = null;
             OnHuntStart = null;
             OnHuntEnd = null;
