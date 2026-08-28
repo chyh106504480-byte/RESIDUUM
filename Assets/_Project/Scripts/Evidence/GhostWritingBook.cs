@@ -9,6 +9,7 @@ namespace Residuum.Evidence
     {
         private const string DisplayName = "鬼影书";
         private const string PickupPrompt = "[E] 捡回鬼影书";
+        private const float MinimumColliderSize = 0.12f;
 
         private enum AppearanceMode
         {
@@ -31,6 +32,9 @@ namespace Residuum.Evidence
 
         [Tooltip("书本沿地面法线抬高的距离，避免模型轻微陷入地面，单位：米。")]
         [SerializeField] private float _surfaceOffset = 0.01f;
+
+        [Tooltip("放到地上时启用的碰撞体，用来被交互射线打到。留空则在 Awake 按子物体 Renderer 的包围盒自动补一个 BoxCollider。")]
+        [SerializeField] private Collider _placedCollider;
 
         [Tooltip("命中面法线向上的最小分量；数值越大，允许放置的地面越平缓。")]
         [SerializeField] private float _minimumGroundNormalY = 0.5f;
@@ -94,6 +98,8 @@ namespace Residuum.Evidence
             CachePlacementCamera();
             _writingWait = new WaitForSeconds(_writingCheckInterval);
             ApplyWritingAppearance(false);
+            CreatePlacedColliderIfNeeded();
+            SetPlacedColliderActive(false);
         }
 
         private void OnEnable()
@@ -172,6 +178,7 @@ namespace Residuum.Evidence
             transform.SetPositionAndRotation(groundPosition, groundRotation);
 
             IsPlaced = true;
+            SetPlacedColliderActive(true);
             _isEquipped = false;
             StartWritingChecks();
             onPlaced?.Invoke();
@@ -187,6 +194,7 @@ namespace Residuum.Evidence
             }
 
             IsPlaced = false;
+            SetPlacedColliderActive(false);
             StopWritingChecks();
             RestoreHeldPose();
             onPickedUp?.Invoke();
@@ -197,6 +205,7 @@ namespace Residuum.Evidence
             StopWritingChecks();
             HasWriting = false;
             _ghostRoomWarningLogged = false;
+            SetPlacedColliderActive(false);
             ApplyWritingAppearance(false);
 
             if (IsPlaced)
@@ -334,6 +343,59 @@ namespace Residuum.Evidence
             return candidateTransform == transform
                 || candidateTransform.IsChildOf(transform)
                 || transform.IsChildOf(candidateTransform);
+        }
+
+        private void CreatePlacedColliderIfNeeded()
+        {
+            if (_placedCollider != null)
+            {
+                return;
+            }
+
+            Renderer[] renderers = GetComponentsInChildren<Renderer>(true);
+            if (renderers.Length == 0)
+            {
+                Debug.LogWarning(
+                    "鬼影书没有可用于生成碰撞体的 Renderer，放置后将无法被捡回，请手动指定 _placedCollider",
+                    this);
+                return;
+            }
+
+            Bounds combinedBounds = renderers[0].bounds;
+            for (int index = 1; index < renderers.Length; index++)
+            {
+                combinedBounds.Encapsulate(renderers[index].bounds);
+            }
+
+            BoxCollider generatedCollider = gameObject.AddComponent<BoxCollider>();
+            Vector3 lossyScale = transform.lossyScale;
+            Vector3 worldSize = combinedBounds.size;
+            generatedCollider.center = transform.InverseTransformPoint(combinedBounds.center);
+            generatedCollider.size = new Vector3(
+                GetLocalColliderSize(worldSize.x, lossyScale.x),
+                GetLocalColliderSize(worldSize.y, lossyScale.y),
+                GetLocalColliderSize(worldSize.z, lossyScale.z));
+            generatedCollider.isTrigger = true;
+            _placedCollider = generatedCollider;
+        }
+
+        private float GetLocalColliderSize(float worldSize, float scale)
+        {
+            float localSize = Mathf.Approximately(scale, 0f)
+                ? worldSize
+                : worldSize / Mathf.Abs(scale);
+            return Mathf.Max(localSize, MinimumColliderSize);
+        }
+
+        private void SetPlacedColliderActive(bool active)
+        {
+            if (_placedCollider == null)
+            {
+                return;
+            }
+
+            _placedCollider.isTrigger = true;
+            _placedCollider.enabled = active;
         }
 
         private void CachePlacementCamera()
