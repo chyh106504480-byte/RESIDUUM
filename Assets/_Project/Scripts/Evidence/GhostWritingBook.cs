@@ -144,7 +144,12 @@ namespace Residuum.Evidence
         public void OnUnequip()
         {
             _isEquipped = false;
-            StopWritingChecks();
+
+            // 放在地上的书要继续等鬼写字——玩家放下它就是为了去干别的。
+            if (!IsPlaced)
+            {
+                StopWritingChecks();
+            }
         }
 
         public void OnPrimaryUse()
