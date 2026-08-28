@@ -555,6 +555,7 @@ namespace Residuum.Player
                 if (CurrentStamina <= Mathf.Epsilon)
                 {
                     CurrentStamina = 0f;
+                    if (!_sprintLockedUntilFull) GameEvents.RaiseStaminaDepleted();
                     _sprintLockedUntilFull = true;
                 }
 

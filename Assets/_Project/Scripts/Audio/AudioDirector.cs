@@ -58,12 +58,29 @@ namespace Residuum.Audio
         [Tooltip("氛围音效音源。建议 2D，Spatial Blend 设为 0")]
         [SerializeField] private AudioSource _oneShotSource;
 
-        [Tooltip("鬼现身时播放的音效，可留空")]
+        [Header("哈气声")]
+        [Tooltip("巡逻阶段随机或鬼现身结束后播放的哈气声，可留空")]
         [SerializeField] private AudioClip _ghostManifestClip;
 
-        [Tooltip("鬼现身音效的音量")]
+        [Tooltip("哈气声的音量")]
         [Range(0f, 1f)]
         [SerializeField] private float _ghostManifestVolume = 1f;
+
+        [Tooltip("巡逻阶段随机哈气声的判定间隔秒数")]
+        [Min(1f)]
+        [SerializeField] private float _ambientBreathCheckInterval = 25f;
+
+        [Tooltip("巡逻阶段每次判定触发的概率，应当很小")]
+        [Range(0f, 1f)]
+        [SerializeField] private float _ambientBreathChance = 0.15f;
+
+        [Tooltip("鬼现身结束后触发哈气声的概率，应当中等")]
+        [Range(0f, 1f)]
+        [SerializeField] private float _postManifestBreathChance = 0.5f;
+
+        [Tooltip("鬼现身开始到现身结束的秒数，应与 GhostAI 的显形秒数一致")]
+        [Min(0f)]
+        [SerializeField] private float _manifestDuration = 2f;
 
         [Tooltip("猎杀开始时播放的音效，可留空")]
         [SerializeField] private AudioClip _huntStartClip;
@@ -107,9 +124,22 @@ namespace Residuum.Audio
         [Range(0f, 1f)]
         [SerializeField] private float _sanityCriticalVolume = 1f;
 
+        [Header("喘气声")]
+        [Tooltip("玩家冲刺体力耗尽时播放的喘气声，可留空")]
+        [SerializeField] private AudioClip _staminaDepletedClip;
+
+        [Tooltip("冲刺体力耗尽喘气声的音量")]
+        [Range(0f, 1f)]
+        [SerializeField] private float _staminaDepletedVolume = 1f;
+
         private bool _heartbeatAvailable;
         private bool _oneShotAvailable;
+        private bool _isRoundActive;
         private bool _isHunting;
+        private bool _isManifesting;
+        private bool _postManifestBreathPending;
+        private float _ambientBreathTimer;
+        private float _postManifestBreathRemaining;
         private float _manifestHeartbeatRemaining;
         private float _heartbeatSampleTimer;
         private float _targetHeartbeatVolume;
@@ -119,6 +149,7 @@ namespace Residuum.Audio
         {
             ValidateReferences();
             ResetHeartbeatState();
+            ResetBreathState(false);
         }
 
         private void OnEnable()
@@ -132,6 +163,7 @@ namespace Residuum.Audio
             GameEvents.OnEvidenceFound += HandleEvidenceFound;
             GameEvents.OnPlayerCaught += HandlePlayerCaught;
             GameEvents.OnSanityCritical += HandleSanityCritical;
+            GameEvents.OnStaminaDepleted += HandleStaminaDepleted;
         }
 
         private void OnDisable()
@@ -145,12 +177,16 @@ namespace Residuum.Audio
             GameEvents.OnEvidenceFound -= HandleEvidenceFound;
             GameEvents.OnPlayerCaught -= HandlePlayerCaught;
             GameEvents.OnSanityCritical -= HandleSanityCritical;
+            GameEvents.OnStaminaDepleted -= HandleStaminaDepleted;
 
             ResetHeartbeatState();
+            ResetBreathState(false);
         }
 
         private void Update()
         {
+            UpdateBreathState();
+
             if (!_heartbeatAvailable)
             {
                 return;
@@ -304,21 +340,78 @@ namespace Residuum.Audio
             _oneShotSource.PlayOneShot(clip, volume);
         }
 
+        private void UpdateBreathState()
+        {
+            if (!_isRoundActive)
+            {
+                return;
+            }
+
+            if (_postManifestBreathPending)
+            {
+                _postManifestBreathRemaining = Mathf.Max(
+                    0f,
+                    _postManifestBreathRemaining - Time.deltaTime);
+                if (_postManifestBreathRemaining <= 0f)
+                {
+                    _postManifestBreathPending = false;
+                    _isManifesting = false;
+                    TryPlayBreath(_postManifestBreathChance);
+                }
+            }
+
+            if (_isHunting || _isManifesting)
+            {
+                return;
+            }
+
+            _ambientBreathTimer -= Time.deltaTime;
+            if (_ambientBreathTimer > 0f)
+            {
+                return;
+            }
+
+            _ambientBreathTimer = _ambientBreathCheckInterval;
+            TryPlayBreath(_ambientBreathChance);
+        }
+
+        private void TryPlayBreath(float chance)
+        {
+            if (chance > 0f && (chance >= 1f || Random.value < chance))
+            {
+                PlayOneShot(_ghostManifestClip, _ghostManifestVolume);
+            }
+        }
+
+        private void ResetBreathState(bool isRoundActive)
+        {
+            _isRoundActive = isRoundActive;
+            _isManifesting = false;
+            _postManifestBreathPending = false;
+            _ambientBreathTimer = _ambientBreathCheckInterval;
+            _postManifestBreathRemaining = 0f;
+        }
+
         private void HandleRoundStart()
         {
             ResetHeartbeatState();
+            ResetBreathState(true);
         }
 
         private void HandleRoundEnd(RoundResult roundResult)
         {
             ResetHeartbeatState();
+            ResetBreathState(false);
         }
 
         private void HandleGhostEvent(Vector3 position)
         {
             _manifestHeartbeatRemaining = _manifestHeartbeatDuration;
             _heartbeatSampleTimer = 0f;
-            PlayOneShot(_ghostManifestClip, _ghostManifestVolume);
+            _isManifesting = true;
+            _postManifestBreathPending = true;
+            _postManifestBreathRemaining = _manifestDuration;
+            _ambientBreathTimer = _ambientBreathCheckInterval;
         }
 
         private void HandleHuntStart(float duration)
@@ -355,6 +448,11 @@ namespace Residuum.Audio
         private void HandleSanityCritical()
         {
             PlayOneShot(_sanityCriticalClip, _sanityCriticalVolume);
+        }
+
+        private void HandleStaminaDepleted()
+        {
+            PlayOneShot(_staminaDepletedClip, _staminaDepletedVolume);
         }
     }
 }
