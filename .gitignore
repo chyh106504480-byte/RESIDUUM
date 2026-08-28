@@ -135,3 +135,9 @@ __pycache__/
 
 # Node 依赖，不入库
 node_modules/
+
+# 打包产物，随时可重新生成，不入库
+/Windows demo/
+/Windows demo.zip
+/*demo/
+/*demo.zip
