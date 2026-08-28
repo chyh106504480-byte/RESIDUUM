@@ -110,6 +110,15 @@ namespace Residuum.Core
         public static event Action<bool> OnHidingChanged;
 
         /// <summary>
+        /// 玩家冲刺体力耗尽的那一刻。此后必须等体力回满才能再次冲刺。
+        ///
+        /// 【为什么单独一条事件】音频要在这一刻播喘气声。用轮询
+        /// CurrentStamina 是否为 0 会在整个恢复期里反复命中，
+        /// 而这是个「瞬间」不是「状态」。
+        /// </summary>
+        public static event Action OnStaminaDepleted;
+
+        /// <summary>
         /// 视角控制是否被界面接管。参数 true 表示界面正在使用鼠标，玩家不应转头。
         ///
         /// 【和 OnHidingChanged 的区别】躲藏会连移动一起停掉，这个只停视角——
@@ -227,6 +236,7 @@ namespace Residuum.Core
         public static void RaiseGhostInteract(Vector3 pos)    => OnGhostInteract?.Invoke(pos);
         public static void RaiseGhostEvent(Vector3 pos)       => OnGhostEvent?.Invoke(pos);
         public static void RaiseHidingChanged(bool hiding)    => OnHidingChanged?.Invoke(hiding);
+        public static void RaiseStaminaDepleted()             => OnStaminaDepleted?.Invoke();
         public static void RaiseLookSuspendedChanged(bool suspended) => OnLookSuspendedChanged?.Invoke(suspended);
         public static void RaiseInteractPromptChanged(string prompt) => OnInteractPromptChanged?.Invoke(prompt);
         public static void RaisePlayerTemperatureChanged(float celsius) => OnPlayerTemperatureChanged?.Invoke(celsius);
@@ -261,6 +271,7 @@ namespace Residuum.Core
             OnGhostInteract = null;
             OnGhostEvent = null;
             OnHidingChanged = null;
+            OnStaminaDepleted = null;
             OnLookSuspendedChanged = null;
             OnInteractPromptChanged = null;
             OnPlayerTemperatureChanged = null;
