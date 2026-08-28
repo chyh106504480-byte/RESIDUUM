@@ -173,6 +173,10 @@ namespace Residuum.Core
         ///
         /// 【与 3×3 推理表的关系】能否到达 5 级由 GhostHasEMF5 决定：
         /// 该鬼种不持有 EMF5 证据时读数封顶 4，这是推理表唯一性的保证，不可绕过。
+        ///
+        /// 【-1 的含义】读数器没有拿在手上。HUD 收到 -1 时应当隐藏整个读数显示，
+        /// 而不是显示 0——「仪器没拿出来」和「仪器显示 0」是两回事，
+        /// 后者意味着玩家确实在测但附近什么都没有。
         /// </summary>
         public static event Action<int> OnEMFReadingChanged;
 
