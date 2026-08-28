@@ -267,10 +267,29 @@ namespace Residuum.Ghost
         private float _openedInteractableReleaseDistance = 2.5f;
 
         [Header("显形与调试")]
+        [Tooltip("巡逻期间两次现身判定之间的间隔秒数")]
+        [Min(0f)]
+        [SerializeField] private float _manifestCheckInterval = 20f;
+
+        [Tooltip("每次判定触发现身的概率")]
+        [Range(0f, 1f)]
+        [SerializeField] private float _manifestChance = 0.2f;
+
         [SerializeField]
         [Min(0f)]
         [Tooltip("GhostEvent 的显形秒数，默认 2 秒。")]
         private float _ghostEventVisibleDuration = 2f;
+
+        [Tooltip("猎杀期间模型闪烁的间隔秒数")]
+        [Min(0f)]
+        [SerializeField] private float _huntFlickerInterval = 0.15f;
+
+        [Tooltip("每次闪烁时模型保持可见的概率")]
+        [Range(0f, 1f)]
+        [SerializeField] private float _huntFlickerVisibleChance = 0.7f;
+
+        [Tooltip("关掉后猎杀期间模型保持常亮，便于调试")]
+        [SerializeField] private bool _huntFlickerEnabled = true;
 
         [SerializeField]
         [Min(0f)]
@@ -310,6 +329,8 @@ namespace Residuum.Ghost
         private float _nextBlockedDoorCheckTime;
         private float _blockedMovementStartTime = -1f;
         private float _nextBlockedDoorInteractionTime;
+        private float _nextManifestCheckTime;
+        private float _nextHuntFlickerTime;
 
         private bool _initialized;
         private bool _idleWaiting;
@@ -324,6 +345,7 @@ namespace Residuum.Ghost
         private bool _isPlayerHiding;
         private bool _playerCaughtRaised;
         private bool _huntVisible;
+        private bool _huntFlickerActive;
         private bool _ghostEventVisible;
         private int _lastSightSampleCount;
 
@@ -368,6 +390,7 @@ namespace Residuum.Ghost
 
         private void OnEnable()
         {
+            GameEvents.OnRoundStart += HandleRoundStart;
             GameEvents.OnHidingChanged += HandleHidingChanged;
 
             if (_initialized && Definition != null && _agent != null)
@@ -421,6 +444,8 @@ namespace Residuum.Ghost
                 return;
             }
 
+            UpdateManifestation();
+
             switch (State)
             {
                 case GhostState.Idle:
@@ -440,17 +465,43 @@ namespace Residuum.Ghost
 
         private void OnDisable()
         {
+            GameEvents.OnRoundStart -= HandleRoundStart;
             GameEvents.OnHidingChanged -= HandleHidingChanged;
             StopAllCoroutines();
             _sprintBurstCoroutine = null;
             _ghostEventCoroutine = null;
             _huntVisible = false;
+            _huntFlickerActive = false;
             _ghostEventVisible = false;
             SetVisible(false);
             ClearSpawnedFootprints();
             ClearPathAndStop();
             ClearBlockedDoorState();
             State = GhostState.Idle;
+        }
+
+        private void UpdateManifestation()
+        {
+            if (State != GhostState.Idle && State != GhostState.Roam)
+            {
+                return;
+            }
+
+            if (Time.time < _nextManifestCheckTime)
+            {
+                return;
+            }
+
+            _nextManifestCheckTime = Time.time + Mathf.Max(_manifestCheckInterval, 0f);
+            if (_isPlayerHiding)
+            {
+                return;
+            }
+
+            if (RollChance(_manifestChance))
+            {
+                TriggerGhostEvent();
+            }
         }
 
         private void OnDestroy()
@@ -582,6 +633,8 @@ namespace Residuum.Ghost
             }
 
             _huntVisible = false;
+            _huntFlickerActive = false;
+            _nextHuntFlickerTime = 0f;
             RefreshVisibility();
 
             if (_agent != null && Definition != null)
@@ -751,7 +804,10 @@ namespace Residuum.Ghost
         {
             _agent.speed = Definition.huntSpeed;
             _huntVisible = true;
+            _huntFlickerActive = false;
             RefreshVisibility();
+            _huntFlickerActive = _huntFlickerEnabled;
+            _nextHuntFlickerTime = Time.time + Mathf.Max(_huntFlickerInterval, 0f);
             _playerCaughtRaised = false;
             _hasLineOfSight = false;
             _reachedLastKnownPosition = false;
@@ -782,6 +838,8 @@ namespace Residuum.Ghost
                 FinishHunt();
                 return;
             }
+
+            UpdateHuntFlicker();
 
             if (_player == null)
             {
@@ -835,6 +893,39 @@ namespace Residuum.Ghost
                 ClearPathAndStop();
                 GameEvents.RaisePlayerCaught();
             }
+        }
+
+        private void UpdateHuntFlicker()
+        {
+            if (!_huntVisible)
+            {
+                return;
+            }
+
+            if (!_huntFlickerEnabled)
+            {
+                if (_huntFlickerActive)
+                {
+                    _huntFlickerActive = false;
+                    RefreshVisibility();
+                }
+
+                return;
+            }
+
+            if (!_huntFlickerActive)
+            {
+                _huntFlickerActive = true;
+                _nextHuntFlickerTime = Time.time;
+            }
+
+            if (Time.time < _nextHuntFlickerTime)
+            {
+                return;
+            }
+
+            _nextHuntFlickerTime = Time.time + Mathf.Max(_huntFlickerInterval, 0f);
+            SetVisible(RollChance(_huntFlickerVisibleChance));
         }
 
         private void UpdateLostPlayerSearch()
@@ -1463,6 +1554,11 @@ namespace Residuum.Ghost
             }
         }
 
+        private void HandleRoundStart()
+        {
+            _nextManifestCheckTime = Time.time + Mathf.Max(_manifestCheckInterval, 0f);
+        }
+
         private void CacheLocalWaits()
         {
             _ghostEventVisibleWait = new WaitForSeconds(Mathf.Max(_ghostEventVisibleDuration, 0f));
@@ -1496,8 +1592,20 @@ namespace Residuum.Ghost
             return Random.Range(minimum, maximum);
         }
 
+        private bool RollChance(float chance)
+        {
+            float clampedChance = Mathf.Clamp01(chance);
+            return clampedChance >= 1f
+                || (clampedChance > 0f && Random.value < clampedChance);
+        }
+
         private void RefreshVisibility()
         {
+            if (_huntFlickerActive)
+            {
+                return;
+            }
+
             SetVisible(_huntVisible || _ghostEventVisible);
         }
 
@@ -1522,6 +1630,8 @@ namespace Residuum.Ghost
             _roamChance = Mathf.Clamp01(_roamChance);
             _fingerprintChance = Mathf.Clamp01(_fingerprintChance);
             _hidingCheckChance = Mathf.Clamp01(_hidingCheckChance);
+            _manifestChance = Mathf.Clamp01(_manifestChance);
+            _huntFlickerVisibleChance = Mathf.Clamp01(_huntFlickerVisibleChance);
             _randomPointSampleAttempts = Mathf.Max(_randomPointSampleAttempts, 1);
             _minimumRoamDistance = Mathf.Max(_minimumRoamDistance, 0f);
             _roamPointValidationRadius = Mathf.Max(_roamPointValidationRadius, 0f);
