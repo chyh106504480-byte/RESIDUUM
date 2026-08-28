@@ -62,6 +62,10 @@ namespace Residuum.Items
         [Tooltip("丢弃时道具出现的高度偏移，单位：米")]
         [SerializeField] private float _dropHeightOffset = -0.3f;
 
+        [Tooltip("丢弃时给道具的初速度倍率。0 表示原地松手，正数表示往前抛")]
+        [Min(0f)]
+        [SerializeField] private float _dropForwardSpeed = 2f;
+
         [Header("切换")]
         [Tooltip("鼠标滚轮输入超过此绝对值时才切换槽位，用于过滤设备噪声。")]
         [SerializeField] private float _scrollInputThreshold = 0.01f;
@@ -497,6 +501,7 @@ namespace Residuum.Items
                 return false;
             }
 
+            FreezeWorldItemPhysics(worldItem);
             worldItem.SetActive(false);
             _hasSlotItem[index] = true;
             SwitchToSlot(index);
@@ -523,6 +528,7 @@ namespace Residuum.Items
                 return false;
             }
 
+            FreezeWorldItemPhysics(_flashlightWorldItem);
             _flashlightWorldItem.SetActive(false);
             _hasFlashlight = true;
             EquipFlashlight();
@@ -628,6 +634,13 @@ namespace Residuum.Items
                 + transform.forward * _dropDistance
                 + Vector3.up * _dropHeightOffset;
             worldItem.SetActive(true);
+
+            Rigidbody worldItemRigidbody = worldItem.GetComponent<Rigidbody>();
+            if (worldItemRigidbody != null)
+            {
+                worldItemRigidbody.isKinematic = false;
+                worldItemRigidbody.linearVelocity = transform.forward * _dropForwardSpeed;
+            }
         }
 
         private void HandleRoundStart()
@@ -659,6 +672,8 @@ namespace Residuum.Items
                 return;
             }
 
+            FreezeWorldItemPhysics(worldItem);
+
             if (_hasWorldItemInitialTransform[slotIndex])
             {
                 worldItem.transform.SetPositionAndRotation(
@@ -675,6 +690,8 @@ namespace Residuum.Items
             {
                 return;
             }
+
+            FreezeWorldItemPhysics(_flashlightWorldItem);
 
             if (_hasFlashlightInitialTransform)
             {
@@ -779,6 +796,19 @@ namespace Residuum.Items
             return _worldItems[slotIndex];
         }
 
+        private static void FreezeWorldItemPhysics(GameObject worldItem)
+        {
+            Rigidbody worldItemRigidbody = worldItem.GetComponent<Rigidbody>();
+            if (worldItemRigidbody == null)
+            {
+                return;
+            }
+
+            worldItemRigidbody.isKinematic = true;
+            worldItemRigidbody.linearVelocity = Vector3.zero;
+            worldItemRigidbody.angularVelocity = Vector3.zero;
+        }
+
         private void ValidateSettings()
         {
             if (_slots == null || _slots.Length != SlotCount)
@@ -800,6 +830,12 @@ namespace Residuum.Items
             {
                 Debug.LogWarning("ItemSlotSystem 的滚轮输入阈值不能为负数，已按 0 处理。", this);
                 _scrollInputThreshold = 0f;
+            }
+
+            if (_dropForwardSpeed < 0f)
+            {
+                Debug.LogWarning("ItemSlotSystem 的丢弃初速度倍率不能为负数，已按 0 处理。", this);
+                _dropForwardSpeed = 0f;
             }
         }
     }
