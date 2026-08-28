@@ -18,6 +18,7 @@ namespace Residuum.UI.Editor
         private const string ResultCanvasName = "Result Canvas";
         private const string ConfirmCanvasName = "Confirm Canvas";
         private const string JournalCanvasName = "Journal Canvas";
+        private const string MainMenuCanvasName = "Main Menu Canvas";
         private const string EvidenceManagerName = "EvidenceManager";
         private const string CrosshairName = "Crosshair";
         private const string PromptLabelName = "PromptLabel";
@@ -33,6 +34,10 @@ namespace Residuum.UI.Editor
         private const string TitleName = "Title";
         private const string DetailName = "Detail";
         private const string RestartButtonName = "RestartButton";
+        private const string BackgroundName = "Background";
+        private const string SubtitleName = "Subtitle";
+        private const string StartButtonName = "StartButton";
+        private const string QuitButtonName = "QuitButton";
         private const string BoxName = "Box";
         private const string MessageName = "Message";
         private const string ConfirmButtonName = "ConfirmButton";
@@ -57,6 +62,7 @@ namespace Residuum.UI.Editor
         private const int ResultSortingOrder = 100;
         private const int ConfirmSortingOrder = 80;
         private const int JournalSortingOrder = 50;
+        private const int MainMenuSortingOrder = 200;
         private const int EvidenceLabelCount = 3;
         private const int GhostCount = 3;
         private const int EvidenceColumnsPerGhost = 3;
@@ -78,6 +84,9 @@ namespace Residuum.UI.Editor
         private const int JournalEvidenceFontSize = 26;
         private const int JournalTableFontSize = 22;
         private const int JournalButtonFontSize = 22;
+        private const int MainMenuTitleFontSize = 96;
+        private const int MainMenuSubtitleFontSize = 28;
+        private const int MainMenuButtonFontSize = 28;
         private const int EvidenceLineHeight = 26;
 
         private const float CanvasMatchWidthOrHeight = 0.5f;
@@ -131,6 +140,16 @@ namespace Residuum.UI.Editor
         private const float JournalGuessButtonHeight = 52f;
         private const float JournalGuessButtonSpacing = 24f;
         private const float JournalGuessButtonBottomMargin = 80f;
+        private const float MainMenuTitleOffsetY = 180f;
+        private const float MainMenuTitleWidth = 1200f;
+        private const float MainMenuTitleHeight = 120f;
+        private const float MainMenuSubtitleOffsetY = 90f;
+        private const float MainMenuSubtitleWidth = 1000f;
+        private const float MainMenuSubtitleHeight = 48f;
+        private const float MainMenuStartButtonOffsetY = -140f;
+        private const float MainMenuButtonWidth = 280f;
+        private const float MainMenuButtonHeight = 64f;
+        private const float MainMenuButtonSpacing = 20f;
 
         private static readonly Color BackgroundColor = new Color(0.04f, 0.04f, 0.04f, 0.9f);
         private static readonly Color BarFillColor = new Color(0.9f, 0.9f, 0.9f, 1f);
@@ -141,6 +160,8 @@ namespace Residuum.UI.Editor
         private static readonly Color ConfirmButtonColor = new Color(0.25f, 0.25f, 0.25f, 1f);
         private static readonly Color JournalPanelColor = new Color(0f, 0f, 0f, PanelAlpha);
         private static readonly Color JournalButtonColor = new Color(0.25f, 0.25f, 0.25f, 1f);
+        private static readonly Color MainMenuBackgroundColor = new Color(0.06f, 0.06f, 0.07f, 1f);
+        private static readonly Color MainMenuButtonColor = new Color(0.25f, 0.25f, 0.25f, 1f);
 
         [UnityEditor.MenuItem(MenuPath)]
         private static void BuildUI()
@@ -191,12 +212,44 @@ namespace Residuum.UI.Editor
                     WireEvacuateConfirmedEvent(evacuateConfirmUI, gameManager);
                 }
 
+                GameObject mainMenuCanvas = GetOrCreateRootCanvas(MainMenuCanvasName);
+                ConfigureCanvas(mainMenuCanvas, MainMenuSortingOrder);
+                MainMenuUI mainMenuUI = EnsureComponent<MainMenuUI>(mainMenuCanvas);
+                MainMenuReferences mainMenuReferences = BuildMainMenuHierarchy(
+                    mainMenuCanvas.transform,
+                    defaultFont);
+
+                Component playerController = FindComponentInActiveSceneByTypeName(PlayerControllerTypeName);
+                WireMainMenuUI(mainMenuUI, mainMenuReferences, playerController);
+
+                if (gameManager == null)
+                {
+                    WireMainMenuStartEvent(mainMenuUI, null);
+                    Debug.LogWarning(
+                        "没找到 GameManager：MainMenuUI.onStartRequested → " +
+                        "GameManager.StartRound 未连接。",
+                        mainMenuCanvas);
+                }
+                else
+                {
+                    WireMainMenuStartEvent(mainMenuUI, gameManager);
+                }
+
+                if (playerController == null)
+                {
+                    Debug.LogWarning(
+                        "没找到 PlayerController：MainMenuUI._playerControllerBehaviour 未连接。",
+                        mainMenuCanvas);
+                }
+
                 UnityEditor.Undo.CollapseUndoOperations(undoGroup);
                 UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(
                     UnityEngine.SceneManagement.SceneManager.GetActiveScene());
                 UnityEditor.Selection.activeGameObject = hudCanvas;
                 Debug.Log(
-                    "HUD Canvas、Result Canvas 与 Confirm Canvas 已搭建并完成界面内部引用接线。" +
+                    "HUD Canvas、Result Canvas、Confirm Canvas 与 Main Menu Canvas 已搭建并完成界面内部引用接线。" +
+                    "要让主菜单真正生效，请取消勾选 GameManager 的 Auto Start On Play；" +
+                    "搭建工具不会自动修改该场景数据。" +
                     "请继续运行 Residuum/搭建判定笔记本，它会自动补齐 PlayerController、" +
                     "GameManager 与结算界面的跨物体接线。",
                     hudCanvas);
@@ -660,6 +713,110 @@ namespace Residuum.UI.Editor
                 cancelButton);
         }
 
+        private static MainMenuReferences BuildMainMenuHierarchy(
+            Transform mainMenuCanvasTransform,
+            TMPro.TMP_FontAsset defaultFont)
+        {
+            UnityEngine.UI.Image panel = EnsureImage(mainMenuCanvasTransform, PanelName);
+            ConfigureStretchRect(panel.rectTransform);
+            ConfigureImage(panel, MainMenuBackgroundColor, true);
+
+            UnityEngine.UI.Image background = EnsureImage(panel.transform, BackgroundName);
+            ConfigureStretchRect(background.rectTransform);
+            ConfigureImage(background, MainMenuBackgroundColor, false);
+            UnityEditor.Undo.RecordObject(background, UndoLabel);
+            background.sprite = null;
+            SetMainMenuSiblingIndex(background.transform, 0);
+
+            TMPro.TextMeshProUGUI titleLabel = EnsureText(panel.transform, TitleName);
+            ConfigureRect(
+                titleLabel.rectTransform,
+                new Vector2(0.5f, 0.5f),
+                new Vector2(0.5f, 0.5f),
+                new Vector2(0.5f, 0.5f),
+                new Vector2(0f, MainMenuTitleOffsetY),
+                new Vector2(MainMenuTitleWidth, MainMenuTitleHeight));
+            ConfigureText(
+                titleLabel,
+                defaultFont,
+                "残响",
+                MainMenuTitleFontSize,
+                TMPro.TextAlignmentOptions.Center,
+                false,
+                false);
+            SetMainMenuSiblingIndex(titleLabel.transform, 1);
+
+            TMPro.TextMeshProUGUI subtitleLabel = EnsureText(panel.transform, SubtitleName);
+            ConfigureRect(
+                subtitleLabel.rectTransform,
+                new Vector2(0.5f, 0.5f),
+                new Vector2(0.5f, 0.5f),
+                new Vector2(0.5f, 0.5f),
+                new Vector2(0f, MainMenuSubtitleOffsetY),
+                new Vector2(MainMenuSubtitleWidth, MainMenuSubtitleHeight));
+            ConfigureText(
+                subtitleLabel,
+                defaultFont,
+                "RESIDUUM",
+                MainMenuSubtitleFontSize,
+                TMPro.TextAlignmentOptions.Center,
+                false,
+                false);
+            SetMainMenuSiblingIndex(subtitleLabel.transform, 2);
+
+            UnityEngine.UI.Button startButton = BuildMainMenuButton(
+                panel.transform,
+                StartButtonName,
+                MainMenuStartButtonOffsetY,
+                "开始游戏",
+                defaultFont);
+            SetMainMenuSiblingIndex(startButton.transform, 3);
+
+            UnityEngine.UI.Button quitButton = BuildMainMenuButton(
+                panel.transform,
+                QuitButtonName,
+                MainMenuStartButtonOffsetY - MainMenuButtonHeight - MainMenuButtonSpacing,
+                "退出",
+                defaultFont);
+            SetMainMenuSiblingIndex(quitButton.transform, 4);
+
+            UnityEditor.Undo.RecordObject(panel.gameObject, UndoLabel);
+            panel.gameObject.SetActive(true);
+
+            return new MainMenuReferences(
+                panel.gameObject,
+                background,
+                titleLabel,
+                subtitleLabel,
+                startButton,
+                quitButton);
+        }
+
+        private static UnityEngine.UI.Button BuildMainMenuButton(
+            Transform parent,
+            string buttonName,
+            float offsetY,
+            string label,
+            TMPro.TMP_FontAsset defaultFont)
+        {
+            UnityEngine.UI.Image buttonImage = EnsureImage(parent, buttonName);
+            ConfigureRect(
+                buttonImage.rectTransform,
+                new Vector2(0.5f, 0.5f),
+                new Vector2(0.5f, 0.5f),
+                new Vector2(0.5f, 0.5f),
+                new Vector2(0f, offsetY),
+                new Vector2(MainMenuButtonWidth, MainMenuButtonHeight));
+            ConfigureImage(buttonImage, MainMenuButtonColor, true);
+
+            UnityEngine.UI.Button button =
+                EnsureComponent<UnityEngine.UI.Button>(buttonImage.gameObject);
+            UnityEditor.Undo.RecordObject(button, UndoLabel);
+            button.targetGraphic = buttonImage;
+            ConfigureButtonText(buttonImage.transform, defaultFont, label, MainMenuButtonFontSize);
+            return button;
+        }
+
         private static UnityEngine.UI.Button BuildConfirmButton(
             Transform parent,
             string buttonName,
@@ -1069,6 +1226,35 @@ namespace Residuum.UI.Editor
                 listener);
         }
 
+        private static void WireMainMenuStartEvent(MainMenuUI mainMenuUI, Component gameManager)
+        {
+            UnityEditor.Undo.RecordObject(mainMenuUI, UndoLabel);
+            if (mainMenuUI.onStartRequested == null)
+            {
+                mainMenuUI.onStartRequested = new UnityEngine.Events.UnityEvent();
+            }
+
+            RemovePersistentListeners(mainMenuUI.onStartRequested, "StartRound");
+            if (gameManager == null)
+            {
+                return;
+            }
+
+            UnityEngine.Events.UnityAction listener =
+                CreatePersistentListener<UnityEngine.Events.UnityAction>(gameManager, "StartRound");
+            if (listener == null)
+            {
+                Debug.LogWarning(
+                    "GameManager 缺少 StartRound()：MainMenuUI.onStartRequested 未连接。",
+                    mainMenuUI);
+                return;
+            }
+
+            UnityEditor.Events.UnityEventTools.AddPersistentListener(
+                mainMenuUI.onStartRequested,
+                listener);
+        }
+
         private static void WireEvacuateConfirmedEvent(
             EvacuateConfirmUI evacuateConfirmUI,
             Component gameManager)
@@ -1301,6 +1487,17 @@ namespace Residuum.UI.Editor
             transform.SetSiblingIndex(siblingIndex);
         }
 
+        private static void SetMainMenuSiblingIndex(Transform transform, int siblingIndex)
+        {
+            if (transform.GetSiblingIndex() == siblingIndex)
+            {
+                return;
+            }
+
+            UnityEditor.Undo.RecordObject(transform, UndoLabel);
+            transform.SetSiblingIndex(siblingIndex);
+        }
+
         private static void WireHudController(HUDController hudController, HudReferences references)
         {
             UnityEditor.Undo.RecordObject(hudController, UndoLabel);
@@ -1376,6 +1573,34 @@ namespace Residuum.UI.Editor
                 references.CancelButton;
 
             serializedEvacuateConfirmUI.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        private static void WireMainMenuUI(
+            MainMenuUI mainMenuUI,
+            MainMenuReferences references,
+            Component playerController)
+        {
+            UnityEditor.Undo.RecordObject(mainMenuUI, UndoLabel);
+            UnityEditor.SerializedObject serializedMainMenuUI =
+                new UnityEditor.SerializedObject(mainMenuUI);
+            serializedMainMenuUI.Update();
+
+            GetRequiredProperty(serializedMainMenuUI, "_panelRoot").objectReferenceValue =
+                references.PanelRoot;
+            GetRequiredProperty(serializedMainMenuUI, "_backgroundImage").objectReferenceValue =
+                references.BackgroundImage;
+            GetRequiredProperty(serializedMainMenuUI, "_titleLabel").objectReferenceValue =
+                references.TitleLabel;
+            GetRequiredProperty(serializedMainMenuUI, "_subtitleLabel").objectReferenceValue =
+                references.SubtitleLabel;
+            GetRequiredProperty(serializedMainMenuUI, "_startButton").objectReferenceValue =
+                references.StartButton;
+            GetRequiredProperty(serializedMainMenuUI, "_quitButton").objectReferenceValue =
+                references.QuitButton;
+            GetRequiredProperty(serializedMainMenuUI, "_playerControllerBehaviour").objectReferenceValue =
+                playerController;
+
+            serializedMainMenuUI.ApplyModifiedPropertiesWithoutUndo();
         }
 
         private static UnityEditor.SerializedProperty GetRequiredProperty(
@@ -1617,6 +1842,32 @@ namespace Residuum.UI.Editor
             public TMPro.TextMeshProUGUI MessageLabel { get; }
             public UnityEngine.UI.Button ConfirmButton { get; }
             public UnityEngine.UI.Button CancelButton { get; }
+        }
+
+        private readonly struct MainMenuReferences
+        {
+            public MainMenuReferences(
+                GameObject panelRoot,
+                UnityEngine.UI.Image backgroundImage,
+                TMPro.TextMeshProUGUI titleLabel,
+                TMPro.TextMeshProUGUI subtitleLabel,
+                UnityEngine.UI.Button startButton,
+                UnityEngine.UI.Button quitButton)
+            {
+                PanelRoot = panelRoot;
+                BackgroundImage = backgroundImage;
+                TitleLabel = titleLabel;
+                SubtitleLabel = subtitleLabel;
+                StartButton = startButton;
+                QuitButton = quitButton;
+            }
+
+            public GameObject PanelRoot { get; }
+            public UnityEngine.UI.Image BackgroundImage { get; }
+            public TMPro.TextMeshProUGUI TitleLabel { get; }
+            public TMPro.TextMeshProUGUI SubtitleLabel { get; }
+            public UnityEngine.UI.Button StartButton { get; }
+            public UnityEngine.UI.Button QuitButton { get; }
         }
 
         private readonly struct JournalReferences
