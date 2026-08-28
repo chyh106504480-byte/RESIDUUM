@@ -11,6 +11,9 @@ namespace Residuum.Core
     [DefaultExecutionOrder(-100)]
     public sealed class GameManager : MonoBehaviour
     {
+        [Tooltip("关闭后进 Play 不自动开局，等主菜单点「开始游戏」再调 StartRound")]
+        [SerializeField] private bool _autoStartOnPlay = true;
+
         [Header("回合依赖")]
         [SerializeField]
         [Tooltip("本垂直切片可随机选择的全部鬼种定义；空引用会被跳过。")]
@@ -100,7 +103,10 @@ namespace Residuum.Core
 
         private void Start()
         {
-            StartRound();
+            if (_autoStartOnPlay)
+            {
+                StartRound();
+            }
         }
 
         private void Update()
