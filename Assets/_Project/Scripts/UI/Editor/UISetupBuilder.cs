@@ -16,6 +16,7 @@ namespace Residuum.UI.Editor
         private const string EventSystemName = "EventSystem";
         private const string HudCanvasName = "HUD Canvas";
         private const string ResultCanvasName = "Result Canvas";
+        private const string ConfirmCanvasName = "Confirm Canvas";
         private const string JournalCanvasName = "Journal Canvas";
         private const string EvidenceManagerName = "EvidenceManager";
         private const string CrosshairName = "Crosshair";
@@ -32,6 +33,10 @@ namespace Residuum.UI.Editor
         private const string TitleName = "Title";
         private const string DetailName = "Detail";
         private const string RestartButtonName = "RestartButton";
+        private const string BoxName = "Box";
+        private const string MessageName = "Message";
+        private const string ConfirmButtonName = "ConfirmButton";
+        private const string CancelButtonName = "CancelButton";
         private const string RestartButtonTextName = "Text";
         private const string EvidenceName = "Evidence";
         private const string DeductionTableName = "DeductionTable";
@@ -50,6 +55,7 @@ namespace Residuum.UI.Editor
 
         private const int HudSortingOrder = 0;
         private const int ResultSortingOrder = 100;
+        private const int ConfirmSortingOrder = 80;
         private const int JournalSortingOrder = 50;
         private const int EvidenceLabelCount = 3;
         private const int GhostCount = 3;
@@ -67,6 +73,8 @@ namespace Residuum.UI.Editor
         private const int ResultTitleFontSize = 36;
         private const int ResultDetailFontSize = 24;
         private const int RestartButtonFontSize = 24;
+        private const int ConfirmMessageFontSize = 26;
+        private const int ConfirmButtonFontSize = 24;
         private const int JournalEvidenceFontSize = 26;
         private const int JournalTableFontSize = 22;
         private const int JournalButtonFontSize = 22;
@@ -98,6 +106,15 @@ namespace Residuum.UI.Editor
         private const float RestartButtonWidth = 240f;
         private const float RestartButtonHeight = 56f;
         private const float ResultContentWidth = 900f;
+        private const float ConfirmBoxWidth = 560f;
+        private const float ConfirmBoxHeight = 220f;
+        private const float ConfirmMessageOffsetY = 42f;
+        private const float ConfirmMessageWidth = 500f;
+        private const float ConfirmMessageHeight = 86f;
+        private const float ConfirmButtonOffsetX = 125f;
+        private const float ConfirmButtonOffsetY = -66f;
+        private const float ConfirmButtonWidth = 200f;
+        private const float ConfirmButtonHeight = 52f;
         private const float JournalLeftMargin = 80f;
         private const float JournalTopMargin = 160f;
         private const float JournalEvidenceRowHeight = 44f;
@@ -120,6 +137,8 @@ namespace Residuum.UI.Editor
         private static readonly Color ResultPanelColor = new Color(0f, 0f, 0f, PanelAlpha);
         private static readonly Color HuntVignetteColor = new Color(1f, 0f, 0f, 0f);
         private static readonly Color RestartButtonColor = new Color(0.25f, 0.25f, 0.25f, 1f);
+        private static readonly Color ConfirmBoxColor = new Color(0.12f, 0.12f, 0.12f, 1f);
+        private static readonly Color ConfirmButtonColor = new Color(0.25f, 0.25f, 0.25f, 1f);
         private static readonly Color JournalPanelColor = new Color(0f, 0f, 0f, PanelAlpha);
         private static readonly Color JournalButtonColor = new Color(0.25f, 0.25f, 0.25f, 1f);
 
@@ -151,12 +170,33 @@ namespace Residuum.UI.Editor
                 ResultReferences resultReferences = BuildResultHierarchy(resultCanvas.transform, defaultFont);
                 WireResultScreenUI(resultScreenUI, resultReferences);
 
+                GameObject confirmCanvas = GetOrCreateRootCanvas(ConfirmCanvasName);
+                ConfigureCanvas(confirmCanvas, ConfirmSortingOrder);
+                EvacuateConfirmUI evacuateConfirmUI = EnsureComponent<EvacuateConfirmUI>(confirmCanvas);
+                ConfirmReferences confirmReferences = BuildConfirmHierarchy(
+                    confirmCanvas.transform,
+                    defaultFont);
+                WireEvacuateConfirmUI(evacuateConfirmUI, confirmReferences);
+
+                Component gameManager = FindComponentInActiveSceneByTypeName(GameManagerTypeName);
+                if (gameManager == null)
+                {
+                    Debug.LogWarning(
+                        "没找到 GameManager：EvacuateConfirmUI.onEvacuateConfirmed → " +
+                        "GameManager.RequestEvacuate 未连接。",
+                        confirmCanvas);
+                }
+                else
+                {
+                    WireEvacuateConfirmedEvent(evacuateConfirmUI, gameManager);
+                }
+
                 UnityEditor.Undo.CollapseUndoOperations(undoGroup);
                 UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(
                     UnityEngine.SceneManagement.SceneManager.GetActiveScene());
                 UnityEditor.Selection.activeGameObject = hudCanvas;
                 Debug.Log(
-                    "HUD Canvas 与 Result Canvas 已搭建并完成界面内部引用接线。" +
+                    "HUD Canvas、Result Canvas 与 Confirm Canvas 已搭建并完成界面内部引用接线。" +
                     "请继续运行 Residuum/搭建判定笔记本，它会自动补齐 PlayerController、" +
                     "GameManager 与结算界面的跨物体接线。",
                     hudCanvas);
@@ -562,6 +602,89 @@ namespace Residuum.UI.Editor
                 restartButton);
         }
 
+        private static ConfirmReferences BuildConfirmHierarchy(
+            Transform confirmCanvasTransform,
+            TMPro.TMP_FontAsset defaultFont)
+        {
+            UnityEngine.UI.Image panel = EnsureImage(confirmCanvasTransform, PanelName);
+            ConfigureStretchRect(panel.rectTransform);
+            ConfigureImage(panel, ResultPanelColor, true);
+
+            UnityEngine.UI.Image box = EnsureImage(panel.transform, BoxName);
+            ConfigureRect(
+                box.rectTransform,
+                new Vector2(0.5f, 0.5f),
+                new Vector2(0.5f, 0.5f),
+                new Vector2(0.5f, 0.5f),
+                Vector2.zero,
+                new Vector2(ConfirmBoxWidth, ConfirmBoxHeight));
+            ConfigureImage(box, ConfirmBoxColor, false);
+
+            TMPro.TextMeshProUGUI messageLabel = EnsureText(box.transform, MessageName);
+            ConfigureRect(
+                messageLabel.rectTransform,
+                new Vector2(0.5f, 0.5f),
+                new Vector2(0.5f, 0.5f),
+                new Vector2(0.5f, 0.5f),
+                new Vector2(0f, ConfirmMessageOffsetY),
+                new Vector2(ConfirmMessageWidth, ConfirmMessageHeight));
+            ConfigureText(
+                messageLabel,
+                defaultFont,
+                string.Empty,
+                ConfirmMessageFontSize,
+                TMPro.TextAlignmentOptions.Center,
+                true,
+                false);
+
+            UnityEngine.UI.Button confirmButton = BuildConfirmButton(
+                box.transform,
+                ConfirmButtonName,
+                new Vector2(-ConfirmButtonOffsetX, ConfirmButtonOffsetY),
+                "撤离",
+                defaultFont);
+            UnityEngine.UI.Button cancelButton = BuildConfirmButton(
+                box.transform,
+                CancelButtonName,
+                new Vector2(ConfirmButtonOffsetX, ConfirmButtonOffsetY),
+                "再等等",
+                defaultFont);
+
+            UnityEditor.Undo.RecordObject(panel.gameObject, UndoLabel);
+            panel.gameObject.SetActive(false);
+
+            return new ConfirmReferences(
+                panel.gameObject,
+                messageLabel,
+                confirmButton,
+                cancelButton);
+        }
+
+        private static UnityEngine.UI.Button BuildConfirmButton(
+            Transform parent,
+            string buttonName,
+            Vector2 anchoredPosition,
+            string label,
+            TMPro.TMP_FontAsset defaultFont)
+        {
+            UnityEngine.UI.Image buttonImage = EnsureImage(parent, buttonName);
+            ConfigureRect(
+                buttonImage.rectTransform,
+                new Vector2(0.5f, 0.5f),
+                new Vector2(0.5f, 0.5f),
+                new Vector2(0.5f, 0.5f),
+                anchoredPosition,
+                new Vector2(ConfirmButtonWidth, ConfirmButtonHeight));
+            ConfigureImage(buttonImage, ConfirmButtonColor, true);
+
+            UnityEngine.UI.Button button =
+                EnsureComponent<UnityEngine.UI.Button>(buttonImage.gameObject);
+            UnityEditor.Undo.RecordObject(button, UndoLabel);
+            button.targetGraphic = buttonImage;
+            ConfigureButtonText(buttonImage.transform, defaultFont, label, ConfirmButtonFontSize);
+            return button;
+        }
+
         private static JournalReferences BuildJournalHierarchy(
             Transform journalCanvasTransform,
             TMPro.TMP_FontAsset defaultFont)
@@ -946,6 +1069,28 @@ namespace Residuum.UI.Editor
                 listener);
         }
 
+        private static void WireEvacuateConfirmedEvent(
+            EvacuateConfirmUI evacuateConfirmUI,
+            Component gameManager)
+        {
+            UnityEditor.Undo.RecordObject(evacuateConfirmUI, UndoLabel);
+            RemovePersistentListeners(evacuateConfirmUI.onEvacuateConfirmed, "RequestEvacuate");
+            UnityEngine.Events.UnityAction listener =
+                CreatePersistentListener<UnityEngine.Events.UnityAction>(
+                    gameManager,
+                    "RequestEvacuate");
+            if (listener == null)
+            {
+                throw new InvalidOperationException(
+                    "GameManager 缺少 RequestEvacuate()，无法连接 " +
+                    "EvacuateConfirmUI.onEvacuateConfirmed。");
+            }
+
+            UnityEditor.Events.UnityEventTools.AddPersistentListener(
+                evacuateConfirmUI.onEvacuateConfirmed,
+                listener);
+        }
+
         private static TDelegate CreatePersistentListener<TDelegate>(Component target, string methodName)
             where TDelegate : Delegate
         {
@@ -1212,6 +1357,27 @@ namespace Residuum.UI.Editor
             serializedResultScreenUI.ApplyModifiedPropertiesWithoutUndo();
         }
 
+        private static void WireEvacuateConfirmUI(
+            EvacuateConfirmUI evacuateConfirmUI,
+            ConfirmReferences references)
+        {
+            UnityEditor.Undo.RecordObject(evacuateConfirmUI, UndoLabel);
+            UnityEditor.SerializedObject serializedEvacuateConfirmUI =
+                new UnityEditor.SerializedObject(evacuateConfirmUI);
+            serializedEvacuateConfirmUI.Update();
+
+            GetRequiredProperty(serializedEvacuateConfirmUI, "_panelRoot").objectReferenceValue =
+                references.PanelRoot;
+            GetRequiredProperty(serializedEvacuateConfirmUI, "_messageLabel").objectReferenceValue =
+                references.MessageLabel;
+            GetRequiredProperty(serializedEvacuateConfirmUI, "_confirmButton").objectReferenceValue =
+                references.ConfirmButton;
+            GetRequiredProperty(serializedEvacuateConfirmUI, "_cancelButton").objectReferenceValue =
+                references.CancelButton;
+
+            serializedEvacuateConfirmUI.ApplyModifiedPropertiesWithoutUndo();
+        }
+
         private static UnityEditor.SerializedProperty GetRequiredProperty(
             UnityEditor.SerializedObject serializedObject,
             string propertyName)
@@ -1431,6 +1597,26 @@ namespace Residuum.UI.Editor
             public TMPro.TextMeshProUGUI TitleLabel { get; }
             public TMPro.TextMeshProUGUI DetailLabel { get; }
             public UnityEngine.UI.Button RestartButton { get; }
+        }
+
+        private readonly struct ConfirmReferences
+        {
+            public ConfirmReferences(
+                GameObject panelRoot,
+                TMPro.TextMeshProUGUI messageLabel,
+                UnityEngine.UI.Button confirmButton,
+                UnityEngine.UI.Button cancelButton)
+            {
+                PanelRoot = panelRoot;
+                MessageLabel = messageLabel;
+                ConfirmButton = confirmButton;
+                CancelButton = cancelButton;
+            }
+
+            public GameObject PanelRoot { get; }
+            public TMPro.TextMeshProUGUI MessageLabel { get; }
+            public UnityEngine.UI.Button ConfirmButton { get; }
+            public UnityEngine.UI.Button CancelButton { get; }
         }
 
         private readonly struct JournalReferences
