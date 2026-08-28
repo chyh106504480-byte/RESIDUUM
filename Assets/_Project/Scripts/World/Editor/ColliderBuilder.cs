@@ -74,7 +74,8 @@ namespace Residuum.World.Editor
                         continue;
                     }
 
-                    if (HasRoomVolumeOnSelfOrAncestor(targetObject.transform))
+                    // 只跳过 RoomVolume 所在的物体本身，子孙墙体与楼板仍需碰撞体来阻挡玩家和鬼的视线。
+                    if (targetObject.GetComponent<Residuum.World.RoomVolume>() != null)
                     {
                         skippedRoomVolumeCount++;
                         continue;
@@ -108,7 +109,7 @@ namespace Residuum.World.Editor
                     $"批量添加碰撞体完成：处理 {meshFilters.Count} 个物体，新增 {addedCount} 个 MeshCollider，"
                     + $"跳过 {skippedCount} 个（已有 Collider：{skippedExistingColliderCount}，"
                     + $"无网格：{skippedMissingMeshCount}，命中关键词：{skippedKeywordCount}，"
-                    + $"RoomVolume 保护范围：{skippedRoomVolumeCount}）。",
+                    + $"RoomVolume 物体自身：{skippedRoomVolumeCount}）。",
                     selectedObjects[0]);
             }
             catch (Exception exception)
@@ -226,22 +227,6 @@ namespace Residuum.World.Editor
                 {
                     return true;
                 }
-            }
-
-            return false;
-        }
-
-        private static bool HasRoomVolumeOnSelfOrAncestor(Transform targetTransform)
-        {
-            Transform currentTransform = targetTransform;
-            while (currentTransform != null)
-            {
-                if (currentTransform.GetComponent<Residuum.World.RoomVolume>() != null)
-                {
-                    return true;
-                }
-
-                currentTransform = currentTransform.parent;
             }
 
             return false;
