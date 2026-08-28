@@ -45,6 +45,9 @@ namespace Residuum.UI
         [Tooltip("拖入玩家身上的 PlayerController 组件。菜单显示时禁用它")]
         [SerializeField] private MonoBehaviour _playerControllerBehaviour;
 
+        [Tooltip("场景里的 ScreenFader。留空则不做过场，直接开始")]
+        [SerializeField] private ScreenFader _screenFader;
+
         [Header("开局事件")]
         [Tooltip("在 Inspector 里连到 GameManager.StartRound")]
         public UnityEngine.Events.UnityEvent onStartRequested;
@@ -140,9 +143,20 @@ namespace Residuum.UI
 
         private void HandleStartClicked()
         {
-            SetMenuVisible(false);
-            SetPlayerControllerEnabled(true);
-            onStartRequested?.Invoke();
+            if (_screenFader == null)
+            {
+                SetMenuVisible(false);
+                SetPlayerControllerEnabled(true);
+                onStartRequested?.Invoke();
+                return;
+            }
+
+            _screenFader.FadeThrough(() =>
+            {
+                SetMenuVisible(false);
+                SetPlayerControllerEnabled(true);
+                onStartRequested?.Invoke();
+            });
         }
 
         private void HandleQuitClicked()
