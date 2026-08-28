@@ -19,6 +19,7 @@ namespace Residuum.UI.Editor
         private const string ConfirmCanvasName = "Confirm Canvas";
         private const string JournalCanvasName = "Journal Canvas";
         private const string MainMenuCanvasName = "Main Menu Canvas";
+        private const string PauseCanvasName = "Pause Canvas";
         private const string EvidenceManagerName = "EvidenceManager";
         private const string CrosshairName = "Crosshair";
         private const string PromptLabelName = "PromptLabel";
@@ -39,6 +40,8 @@ namespace Residuum.UI.Editor
         private const string SubtitleName = "Subtitle";
         private const string StartButtonName = "StartButton";
         private const string QuitButtonName = "QuitButton";
+        private const string ResumeButtonName = "ResumeButton";
+        private const string QuitToMenuButtonName = "QuitToMenuButton";
         private const string BoxName = "Box";
         private const string MessageName = "Message";
         private const string ConfirmButtonName = "ConfirmButton";
@@ -64,6 +67,7 @@ namespace Residuum.UI.Editor
         private const int ConfirmSortingOrder = 80;
         private const int JournalSortingOrder = 50;
         private const int MainMenuSortingOrder = 200;
+        private const int PauseSortingOrder = 250;
         private const int EvidenceLabelCount = 3;
         private const int GhostCount = 3;
         private const int EvidenceColumnsPerGhost = 3;
@@ -89,6 +93,7 @@ namespace Residuum.UI.Editor
         private const int MainMenuTitleFontSize = 96;
         private const int MainMenuSubtitleFontSize = 28;
         private const int MainMenuButtonFontSize = 28;
+        private const int PauseButtonFontSize = 24;
         private const int EvidenceLineHeight = 26;
 
         private const float CanvasMatchWidthOrHeight = 0.5f;
@@ -155,6 +160,13 @@ namespace Residuum.UI.Editor
         private const float MainMenuButtonWidth = 280f;
         private const float MainMenuButtonHeight = 64f;
         private const float MainMenuButtonSpacing = 20f;
+        private const float PauseBoxWidth = 460f;
+        private const float PauseBoxHeight = 220f;
+        private const float PauseButtonWidth = 260f;
+        private const float PauseButtonHeight = 56f;
+        private const float PauseButtonSpacing = 20f;
+        private const float PauseButtonOffsetY =
+            (PauseButtonHeight + PauseButtonSpacing) * 0.5f;
 
         private static readonly Color BackgroundColor = new Color(0.04f, 0.04f, 0.04f, 0.9f);
         private static readonly Color BarFillColor = new Color(0.9f, 0.9f, 0.9f, 1f);
@@ -167,6 +179,9 @@ namespace Residuum.UI.Editor
         private static readonly Color JournalButtonColor = new Color(0.25f, 0.25f, 0.25f, 1f);
         private static readonly Color MainMenuBackgroundColor = new Color(0.06f, 0.06f, 0.07f, 1f);
         private static readonly Color MainMenuButtonColor = new Color(0.25f, 0.25f, 0.25f, 1f);
+        private static readonly Color PausePanelColor = new Color(0f, 0f, 0f, PanelAlpha);
+        private static readonly Color PauseBoxColor = new Color(0.12f, 0.12f, 0.12f, 1f);
+        private static readonly Color PauseButtonColor = new Color(0.25f, 0.25f, 0.25f, 1f);
 
         [UnityEditor.MenuItem(MenuPath)]
         private static void BuildUI()
@@ -227,6 +242,19 @@ namespace Residuum.UI.Editor
                 Component playerController = FindComponentInActiveSceneByTypeName(PlayerControllerTypeName);
                 WireMainMenuUI(mainMenuUI, mainMenuReferences, playerController);
 
+                GameObject pauseCanvas = GetOrCreateRootCanvas(PauseCanvasName);
+                ConfigureCanvas(pauseCanvas, PauseSortingOrder);
+                PauseMenuUI pauseMenuUI = EnsureComponent<PauseMenuUI>(pauseCanvas);
+                PauseReferences pauseReferences = BuildPauseHierarchy(
+                    pauseCanvas.transform,
+                    defaultFont);
+                ScreenFader screenFader = FindComponentInActiveScene<ScreenFader>();
+                WirePauseMenuUI(
+                    pauseMenuUI,
+                    pauseReferences,
+                    playerController,
+                    screenFader);
+
                 if (gameManager == null)
                 {
                     WireMainMenuStartEvent(mainMenuUI, null);
@@ -245,6 +273,16 @@ namespace Residuum.UI.Editor
                     Debug.LogWarning(
                         "没找到 PlayerController：MainMenuUI._playerControllerBehaviour 未连接。",
                         mainMenuCanvas);
+                    Debug.LogWarning(
+                        "没找到 PlayerController：PauseMenuUI._playerControllerBehaviour 未连接。",
+                        pauseCanvas);
+                }
+
+                if (screenFader == null)
+                {
+                    Debug.LogWarning(
+                        "没找到 ScreenFader：PauseMenuUI._screenFader 未连接，将直接重载场景。",
+                        pauseCanvas);
                 }
 
                 UnityEditor.Undo.CollapseUndoOperations(undoGroup);
@@ -252,7 +290,8 @@ namespace Residuum.UI.Editor
                     UnityEngine.SceneManagement.SceneManager.GetActiveScene());
                 UnityEditor.Selection.activeGameObject = hudCanvas;
                 Debug.Log(
-                    "HUD Canvas、Result Canvas、Confirm Canvas 与 Main Menu Canvas 已搭建并完成界面内部引用接线。" +
+                    "HUD Canvas、Result Canvas、Confirm Canvas、Main Menu Canvas 与 Pause Canvas " +
+                    "已搭建并完成界面内部引用接线。" +
                     "要让主菜单真正生效，请取消勾选 GameManager 的 Auto Start On Play；" +
                     "搭建工具不会自动修改该场景数据。" +
                     "请继续运行 Residuum/搭建判定笔记本，它会自动补齐 PlayerController、" +
@@ -839,6 +878,71 @@ namespace Residuum.UI.Editor
             UnityEditor.Undo.RecordObject(button, UndoLabel);
             button.targetGraphic = buttonImage;
             ConfigureButtonText(buttonImage.transform, defaultFont, label, MainMenuButtonFontSize);
+            return button;
+        }
+
+        private static PauseReferences BuildPauseHierarchy(
+            Transform pauseCanvasTransform,
+            TMPro.TMP_FontAsset defaultFont)
+        {
+            UnityEngine.UI.Image panel = EnsureImage(pauseCanvasTransform, PanelName);
+            ConfigureStretchRect(panel.rectTransform);
+            ConfigureImage(panel, PausePanelColor, true);
+
+            UnityEngine.UI.Image box = EnsureImage(panel.transform, BoxName);
+            ConfigureRect(
+                box.rectTransform,
+                new Vector2(0.5f, 0.5f),
+                new Vector2(0.5f, 0.5f),
+                new Vector2(0.5f, 0.5f),
+                Vector2.zero,
+                new Vector2(PauseBoxWidth, PauseBoxHeight));
+            ConfigureImage(box, PauseBoxColor, true);
+
+            UnityEngine.UI.Button resumeButton = BuildPauseButton(
+                box.transform,
+                ResumeButtonName,
+                PauseButtonOffsetY,
+                "继续游戏",
+                defaultFont);
+            UnityEngine.UI.Button quitToMenuButton = BuildPauseButton(
+                box.transform,
+                QuitToMenuButtonName,
+                -PauseButtonOffsetY,
+                "返回主菜单",
+                defaultFont);
+
+            UnityEditor.Undo.RecordObject(panel.gameObject, UndoLabel);
+            panel.gameObject.SetActive(false);
+
+            return new PauseReferences(
+                panel.gameObject,
+                resumeButton,
+                quitToMenuButton);
+        }
+
+        private static UnityEngine.UI.Button BuildPauseButton(
+            Transform parent,
+            string buttonName,
+            float offsetY,
+            string label,
+            TMPro.TMP_FontAsset defaultFont)
+        {
+            UnityEngine.UI.Image buttonImage = EnsureImage(parent, buttonName);
+            ConfigureRect(
+                buttonImage.rectTransform,
+                new Vector2(0.5f, 0.5f),
+                new Vector2(0.5f, 0.5f),
+                new Vector2(0.5f, 0.5f),
+                new Vector2(0f, offsetY),
+                new Vector2(PauseButtonWidth, PauseButtonHeight));
+            ConfigureImage(buttonImage, PauseButtonColor, true);
+
+            UnityEngine.UI.Button button =
+                EnsureComponent<UnityEngine.UI.Button>(buttonImage.gameObject);
+            UnityEditor.Undo.RecordObject(button, UndoLabel);
+            button.targetGraphic = buttonImage;
+            ConfigureButtonText(buttonImage.transform, defaultFont, label, PauseButtonFontSize);
             return button;
         }
 
@@ -1629,6 +1733,31 @@ namespace Residuum.UI.Editor
             serializedMainMenuUI.ApplyModifiedPropertiesWithoutUndo();
         }
 
+        private static void WirePauseMenuUI(
+            PauseMenuUI pauseMenuUI,
+            PauseReferences references,
+            Component playerController,
+            ScreenFader screenFader)
+        {
+            UnityEditor.Undo.RecordObject(pauseMenuUI, UndoLabel);
+            UnityEditor.SerializedObject serializedPauseMenuUI =
+                new UnityEditor.SerializedObject(pauseMenuUI);
+            serializedPauseMenuUI.Update();
+
+            GetRequiredProperty(serializedPauseMenuUI, "_panelRoot").objectReferenceValue =
+                references.PanelRoot;
+            GetRequiredProperty(serializedPauseMenuUI, "_resumeButton").objectReferenceValue =
+                references.ResumeButton;
+            GetRequiredProperty(serializedPauseMenuUI, "_quitToMenuButton").objectReferenceValue =
+                references.QuitToMenuButton;
+            GetRequiredProperty(serializedPauseMenuUI, "_playerControllerBehaviour").objectReferenceValue =
+                playerController;
+            GetRequiredProperty(serializedPauseMenuUI, "_screenFader").objectReferenceValue =
+                screenFader;
+
+            serializedPauseMenuUI.ApplyModifiedPropertiesWithoutUndo();
+        }
+
         private static UnityEditor.SerializedProperty GetRequiredProperty(
             UnityEditor.SerializedObject serializedObject,
             string propertyName)
@@ -1897,6 +2026,23 @@ namespace Residuum.UI.Editor
             public TMPro.TextMeshProUGUI SubtitleLabel { get; }
             public UnityEngine.UI.Button StartButton { get; }
             public UnityEngine.UI.Button QuitButton { get; }
+        }
+
+        private readonly struct PauseReferences
+        {
+            public PauseReferences(
+                GameObject panelRoot,
+                UnityEngine.UI.Button resumeButton,
+                UnityEngine.UI.Button quitToMenuButton)
+            {
+                PanelRoot = panelRoot;
+                ResumeButton = resumeButton;
+                QuitToMenuButton = quitToMenuButton;
+            }
+
+            public GameObject PanelRoot { get; }
+            public UnityEngine.UI.Button ResumeButton { get; }
+            public UnityEngine.UI.Button QuitToMenuButton { get; }
         }
 
         private readonly struct JournalReferences
