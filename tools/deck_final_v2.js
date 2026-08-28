@@ -662,7 +662,7 @@ function foot(s, t, color, y) {
 {
   const s = newSlide("how we built it · 02  ·  the production line");
   title(s, "How a feature actually got made");
-  sub(s, "Same six steps, seventy-two times. The AI writes the code. It never decides what the code is for.");
+  sub(s, "Same six steps, every single task. The AI writes the code. It never decides what the code is for.");
 
   const STEPS = [
     ["01", "HUMAN", "writes the task spec:\nwhich files, which\nnumbers, what is\nout of scope", AMBER],
@@ -717,7 +717,7 @@ function foot(s, t, color, y) {
     x: XL - 0.09, y: 4.86, w: 0.19, h: 0.15, fill: { color: RED }, line: { type: "none" },
   });
   s.addText("fail  →  back to step 02, with the error text pasted in.\nTwo attempts, then it stops and a human looks.", {
-    x: ML + 7.9, y: LY - 0.34, w: 4.63, h: 0.6, isTextBox: true, margin: 0,
+    x: ML + 7.9, y: LY - 0.34, w: 3.83, h: 0.6, isTextBox: true, margin: 0,
     fontFace: F, fontSize: 11.5, color: REDBR, lineSpacing: 16,
   });
 
