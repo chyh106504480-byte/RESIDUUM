@@ -81355,7 +81355,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1132145995
 Transform:
   m_ObjectHideFlags: 0
@@ -81394,12 +81394,12 @@ MonoBehaviour:
   _minimumGroundNormalY: 0.5
   _writingCheckInterval: 30
   _writingChance: 0.3
-  _appearanceMode: 0
+  _appearanceMode: 1
   _unwrittenAppearance: {fileID: 0}
   _writtenAppearance: {fileID: 0}
-  _writingRenderer: {fileID: 0}
-  _unwrittenMaterial: {fileID: 0}
-  _writtenMaterial: {fileID: 0}
+  _writingRenderer: {fileID: 417166438}
+  _unwrittenMaterial: {fileID: 2100000, guid: 5c6e8345dc30845c7adf149adfb12bd8, type: 2}
+  _writtenMaterial: {fileID: 2100000, guid: 3a316c73afba74306a064f1a14efa681, type: 2}
   onPlaced:
     m_PersistentCalls:
       m_Calls: []
