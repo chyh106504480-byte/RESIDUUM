@@ -15,6 +15,17 @@ namespace Residuum.World
         [Tooltip("开局时这组灯是否亮着")]
         [SerializeField] private bool _startsOn = true;
 
+        [Header("音效")]
+        [Tooltip("开关的音源。建议挂在开关物体自己身上，Spatial Blend 设为 1（3D）")]
+        [SerializeField] private AudioSource _audioSource;
+
+        [Tooltip("拨动开关的音效。开灯关灯共用一个")]
+        [SerializeField] private AudioClip _toggleClip;
+
+        [Range(0f, 1f)]
+        [Tooltip("音效音量")]
+        [SerializeField] private float _toggleVolume = 1f;
+
         [Tooltip("灯亮着时的提示")]
         [SerializeField] private string _turnOffPromptText = "[E] 关灯";
 
@@ -66,6 +77,7 @@ namespace Residuum.World
             }
 
             ApplyState(!_isOn);
+            PlayToggleSound();
         }
 
         private void HandleRoundStart()
@@ -89,6 +101,16 @@ namespace Residuum.World
                     controlledLight.enabled = _isOn;
                 }
             }
+        }
+
+        private void PlayToggleSound()
+        {
+            if (_audioSource == null || _toggleClip == null)
+            {
+                return;
+            }
+
+            _audioSource.PlayOneShot(_toggleClip, _toggleVolume);
         }
 
         private bool HasValidLight()

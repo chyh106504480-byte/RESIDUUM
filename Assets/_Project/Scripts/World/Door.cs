@@ -16,6 +16,20 @@ namespace Residuum.World
         [Tooltip("门的铰链 Transform。留空时使用当前 Door 所在的 Transform。")]
         [SerializeField] private Transform _hinge;
 
+        [Header("音效")]
+        [Tooltip("门的音源。建议挂在门物体自己身上，Spatial Blend 设为 1（3D）")]
+        [SerializeField] private AudioSource _audioSource;
+
+        [Tooltip("开门音效")]
+        [SerializeField] private AudioClip _openClip;
+
+        [Tooltip("关门音效。留空时复用开门音效")]
+        [SerializeField] private AudioClip _closeClip;
+
+        [Range(0f, 1f)]
+        [Tooltip("音效音量")]
+        [SerializeField] private float _doorVolume = 1f;
+
         [Header("猎杀上锁")]
         [Tooltip("勾上后，这扇门在猎杀期间会自动关闭并锁死。只给通往一楼的楼梯门勾")]
         [SerializeField] private bool _locksDuringHunt = false;
@@ -115,6 +129,7 @@ namespace Residuum.World
             _transitionDuration = _openCloseDuration * remainingRatio;
             _transitionElapsed = 0f;
             _isTransitioning = true;
+            PlayDoorSound(_targetOpen);
             UpdateNavMeshObstacle();
         }
 
@@ -151,6 +166,22 @@ namespace Residuum.World
             {
                 _navMeshObstacle.carving = !IsOpen;
             }
+        }
+
+        private void PlayDoorSound(bool opening)
+        {
+            if (_audioSource == null)
+            {
+                return;
+            }
+
+            AudioClip clip = opening ? _openClip : _closeClip != null ? _closeClip : _openClip;
+            if (clip == null)
+            {
+                return;
+            }
+
+            _audioSource.PlayOneShot(clip, _doorVolume);
         }
 
         private void ValidateSettings()
