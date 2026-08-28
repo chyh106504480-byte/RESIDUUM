@@ -43,8 +43,8 @@ namespace Residuum.Items
         [Tooltip("手电筒的手持模型")]
         [SerializeField] private GameObject _flashlightModel;
 
-        [Tooltip("手电筒在世界中的对象")]
-        [SerializeField] private GameObject _flashlightWorldItem;
+        [Tooltip("回合开始时是否自动把手电拿在手上")]
+        [SerializeField] private bool _equipFlashlightOnRoundStart = true;
 
         [Tooltip("装备/收起手电筒的按键")]
         [SerializeField] private UnityEngine.InputSystem.Key _flashlightKey
@@ -84,11 +84,8 @@ namespace Residuum.Items
         private UnityEngine.InputSystem.InputAction _slotThreeAction;
         private UnityEngine.InputSystem.InputAction _scrollAction;
         private UnityEngine.InputSystem.InputAction _primaryUseAction;
-        private Vector3 _flashlightInitialPosition;
-        private Quaternion _flashlightInitialRotation;
         private int _currentSlotIndex = NoSlotIndex;
         private int _lastNumberedSlotIndex = NoSlotIndex;
-        private bool _hasFlashlightInitialTransform;
         private bool _hasFlashlight;
         private bool _isFlashlightEquipped;
         private bool _isInitialized;
@@ -298,15 +295,6 @@ namespace Residuum.Items
                 _hasWorldItemInitialTransform[index] = true;
             }
 
-            if (_flashlightWorldItem == null)
-            {
-                return;
-            }
-
-            Transform flashlightTransform = _flashlightWorldItem.transform;
-            _flashlightInitialPosition = flashlightTransform.position;
-            _flashlightInitialRotation = flashlightTransform.rotation;
-            _hasFlashlightInitialTransform = true;
         }
 
         private bool TryInitializeInput()
@@ -508,31 +496,10 @@ namespace Residuum.Items
             return true;
         }
 
-        /// <summary>拾取手电筒。已持有返回 false。</summary>
+        /// <summary>兼容场景中遗留的手电筒 WorldItem；手电筒为开局基础装备。</summary>
         public bool TryPickUpFlashlight()
         {
-            if (_hasFlashlight)
-            {
-                return false;
-            }
-
-            if (_flashlightHoldable == null)
-            {
-                Debug.LogError("ItemSlotSystem 没有有效的手电筒 IHoldable，无法拾取。", this);
-                return false;
-            }
-
-            if (_flashlightWorldItem == null)
-            {
-                Debug.LogError("ItemSlotSystem 未指定手电筒世界道具对象，无法拾取。", this);
-                return false;
-            }
-
-            FreezeWorldItemPhysics(_flashlightWorldItem);
-            _flashlightWorldItem.SetActive(false);
-            _hasFlashlight = true;
-            EquipFlashlight();
-            return true;
+            return false;
         }
 
         private void ToggleFlashlight()
@@ -611,20 +578,6 @@ namespace Residuum.Items
 
         private void DropFlashlight()
         {
-            if (!_hasFlashlight || _flashlightWorldItem == null)
-            {
-                if (_flashlightWorldItem == null)
-                {
-                    Debug.LogError("ItemSlotSystem 未指定手电筒世界道具对象，无法丢弃。", this);
-                }
-
-                return;
-            }
-
-            UnequipCurrent();
-            _hasFlashlight = false;
-            PlaceWorldItemForDrop(_flashlightWorldItem);
-            BroadcastEmptySlot();
         }
 
         private void PlaceWorldItemForDrop(GameObject worldItem)
@@ -646,6 +599,11 @@ namespace Residuum.Items
         private void HandleRoundStart()
         {
             ResetInventory();
+
+            if (_equipFlashlightOnRoundStart)
+            {
+                EquipFlashlight();
+            }
         }
 
         private void ResetInventory()
@@ -658,9 +616,8 @@ namespace Residuum.Items
                 RestoreWorldItem(index);
             }
 
-            _hasFlashlight = false;
+            _hasFlashlight = _flashlightHoldable != null;
             _lastNumberedSlotIndex = NoSlotIndex;
-            RestoreFlashlightWorldItem();
             _slotBroadcastPending = true;
         }
 
@@ -682,25 +639,6 @@ namespace Residuum.Items
             }
 
             worldItem.SetActive(true);
-        }
-
-        private void RestoreFlashlightWorldItem()
-        {
-            if (_flashlightWorldItem == null)
-            {
-                return;
-            }
-
-            FreezeWorldItemPhysics(_flashlightWorldItem);
-
-            if (_hasFlashlightInitialTransform)
-            {
-                _flashlightWorldItem.transform.SetPositionAndRotation(
-                    _flashlightInitialPosition,
-                    _flashlightInitialRotation);
-            }
-
-            _flashlightWorldItem.SetActive(true);
         }
 
         private int FindNextHeldSlot(int startIndex, int direction)
