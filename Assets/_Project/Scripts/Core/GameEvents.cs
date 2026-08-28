@@ -35,6 +35,16 @@ namespace Residuum.Core
         /// </summary>
         public static event Action<RoundSummary> OnRoundSummary;
 
+        /// <summary>
+        /// 玩家在出口门上按了交互键，请求撤离。**这不是撤离本身**——
+        /// 订阅方（确认弹窗）负责问「确定要走吗」，玩家点确认后才调
+        /// GameManager.RequestEvacuate()。
+        ///
+        /// 【为什么不让出口门直接调 RequestEvacuate】那样玩家碰一下门就结束整局，
+        /// 没有反悔余地。撤离是不可逆的，必须有一次确认。
+        /// </summary>
+        public static event Action OnEvacuatePromptRequested;
+
         // ─────────────────────────────────────────────
         //  理智
         // ─────────────────────────────────────────────
@@ -185,6 +195,7 @@ namespace Residuum.Core
         public static void RaiseRoundStart()                  => OnRoundStart?.Invoke();
         public static void RaiseRoundEnd(RoundResult r)       => OnRoundEnd?.Invoke(r);
         public static void RaiseRoundSummary(RoundSummary s)  => OnRoundSummary?.Invoke(s);
+        public static void RaiseEvacuatePromptRequested()     => OnEvacuatePromptRequested?.Invoke();
         public static void RaiseSanityChanged(float v)        => OnSanityChanged?.Invoke(v);
         public static void RaiseSanityCritical()              => OnSanityCritical?.Invoke();
         public static void RaiseSanityThresholdCrossed(float threshold) => OnSanityThresholdCrossed?.Invoke(threshold);
@@ -216,6 +227,7 @@ namespace Residuum.Core
             OnRoundStart = null;
             OnRoundEnd = null;
             OnRoundSummary = null;
+            OnEvacuatePromptRequested = null;
             OnSanityChanged = null;
             OnSanityCritical = null;
             OnSanityThresholdCrossed = null;
