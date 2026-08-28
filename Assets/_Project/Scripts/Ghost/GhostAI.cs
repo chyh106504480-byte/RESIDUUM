@@ -184,6 +184,14 @@ namespace Residuum.Ghost
         [Tooltip("最后已知位置附近的随机搜索半径。")]
         private float _huntSearchRadius = 3f;
 
+        [Tooltip("猎杀期间在同一片区域搜索多少秒之后换个地方，默认 6 秒")]
+        [Min(1f)]
+        [SerializeField] private float _huntAreaSearchDuration = 6f;
+
+        [Tooltip("换区域时优先使用巡逻点；没有可用巡逻点时在这个半径内另取一点")]
+        [Min(1f)]
+        [SerializeField] private float _huntRelocateRadius = 18f;
+
         [SerializeField]
         [Min(0f)]
         [Tooltip("玩家躲藏时检查藏匿点的判定间隔，默认 5 秒。")]
@@ -317,6 +325,7 @@ namespace Residuum.Ghost
         private Vector3 _lastMovementPosition;
         private Vector3 _lastKnownPlayerPosition;
         private Vector3 _hidingCheckTarget;
+        private Vector3 _huntSearchAreaCenter;
 
         private float _stateTimerEnd;
         private float _huntEndTime;
@@ -331,6 +340,7 @@ namespace Residuum.Ghost
         private float _nextBlockedDoorInteractionTime;
         private float _nextManifestCheckTime;
         private float _nextHuntFlickerTime;
+        private float _huntAreaSearchStartTime;
 
         private bool _initialized;
         private bool _idleWaiting;
@@ -347,6 +357,7 @@ namespace Residuum.Ghost
         private bool _huntVisible;
         private bool _huntFlickerActive;
         private bool _ghostEventVisible;
+        private bool _hasHuntSearchArea;
         private int _lastSightSampleCount;
 
         private IInteractable _lastOpenedInteractable;
@@ -477,6 +488,7 @@ namespace Residuum.Ghost
             ClearSpawnedFootprints();
             ClearPathAndStop();
             ClearBlockedDoorState();
+            ClearHuntSearchArea();
             State = GhostState.Idle;
         }
 
@@ -514,6 +526,7 @@ namespace Residuum.Ghost
             _roamPointNavMeshPositions.Clear();
             _lastRoamPoint = null;
             ClearBlockedDoorState();
+            ClearHuntSearchArea();
             Definition = null;
         }
 
@@ -635,6 +648,7 @@ namespace Residuum.Ghost
             _huntVisible = false;
             _huntFlickerActive = false;
             _nextHuntFlickerTime = 0f;
+            ClearHuntSearchArea();
             RefreshVisibility();
 
             if (_agent != null && Definition != null)
@@ -810,7 +824,7 @@ namespace Residuum.Ghost
             _nextHuntFlickerTime = Time.time + Mathf.Max(_huntFlickerInterval, 0f);
             _playerCaughtRaised = false;
             _reachedLastKnownPosition = false;
-            _huntSearchTargetActive = false;
+            ClearHuntSearchArea();
             _checkingHidingSpot = false;
             _lastSightSampleCount = 0;
             _nextSightCheckTime = Time.time;
@@ -873,7 +887,7 @@ namespace Residuum.Ghost
                         _lastKnownPlayerPosition = _player.position;
                         _hasLastKnownPlayerPosition = true;
                         _reachedLastKnownPosition = false;
-                        _huntSearchTargetActive = false;
+                        ClearHuntSearchArea();
                         _checkingHidingSpot = false;
                     }
                 }
@@ -947,11 +961,13 @@ namespace Residuum.Ghost
                 _hasCurrentTarget = true;
                 TrySetDestination(_currentTarget, false);
 
-                if (HasReachedDestination()
-                    && Time.time - _lastSeenTime > Mathf.Max(_lostSightMemoryDuration, 0f))
+                bool reachedLastKnownPosition = HasReachedDestination();
+                bool lastKnownApproachExpired = Time.time - _lastSeenTime
+                    > Mathf.Max(_lostSightMemoryDuration, 0f);
+                if (reachedLastKnownPosition || lastKnownApproachExpired)
                 {
                     _reachedLastKnownPosition = true;
-                    _huntSearchTargetActive = false;
+                    BeginHuntSearchArea(_lastKnownPlayerPosition);
                 }
                 return;
             }
@@ -972,7 +988,7 @@ namespace Residuum.Ghost
                     _lastKnownPlayerPosition = _hidingCheckTarget;
                     _hasLastKnownPlayerPosition = true;
                     _reachedLastKnownPosition = true;
-                    _huntSearchTargetActive = false;
+                    BeginHuntSearchArea(_lastKnownPlayerPosition);
                 }
                 return;
             }
@@ -998,11 +1014,26 @@ namespace Residuum.Ghost
 
         private void SearchAround(Vector3 center)
         {
+            if (!_hasHuntSearchArea)
+            {
+                BeginHuntSearchArea(center);
+            }
+
+            float areaSearchDuration = Mathf.Max(_huntAreaSearchDuration, 1f);
+            if (Time.time - _huntAreaSearchStartTime >= areaSearchDuration)
+            {
+                // 区域计时独立于单个细搜目标；到时立即换房间级中心。
+                RelocateHuntSearchArea();
+            }
+
             if (!_huntSearchTargetActive)
             {
-                if (!TryGetRandomNavMeshPoint(center, _huntSearchRadius, out _currentTarget))
+                if (!TryGetRandomNavMeshPoint(
+                        _huntSearchAreaCenter,
+                        _huntSearchRadius,
+                        out _currentTarget))
                 {
-                    _currentTarget = center;
+                    _currentTarget = _huntSearchAreaCenter;
                 }
 
                 _hasCurrentTarget = true;
@@ -1015,6 +1046,43 @@ namespace Residuum.Ghost
             {
                 _huntSearchTargetActive = false;
             }
+        }
+
+        private void BeginHuntSearchArea(Vector3 center)
+        {
+            _huntSearchAreaCenter = center;
+            _huntAreaSearchStartTime = Time.time;
+            _hasHuntSearchArea = true;
+            _huntSearchTargetActive = false;
+            _hasRequestedDestination = false;
+        }
+
+        private void RelocateHuntSearchArea()
+        {
+            Vector3 nextAreaCenter;
+            // 只借用巡逻点坐标，不进入 Roam 的等待或状态切换流程。
+            bool foundDistantRoamPoint = TryChooseRoamPoint(
+                out nextAreaCenter,
+                allowNearbyFallback: false);
+
+            if (!foundDistantRoamPoint
+                && !TryGetRandomNavMeshPoint(
+                    transform.position,
+                    _huntRelocateRadius,
+                    out nextAreaCenter))
+            {
+                nextAreaCenter = transform.position;
+            }
+
+            BeginHuntSearchArea(nextAreaCenter);
+        }
+
+        private void ClearHuntSearchArea()
+        {
+            _huntSearchAreaCenter = default;
+            _huntAreaSearchStartTime = 0f;
+            _hasHuntSearchArea = false;
+            _huntSearchTargetActive = false;
         }
 
         private bool EvaluatePlayerLineOfSight()
@@ -1382,7 +1450,7 @@ namespace Residuum.Ghost
             return false;
         }
 
-        private bool TryChooseRoamPoint(out Vector3 point)
+        private bool TryChooseRoamPoint(out Vector3 point, bool allowNearbyFallback = true)
         {
             _roamPointCandidates.Clear();
 
@@ -1434,6 +1502,12 @@ namespace Residuum.Ghost
                 _lastRoamPoint = lastPointCandidate;
                 point = _roamPointNavMeshPositions[lastPointCandidate];
                 return true;
+            }
+
+            if (!allowNearbyFallback)
+            {
+                point = transform.position;
+                return false;
             }
 
             if (farthestPoint != null)
@@ -1641,6 +1715,8 @@ namespace Residuum.Ghost
             _randomPointSampleAttempts = Mathf.Max(_randomPointSampleAttempts, 1);
             _minimumRoamDistance = Mathf.Max(_minimumRoamDistance, 0f);
             _roamPointValidationRadius = Mathf.Max(_roamPointValidationRadius, 0f);
+            _huntAreaSearchDuration = Mathf.Max(_huntAreaSearchDuration, 1f);
+            _huntRelocateRadius = Mathf.Max(_huntRelocateRadius, 1f);
 
             if (Application.isPlaying)
             {
