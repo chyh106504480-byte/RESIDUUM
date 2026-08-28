@@ -809,19 +809,24 @@ namespace Residuum.Ghost
             _huntFlickerActive = _huntFlickerEnabled;
             _nextHuntFlickerTime = Time.time + Mathf.Max(_huntFlickerInterval, 0f);
             _playerCaughtRaised = false;
-            _hasLineOfSight = false;
             _reachedLastKnownPosition = false;
             _huntSearchTargetActive = false;
             _checkingHidingSpot = false;
             _lastSightSampleCount = 0;
             _nextSightCheckTime = Time.time;
-            _lastSeenTime = Time.time;
             _nextHidingCheckTime = Time.time + Mathf.Max(_hidingCheckInterval, 0f);
 
-            if (_player != null)
+            if (_player != null && EvaluatePlayerLineOfSight())
             {
                 _lastKnownPlayerPosition = _player.position;
                 _hasLastKnownPlayerPosition = true;
+                _hasLineOfSight = true;
+                _lastSeenTime = Time.time;
+            }
+            else
+            {
+                _hasLastKnownPlayerPosition = false;
+                _hasLineOfSight = false;
             }
 
             CacheDefinitionWaits();
@@ -932,6 +937,7 @@ namespace Residuum.Ghost
         {
             if (!_hasLastKnownPlayerPosition)
             {
+                SearchAround(transform.position);
                 return;
             }
 
