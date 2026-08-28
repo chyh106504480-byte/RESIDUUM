@@ -20907,6 +20907,27 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5769129917905125718, guid: 3106a6f3c2fc2a547b55f8f47ff2e09c, type: 3}
   m_PrefabInstance: {fileID: 292749517}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &293715687 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: d40c989e38b544ea3bf92df186973c87, type: 3}
+  m_PrefabInstance: {fileID: 2127080018}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &293715689
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 293715687}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 41ac44a676e764919a1598ddafe0f780, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Residuum.Items.WorldItem
+  _slotIndex: 0
+  _isFlashlight: 0
+  _itemName: "EMF\u8BFB\u6570\u5668"
+  _promptFormat: "[E] \u6361\u8D77 {0}"
 --- !u!1001 &295470402
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -44688,6 +44709,133 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5769129917905125718, guid: 3106a6f3c2fc2a547b55f8f47ff2e09c, type: 3}
   m_PrefabInstance: {fileID: 653997994}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &654150330
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 654150331}
+  - component: {fileID: 654150333}
+  - component: {fileID: 654150332}
+  m_Layer: 0
+  m_Name: FlashLightBeam
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &654150331
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 654150330}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1712216682}
+  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
+--- !u!114 &654150332
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 654150330}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Runtime::UnityEngine.Rendering.Universal.UniversalAdditionalLightData
+  m_UsePipelineSettings: 1
+  m_AdditionalLightsShadowResolutionTier: 2
+  m_CustomShadowLayers: 0
+  m_LightCookieSize: {x: 1, y: 1}
+  m_LightCookieOffset: {x: 0, y: 0}
+  m_SoftShadowQuality: 0
+  m_RenderingLayersMask:
+    serializedVersion: 0
+    m_Bits: 1
+  m_ShadowRenderingLayersMask:
+    serializedVersion: 0
+    m_Bits: 1
+  m_Version: 4
+  m_LightLayerMask: 1
+  m_ShadowLayerMask: 1
+  m_RenderingLayers: 1
+  m_ShadowRenderingLayers: 1
+--- !u!108 &654150333
+Light:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 654150330}
+  m_Enabled: 1
+  serializedVersion: 13
+  m_Type: 0
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Intensity: 1
+  m_Range: 10
+  m_SpotAngle: 30
+  m_InnerSpotAngle: 21.802082
+  m_CookieSize2D: {x: 0.5, y: 0.5}
+  m_Shadows:
+    m_Type: 0
+    m_Resolution: -1
+    m_CustomResolution: -1
+    m_Strength: 1
+    m_Bias: 0.05
+    m_NormalBias: 0.4
+    m_NearPlane: 0.2
+    m_CullingMatrixOverride:
+      e00: 1
+      e01: 0
+      e02: 0
+      e03: 0
+      e10: 0
+      e11: 1
+      e12: 0
+      e13: 0
+      e20: 0
+      e21: 0
+      e22: 1
+      e23: 0
+      e30: 0
+      e31: 0
+      e32: 0
+      e33: 1
+    m_UseCullingMatrixOverride: 0
+  m_Cookie: {fileID: 0}
+  m_DrawHalo: 0
+  m_Flare: {fileID: 0}
+  m_RenderMode: 0
+  m_CullingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_RenderingLayerMask: 1
+  m_Lightmapping: 4
+  m_LightShadowCasterMode: 0
+  m_AreaSize: {x: 1, y: 1}
+  m_BounceIntensity: 1
+  m_ColorTemperature: 6570
+  m_UseColorTemperature: 0
+  m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
+  m_UseBoundingSphereOverride: 0
+  m_UseViewFrustumForShadowCasterCull: 1
+  m_ForceVisible: 0
+  m_ShapeRadius: 0.025
+  m_ShadowAngle: 0
+  m_LightUnit: 1
+  m_LuxAtDistance: 1
+  m_EnableSpotReflector: 1
 --- !u!1001 &657712620
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -52251,7 +52399,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 41ac44a676e764919a1598ddafe0f780, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Residuum.Items.WorldItem
-  _slotIndex: 0
+  _slotIndex: 1
   _isFlashlight: 1
   _itemName: "\u7D2B\u5916\u7EBF\u706F"
   _promptFormat: "[E] \u6361\u8D77 {0}"
@@ -68094,8 +68242,12 @@ GameObject:
   m_Component:
   - component: {fileID: 1008631338}
   - component: {fileID: 1008631340}
+  - component: {fileID: 1008631345}
   - component: {fileID: 1008631339}
   - component: {fileID: 1008631341}
+  - component: {fileID: 1008631344}
+  - component: {fileID: 1008631343}
+  - component: {fileID: 1008631342}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -68226,6 +68378,121 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 51
   _safeZone: {fileID: 2014203569}
+--- !u!114 &1008631342
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1008631337}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c8d6dca494d9b417db046bb82ab413b3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Residuum.Evidence.GhostWritingBook
+  _placementCamera: {fileID: 0}
+  _placementRayDistance: 1.5
+  _downwardOffset: 2
+  _groundLayers:
+    serializedVersion: 2
+    m_Bits: 51
+  _surfaceOffset: 0.01
+  _minimumGroundNormalY: 0.5
+  _writingCheckInterval: 30
+  _writingChance: 0.3
+  _appearanceMode: 0
+  _unwrittenAppearance: {fileID: 0}
+  _writtenAppearance: {fileID: 0}
+  _writingRenderer: {fileID: 0}
+  _unwrittenMaterial: {fileID: 0}
+  _writtenMaterial: {fileID: 0}
+  onPlaced:
+    m_PersistentCalls:
+      m_Calls: []
+  onPickedUp:
+    m_PersistentCalls:
+      m_Calls: []
+  onWritingAppeared:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &1008631343
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1008631337}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3532681294c8a486d813d2fd2da71287, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Residuum.Evidence.UVLight
+  _spotLight: {fileID: 1304086919}
+  _lightColor: {r: 0.35, g: 0, b: 1, a: 1}
+  _lightIntensity: 5
+  _coneAngle: 45
+  _detectionRadius: 4
+  _detectionInterval: 0.2
+  _detectionLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  _overlapBufferSize: 32
+  _fullBatterySeconds: 180
+  _lowBatteryThreshold: 0.2
+  onRequestFlashlightLock:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &1008631344
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1008631337}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a1d5ca79ea385408789892b4d1818fdf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Residuum.Evidence.EMFReader
+  _detectionRadius: 6
+  _readingDuration: 8
+  _highestLevelDistance: 2
+  _readingRefreshInterval: 0.25
+  _readingLabel: {fileID: 0}
+  _indicatorLights: []
+--- !u!114 &1008631345
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1008631337}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 576d165c85eac454bb822182161721ab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Residuum.Items.Flashlight
+  _spotLight: {fileID: 654150333}
+  _inputActions: {fileID: 0}
+  _intensity: 8
+  _colorTemperature: 4200
+  _range: 12
+  _innerSpotAngle: 30
+  _outerSpotAngle: 45
+  _fullBatterySeconds: 300
+  _batteryBroadcastThreshold: 0.01
+  _lowBatteryThreshold: 0.2
+  _depletedCooldownSeconds: 15
+  _lowBatteryMinimumInterval: 0.08
+  _lowBatteryMaximumInterval: 0.8
+  _lowBatteryOffDuration: 0.05
+  _lowBatteryRandomMinimumMultiplier: 0.75
+  _lowBatteryRandomMaximumMultiplier: 1.25
+  _forcedFlickerMinimumInterval: 0.05
+  _forcedFlickerMaximumInterval: 0.4
+  _flickerWaitCacheSize: 16
+  _ghostEventDistance: 8
+  _ghostEventFlickerDuration: 1.5
 --- !u!1001 &1011308895
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -88960,6 +89227,133 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5921126462729845301, guid: bee09117d2231334d90a559b1ff7f323, type: 3}
   m_PrefabInstance: {fileID: 1303518103}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1304086916
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1304086917}
+  - component: {fileID: 1304086919}
+  - component: {fileID: 1304086918}
+  m_Layer: 0
+  m_Name: UVBeam
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1304086917
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1304086916}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1712216682}
+  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
+--- !u!114 &1304086918
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1304086916}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Runtime::UnityEngine.Rendering.Universal.UniversalAdditionalLightData
+  m_UsePipelineSettings: 1
+  m_AdditionalLightsShadowResolutionTier: 2
+  m_CustomShadowLayers: 0
+  m_LightCookieSize: {x: 1, y: 1}
+  m_LightCookieOffset: {x: 0, y: 0}
+  m_SoftShadowQuality: 0
+  m_RenderingLayersMask:
+    serializedVersion: 0
+    m_Bits: 1
+  m_ShadowRenderingLayersMask:
+    serializedVersion: 0
+    m_Bits: 1
+  m_Version: 4
+  m_LightLayerMask: 1
+  m_ShadowLayerMask: 1
+  m_RenderingLayers: 1
+  m_ShadowRenderingLayers: 1
+--- !u!108 &1304086919
+Light:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1304086916}
+  m_Enabled: 1
+  serializedVersion: 13
+  m_Type: 0
+  m_Color: {r: 0.35, g: 0, b: 1, a: 1}
+  m_Intensity: 0
+  m_Range: 4
+  m_SpotAngle: 45
+  m_InnerSpotAngle: 21.802082
+  m_CookieSize2D: {x: 0.5, y: 0.5}
+  m_Shadows:
+    m_Type: 0
+    m_Resolution: -1
+    m_CustomResolution: -1
+    m_Strength: 1
+    m_Bias: 0.05
+    m_NormalBias: 0.4
+    m_NearPlane: 0.2
+    m_CullingMatrixOverride:
+      e00: 1
+      e01: 0
+      e02: 0
+      e03: 0
+      e10: 0
+      e11: 1
+      e12: 0
+      e13: 0
+      e20: 0
+      e21: 0
+      e22: 1
+      e23: 0
+      e30: 0
+      e31: 0
+      e32: 0
+      e33: 1
+    m_UseCullingMatrixOverride: 0
+  m_Cookie: {fileID: 0}
+  m_DrawHalo: 0
+  m_Flare: {fileID: 0}
+  m_RenderMode: 0
+  m_CullingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_RenderingLayerMask: 1
+  m_Lightmapping: 4
+  m_LightShadowCasterMode: 0
+  m_AreaSize: {x: 1, y: 1}
+  m_BounceIntensity: 1
+  m_ColorTemperature: 6570
+  m_UseColorTemperature: 0
+  m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
+  m_UseBoundingSphereOverride: 0
+  m_UseViewFrustumForShadowCasterCull: 1
+  m_ForceVisible: 0
+  m_ShapeRadius: 0.025
+  m_ShadowAngle: 0
+  m_LightUnit: 1
+  m_LuxAtDistance: 1
+  m_EnableSpotReflector: 1
 --- !u!1001 &1304618770
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -106425,6 +106819,7 @@ GameObject:
   - component: {fileID: 1546467318}
   - component: {fileID: 1546467321}
   - component: {fileID: 1546467322}
+  - component: {fileID: 1546467323}
   m_Layer: 0
   m_Name: Camera
   m_TagString: MainCamera
@@ -106503,7 +106898,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 1712216682}
   m_Father: {fileID: 1553328729}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1546467321
@@ -106569,6 +106965,40 @@ MonoBehaviour:
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
   m_Version: 2
+--- !u!114 &1546467323
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1546467315}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5359b366a83d4a4fb0665b11a78cb6b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Residuum.Items.ItemSlotSystem
+  _slots:
+  - {fileID: 1008631344}
+  - {fileID: 1008631343}
+  - {fileID: 1008631342}
+  _heldModels:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  _handAnchor: {fileID: 1712216682}
+  _inputActions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  _worldItems:
+  - {fileID: 2127080019}
+  - {fileID: 770866956}
+  - {fileID: 1895224959922308468}
+  _flashlightSlot: {fileID: 1008631345}
+  _flashlightModel: {fileID: 0}
+  _flashlightWorldItem: {fileID: 770866956}
+  _flashlightKey: 34
+  _dropKey: 21
+  _dropDistance: 1.2
+  _dropHeightOffset: -0.3
+  _scrollInputThreshold: 0.01
 --- !u!4 &1548713797 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 421252560260396522, guid: a210596d183602d4f9abc956ba791b9e, type: 3}
@@ -117924,6 +118354,39 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 44297ac12129a474d89e1b2eb6151936, type: 3}
+--- !u!1 &1712216681
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1712216682}
+  m_Layer: 0
+  m_Name: HandAnchor
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1712216682
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1712216681}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 654150331}
+  - {fileID: 1304086917}
+  m_Father: {fileID: 1546467320}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &1715564026 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2250178883754422351, guid: 143623a82f19a9e49b450142a80c6d52, type: 3}
@@ -146030,34 +146493,18 @@ PrefabInstance:
     - {fileID: -3932568220390100559, guid: d40c989e38b544ea3bf92df186973c87, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: d40c989e38b544ea3bf92df186973c87, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 293715689}
     - targetCorrespondingSourceObject: {fileID: -7884965937525512670, guid: d40c989e38b544ea3bf92df186973c87, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2127080021}
-    - targetCorrespondingSourceObject: {fileID: -7884965937525512670, guid: d40c989e38b544ea3bf92df186973c87, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 2127080020}
   m_SourcePrefab: {fileID: 100100000, guid: d40c989e38b544ea3bf92df186973c87, type: 3}
 --- !u!1 &2127080019 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -7884965937525512670, guid: d40c989e38b544ea3bf92df186973c87, type: 3}
   m_PrefabInstance: {fileID: 2127080018}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &2127080020
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2127080019}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 41ac44a676e764919a1598ddafe0f780, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Residuum.Items.WorldItem
-  _slotIndex: 0
-  _isFlashlight: 0
-  _itemName: "EMF\u8BFB\u6570\u5668"
-  _promptFormat: "[E] \u6361\u8D77 {0}"
 --- !u!65 &2127080021
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -157992,7 +158439,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 41ac44a676e764919a1598ddafe0f780, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Residuum.Items.WorldItem
-  _slotIndex: 0
+  _slotIndex: 2
   _isFlashlight: 0
   _itemName: "\u9B3C\u5F71\u4E66"
   _promptFormat: "[E] \u6361\u8D77 {0}"

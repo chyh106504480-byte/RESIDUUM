@@ -1,43 +1,62 @@
 # RESIDUUM — Final Presentation Script (English)
 
 **Deck**: `Docs/decks/RESIDUUM_Final_EN.pptx` — 18 slides, 16:9
-**Target**: 12 minutes of talk + 8 minutes of live demo + 5 minutes of questions
-**Speaker**: Henry
+**Plan**: about 12 minutes of talking + 8 minutes of live demo + 5 minutes of questions
+
+Every line below is written to be **said out loud by someone whose English is OK but
+not perfect**. Short sentences. Common words. If a line feels hard in your mouth,
+cut it — the short version is always allowed.
 
 ---
 
-## Say these out loud a few times first
+## Say these words out loud a few times first
 
 | Word | Say it like | Not |
 |---|---|---|
 | **Residuum** | ri-ZID-yoo-um | "resi-doom" |
-| **Wraith** | RAYTH — one syllable, rhymes with *faith* | "wray-ith" |
+| **Wraith** | RAYTH — one sound, rhymes with *faith* | "wray-ith" |
 | **Poltergeist** | POLE-ter-guyst | "polter-gee-st" |
 | **Phasmophobia** | faz-mo-FOH-bee-uh | — |
 | **Sanity** | SAN-i-tee | — |
-| **Deduction** | dee-DUK-shun | — |
-| **NavMesh** | NAV-mesh | "nav-em-esh" |
-| **Scriptable Object** | SCRIPT-a-bul OB-ject | — |
+| **Evidence** | EV-i-dence | — |
 
-The four you'll say more than once are **Wraith**, **Poltergeist**, **sanity**,
-and **deduction**. Get those comfortable and the rest takes care of itself.
+Only four of these come up more than once: **Wraith**, **Poltergeist**, **sanity**,
+**evidence**. Practise those four and you are fine.
 
 ---
 
-## Three things to hold on to
+## Words to keep out of your mouth
 
-**One. The 3 × 3 matrix is still your strongest weapon.** That hasn't changed since
-the pitch. Slides 4 and 5 are the peak; every other slide is either setting them up
-or backing them up. If you get cut to three minutes, do 4, 5 and 6 and nothing else.
+You do not need any of these, and none of them make the talk better. The plain
+version on the right is what the deck already says.
 
-**Two. A final presentation is a different job from a pitch.** A pitch asks *is this
-worth building*. A final asks *did you do what you said*. That's why slides 14 and 15
-matter — they are the only evidence in the deck that the promises were kept. Say those
-numbers with confidence.
+| Don't say | Say |
+|---|---|
+| deduction / deduce | work it out · figure it out |
+| ambiguous / redundant | not clear · repeated |
+| architecture | how the code fits together |
+| implement | write · build |
+| vertical slice | a playable demo |
+| asymmetric information | you don't know what it is |
+| credible | easy to trust |
+| mitigate the risk | keep the risk small |
+| iterate | try it again |
+| leverage | use |
+| in terms of | for · about |
 
-**Three. Slides 12 and 13 are what separates you from every other team.** Other teams
-hand in a game. You hand in a game *and* a production line. Present it as an
-engineering decision, not as a party trick.
+---
+
+## Three things to remember
+
+**One. The 3 × 3 table is your best weapon.** Slides 4 and 5 are the good part.
+Everything else is there to set them up. If you only get three minutes, do 4, 5 and 6.
+
+**Two. A final show is not a pitch.** A pitch asks *is this a good idea*. A final show
+asks *did you do it*. That is why slides 14 and 15 matter — the numbers and the plan
+are your proof. Say them like you mean them.
+
+**Three. It is fine to say we are new at this.** We are. Saying it makes the rest more
+believable, not less. It also explains why we made so many rules before we started.
 
 ---
 
@@ -45,523 +64,519 @@ engineering decision, not as a party trick.
 
 ### 1 · Cover — 15 sec
 
-> "Our game is called **Residuum**. It's a first-person horror investigation game.
-> Unity 6, single-player, about ten minutes a run."
+> "Our game is called **Residuum**. It is a first-person horror game. Unity 6,
+> single player, about ten minutes per game."
 >
-> "Here's the premise in one line: **you don't know what it is. That is the entire game.**"
+> "Here is the idea in one line: **you don't know what it is. That is the whole game.**"
 
-Don't explain the grid on the right yet — slide 4 pays it off. Advance.
+Do not explain the squares on the right yet. Slide 4 explains them. Move on.
 
 ---
 
-### 2 · Premise — 40 sec
+### 2 · The game in one sentence — 40 sec
 
-Read the sentence in the box. **Slowly.** One clause, one beat.
+Read the sentence in the box. **Slowly.** Stop where the commas are.
 
-> "You walk into a house you shouldn't be in with three instruments." *[beat]*
-> "Before your sanity runs out, you must identify what is haunting it — and get back
-> out alive."
+> "You go into a house you should not be in, carrying three tools." *[stop]*
+> "Before your sanity runs out, you have to work out what is haunting it —
+> and get back out alive."
 
-Beat. Then point at the four numbers and say them **one at a time**:
+Stop. Then point at the four numbers and say them **one at a time**:
 
-> "Eight to twelve minutes a run. Three ghosts. Three kinds of evidence.
-> **Any two of them settle it for good.**"
+> "Eight to twelve minutes per game. Three ghosts. Three kinds of evidence.
+> **Two clues give you the answer.**"
 >
-> "We benchmarked against Phasmophobia — but we only copied its deductive structure,
-> not its content volume. Here's why."
+> "We looked at Phasmophobia. We copied the way it makes you think — not the amount
+> of stuff in it. I'll show you why."
 
 ---
 
-### 3 · Why we cut to 3 × 3 — 50 sec
+### 3 · Keeping it small — 50 sec
 
-> "Phasmophobia has twenty-four ghosts, seven kinds of evidence, forty-odd items.
-> Its evidence sets overlap heavily, so players often finish collecting and are
-> still guessing from behaviour."
+> "Phasmophobia has twenty-four ghosts, seven kinds of evidence, and more than forty
+> tools. But a lot of its ghosts share the same clues. So players collect everything
+> and then still guess."
 >
-> "We have three ghosts, three kinds of evidence, four items. And we didn't cut
-> because we ran out of time — we cut because we worked out what mattered."
+> "We have three ghosts, three kinds of evidence, four tools. And we did not make it
+> small because we ran out of time. **We made it small on purpose.**"
 
-Point at the three cards along the bottom:
+Point at the three boxes along the bottom:
 
-> "That game's appeal really comes down to three things. **Asymmetric information** —
-> you know it's there, you don't know what or where. **Deduction under constraint** —
-> elimination with a limited toolkit. And **risk pulling against reward** — one more
-> second is one more clue, and one more chance to die."
+> "We think that game is fun for three reasons."
 >
-> "All three of those survive completely at minimum scale. So we kept all three,
-> and cut only the volume."
+> "**You don't know what it is.** You know something is in the house. You just don't
+> know what, or where."
+>
+> "**You have to work it out.** You use clues to rule ghosts out."
+>
+> "**Staying is dangerous.** One more second is one more clue — and one more chance
+> to die."
+>
+> "All three of those still work in a small game. So we kept all three, and cut
+> everything else."
 
 ---
 
-### 4 · The matrix — 60 sec ★ CORE
+### 4 · The table — 60 sec ★ THE IMPORTANT ONE
 
-**Slow down. If there's a whiteboard, walk over and draw this instead of showing it —
-three rows, three columns, one checkmark at a time.**
+**Slow down here. If there is a whiteboard, go and draw this instead of showing it —
+three rows, three columns, one tick at a time.**
 
 > "There are three ghosts: the **Spirit**, the **Wraith**, and the **Poltergeist**.
-> And three kinds of evidence: an **EMF reading**, **ultraviolet fingerprints**,
+> And three kinds of evidence: an **EMF reading**, **UV fingerprints**,
 > and **ghost writing**."
 >
-> "Here's the design —" *[beat]*
+> "Here is the design." *[stop]*
 >
-> "**Every ghost has exactly two. Not one, not three.**"
+> "**Every ghost has exactly two. Not one. Not three.**"
 >
-> "The Spirit is EMF plus fingerprints. The Wraith is EMF plus writing.
-> The Poltergeist is fingerprints plus writing."
+> "The Spirit has EMF and fingerprints. The Wraith has EMF and writing.
+> The Poltergeist has fingerprints and writing."
 
-Point at each row as you say it, so their eyes follow your hand.
-Beat after the last one, then advance.
+Point at each row while you say it, so people's eyes follow your hand.
+Stop for one second, then move on.
 
 ---
 
-### 5 · Uniqueness — 60 sec ★ PEAK OF THE TALK
+### 5 · Why it works — 60 sec ★ THE BEST MOMENT
 
-> "Why is this airtight? Because if you choose two things out of three, there are
-> **exactly three combinations**. Three combinations, three ghosts — one to one.
-> Not one spare, not one missing."
+> "Why does this always work? Because if you pick two things out of three, there are
+> **only three ways to do it.** Three ways, three ghosts. One each. Nothing left over,
+> nothing missing."
 
 Point at the three numbered points:
 
-> "That gives you three consequences."
+> "That gives us three things."
 >
-> "One. **A single clue is never enough.** Every kind of evidence is shared by two
-> ghosts — find an EMF reading and you've only ruled out the Poltergeist. Two left."
+> "One. **One clue is never enough.** Two ghosts share every clue. So if you find an
+> EMF reading, you have only ruled out the Poltergeist. Two ghosts left."
 >
-> "Two. **Two clues are always decisive.** There is no second solution."
+> "Two. **Two clues always give the answer.** There is no second answer."
 >
-> "Three. **Elimination works just as well.** Proving a kind of evidence *absent*
-> also advances the deduction."
+> "Three. **Ruling things out works too.** Showing that a clue is *not* there also
+> helps you."
 
-Beat. Now the line at the bottom, word by word:
+Stop. Now the big line at the bottom, one word at a time:
 
-> "**No redundancy. No ambiguity. No luck.**"
+> "**No guessing. No luck. Just logic.**"
 >
-> "When a player wins a run, they won it by deduction and nothing else."
+> "If a player wins, it is because they worked it out."
 
-**This is the peak.** Stop for two full seconds before you advance. Don't fill it.
+**This is the best moment in the talk.** Stop for two full seconds. Do not fill the
+silence. Then move on.
 
 ---
 
 ### 6 · Sanity — 50 sec
 
-> "Which raises the obvious question. If the answer is knowable, why not just take
-> your time?"
+> "So the obvious question: if the answer can be worked out, why not just take your time?"
 >
-> "Because your sanity is dropping."
+> "Because your sanity is going down."
 
-Point at the left-hand table:
+Point at the table on the left:
 
-> "Standing in the dark costs you about a tenth of a percent every second. A lit room
-> is half that. Holding a flashlight halves it again. Witnessing a ghost event takes
-> fifteen percent in one hit. Being hunted takes half a percent a second. The only
-> place you recover is the entrance."
+> "Standing in the dark costs you a small amount every second. A room with the light on
+> is half that. Holding a flashlight halves it again. Seeing the ghost do something takes
+> fifteen percent at once. Being hunted takes half a percent every second.
+> The only place you get sanity back is the lobby."
 
 Point at the formula:
 
-> "Once sanity drops below fifty percent, the game rolls **once every twenty-five
-> seconds** to start a hunt. The probability is just this: fifty minus your sanity,
-> over fifty."
+> "Once your sanity is under fifty percent, the game checks **every twenty-five seconds**
+> whether a hunt starts. The chance is simple: fifty minus your sanity, divided by fifty."
 >
-> "At fifty percent, that's zero. At twenty-five, it's a coin flip.
-> **At zero, the hunt is guaranteed.**"
+> "At fifty percent that is zero. At twenty-five it is a coin flip.
+> **At zero, the hunt always happens.**"
 
-Beat.
+Stop.
 
-> "So every extra clue costs you. The player is permanently doing arithmetic on how
-> much longer they can stay. **That anxiety is the gameplay.**"
+> "So every extra clue costs you something. The player is always asking the same
+> question: how much longer can I stay? **That worry is the game.**"
 
 ---
 
-### 7 · The hunt — 50 sec
+### 7 · Running — 50 sec
 
-> "Once a hunt starts, most people's instinct is to run. We made sure running isn't
-> the answer."
+> "When a hunt starts, most people try to run. We made sure running does not work."
 
 Point at the chart, right to left:
 
-> "A player sprints at three and a half metres per second. The Spirit hunts at 3.3
-> and the Wraith at 3.4 — you can just barely outrun those.
-> **The Poltergeist moves at 3.6. It is faster than you.**"
+> "You sprint at three point five metres per second. The Spirit hunts at three point
+> three, the Wraith at three point four — you can just about outrun those.
+> **The Poltergeist moves at three point six. It is faster than you.**"
 >
-> "And there's no adrenaline bonus during a hunt — a hunt sprint is exactly the same
-> 3.5 as any other sprint. Your stamina lasts **4.2 seconds**, then takes three and
-> a half to refill, and you're walking the whole time."
+> "And there is no speed boost during a hunt. Sprinting is three point five, the same
+> as normal. Your sprint only lasts **four point two seconds**, then it takes three and
+> a half seconds to come back, and you are walking the whole time."
 
-Beat.
+Stop.
 
-> "So the only reliable move is to **break line of sight**. Lose it and the ghost only
-> searches your last known position. Turn a corner, shut the door behind you,
-> and you're gone."
+> "So the only thing that works is **getting out of its sight.** If it cannot see you,
+> it only goes to where you were. Turn a corner, close the door behind you, and you
+> are gone."
 >
-> "We re-benchmarked all six of those numbers on day seven, specifically so that
-> running would be a **costly choice** rather than a safe answer."
+> "We set all six of these speeds by hand on day seven, so that running would be a
+> **choice with a cost**, not a safe answer."
 
 ---
 
-### 8 · The three instruments — 45 sec
+### 8 · Three tools — 45 sec
 
-> "About the tools. These three instruments are not three ways of getting the same
-> thing. They are **three different fears**."
+> "About the tools. These three are not just three ways to get the same thing.
+> They are **three different kinds of fear**."
 
-Take them one at a time:
+One at a time:
 
-> "The EMF reader makes you **track**. A higher reading means you're closer to where
-> it just was — **it pulls you toward it.**"
+> "The EMF reader makes you **follow**. A higher number means it was just there —
+> **it pulls you toward it.**"
 >
-> "The UV light makes you **search**. And while it's equipped, your flashlight is
-> forced off — ultraviolet fluorescence is only visible in the dark, so that's physics,
-> not a rule we invented. **It takes your light away.**"
+> "The UV light makes you **search**. And while you hold it, your flashlight turns off.
+> UV only shows up in the dark, so that is real physics, not a rule we made up.
+> **It takes your light away.**"
 >
-> "The ghost writing book makes you **wait**. You set it down, you leave, and then you
+> "The ghost writing book makes you **wait**. You put it down, you leave, and then you
 > have to go back in to read it. **It sends you back in.**"
 
-Point at the bottom bar:
+Point at the bar at the bottom:
 
-> "And there are only three equipment slots, one of which the flashlight permanently
-> occupies. So every run forces a trade. That pressure is deliberate."
-
----
-
-### 9 · The three ghosts — 35 sec
-
-> "On the matrix the three ghosts are symmetrical, but they don't play the same at all."
->
-> "The Spirit is slow and stubborn — it lingers in its room, its footsteps are heavy
-> and distinct. The Wraith drifts, blinks closer, and **leaves no footprints on the
-> floor** — players can actually use that as a tell. The Poltergeist throws things,
-> and drains your sanity half again as fast just by being around."
-
-Point at the bar along the bottom — this is the engineering point:
-
-> "But in the code, this is **not three classes**. It's **one GhostAI plus three
-> ScriptableObject data assets.**"
->
-> "So adding a fourth ghost means authoring one asset file. Not one line of code
-> changes. The extension path was clear from day one."
+> "And you only get three tool slots. The flashlight always takes one. So you always
+> have to choose. We did that on purpose."
 
 ---
 
-### 10 · Level and lighting — 35 sec
+### 9 · Three ghosts — 35 sec
 
-> "The map is a single-floor apartment. Eight zones — a main room, a kitchen, a
-> corridor, a washroom, three bedrooms, and a lobby. **Seven of them are ghost-room
-> candidates, and one is drawn at random each run** — the player has to find it from
-> temperature drop and EMF readings. The lobby is the safe zone."
-
-Point at the right:
-
-> "For lighting, the only ambient source is **cold blue moonlight** through the
-> windows. The interior is almost black. The only warm light in the game is the
-> flashlight in your hand — forty-two hundred Kelvin, twelve metre range."
+> "On the table the three ghosts look the same. In the game they do not feel the same
+> at all."
 >
-> "When a hunt starts the whole house shifts red and flickers, your flashlight dies,
-> and there's a chance the power cuts entirely."
->
-> "And the corridor breaks up the sightlines — you rarely see the whole space at once,
-> so **footsteps tend to arrive before vision.**"
+> "The Spirit is slow and stubborn. It stays in its room, and its footsteps are loud
+> and clear. The Wraith is quiet — it **leaves no footprints**, which players can
+> actually use as a hint. The Poltergeist throws things around, and just being near it
+> drains your sanity one and a half times faster."
 
-If you're running short, cut this slide to its first and last sentence.
+Point at the bar at the bottom. This is the code part:
+
+> "But in the code this is **not three sets of scripts**. It is **one GhostAI script
+> plus three data files.**"
+>
+> "So to add a fourth ghost, we make one more data file. We do not change any code."
 
 ---
 
-### 11 · Architecture — 45 sec
+### 10 · The map — 35 sec
 
-> "A word on the engineering."
+> "The map is one floor of an apartment. Eight areas: a main room, a kitchen, a corridor,
+> a washroom, three bedrooms, and a lobby. **Seven of them can be the ghost room, and
+> the game picks one at random each time.** The player has to find it using cold air
+> and the EMF reader. The lobby is the safe area."
+
+Point at the right side:
+
+> "For light, the only light in the rooms is **cold blue moonlight** through the windows.
+> Inside it is almost black. The only warm light in the game is the flashlight in your
+> hand — twelve metres, a forty-five degree cone."
 >
-> "The architecture has one rule at its centre: **zero direct references between
-> modules.** Player, Ghost, Evidence, Items, World, UI — none of them know each other
-> exists. Everything crosses through this static event bus in the middle,
-> twenty-three events in total."
+> "When a hunt starts the whole house turns red and flickers, your flashlight stops
+> working, and sometimes the power goes out completely."
+
+If you are short on time, say only the first sentence and the last one.
+
+---
+
+### 11 · How the code fits together — 45 sec
+
+> "A bit about the code."
+>
+> "There is one rule at the centre of it: **no part of the code talks to another part
+> directly.** Player, Ghost, Evidence, Items, World, UI — none of them know the others
+> exist. Everything goes through this message board in the middle. Twenty-three messages
+> in total."
 
 Point at the five rules:
 
-> "On top of that: four interfaces fixed up front, seven contract files that only one
-> person is allowed to edit, every tunable value exposed to the Inspector,
-> and ghosts as data rather than classes."
+> "On top of that: four interfaces agreed before we started, seven files only one person
+> is allowed to edit, all the numbers set in the Unity Inspector instead of in code,
+> and ghosts stored as data instead of code."
 
-Beat, then land why the rule is worth anything:
+Stop, then say why it was worth doing:
 
-> "The payoff is direct: **any two modules can be written at the same time by two
-> sessions that know nothing about each other, and it will still compile.**
-> That's the precondition for writing sixteen thousand lines in a week."
-
----
-
-### 12 · The pipeline — 60 sec ★ DIFFERENTIATOR
-
-> "So — how did the code actually get written? We didn't just let an AI loose on it.
-> We built it a pipeline. Six steps."
-
-Left to right, one line each, **don't linger on any one**:
-
-> "One: the task spec, **written by a human** — which files to touch, the default value
-> of every number, what it is explicitly forbidden to do, and the acceptance criteria."
->
-> "Two: the AI implements, behind the contract. It has no permission to edit the
-> contract at all."
->
-> "Three: static gates. Eight regular expressions. Any hit and it goes straight back."
->
-> "Four: a headless Unity compile, for real compiler errors."
->
-> "Five: the AI answers an eighteen-point audit checklist, line by line."
->
-> "Six: **a human reads the diff** and either passes it or rejects it."
-
-Point at the italic line:
-
-> "A failure at step three or four returns automatically to step two, carrying the raw
-> error text. Two rounds maximum."
-
-Beat, then the bottom bar:
-
-> "**Humans own design, contract and acceptance. The AI owns implementation. The author
-> and the reviewer have to be two independent viewpoints.**"
->
-> "An AI can write every script in this project in a day. But only a person can tell
-> whether it *feels* right."
+> "Why bother? Because it means **two parts of the game can be written at the same time
+> by people who never talk to each other, and it still builds.** That is how we got
+> sixteen thousand lines done in a week."
 
 ---
 
-### 13 · Gates — 40 sec
+### 12 · How we wrote the code — 60 sec ★ WHAT MAKES US DIFFERENT
 
-> "These eight on the left are the gate rules. The first five are errors — a hit sends
-> the work straight back. The last three are warnings."
+> "So how did the code actually get written? We did not just let an AI loose on it.
+> We built it a process. Six steps."
+
+Left to right, one line each. **Do not slow down here** — it is a list, not an argument.
+
+> "One: the task spec. **A person writes it** — which files to touch, what each number
+> should be, and what it is not allowed to do."
 >
-> "Why bother? Because **an AI never gets tired, but it will make the same mistake a
-> hundred times.** Unity 6 deprecated an entire family of lookup APIs. You can say so
-> a hundred times in the prompt and it will still reach for them — but a regular
-> expression catches it for free, every single time."
-
-Point at the third card on the right — this one is worth its own beat:
-
-> "One lesson worth stating on its own. **A gate must never accuse the innocent.**"
+> "Two: the AI writes the code, inside those rules. It cannot change the rules at all."
 >
-> "Our first rule set flagged two errors and fifteen warnings on a completely clean
-> repository. **Every one was a false positive.** That isn't noise — it burns an entire
-> round, because the AI then spends two attempts 'fixing' things that were never
-> broken, some of which it isn't even allowed to touch. So we made it a rule:
-> you validate a gate against a clean tree before you ship it."
+> "Three: an automatic check. Eight text rules. One hit and it goes straight back."
+>
+> "Four: Unity builds it with no window open, so we get real errors."
+>
+> "Five: the AI answers eighteen questions about its own work."
+>
+> "Six: **a person reads the changes** and says yes or no."
+
+Point at the line in the middle:
+
+> "If step three or four fails, it goes back to step two with the error text.
+> Two tries, then it stops."
+
+Stop, then the bar at the bottom:
+
+> "**People decide what to build and whether it is good. The AI writes it.
+> The person who writes it and the person who checks it cannot be the same person.**"
+>
+> "We are new to 3D games. That is exactly why we made the rules so strict before we
+> started. An AI can write every script in this project in one day. But only a person
+> can tell whether the game **feels** right."
 
 ---
 
-### 14 · Numbers — 30 sec
+### 13 · The eight rules — 40 sec
 
-**Don't read all six.** Pick two, let them read the rest.
-
-> "Eight days, measured."
+> "These eight on the left are the automatic checks. The first five are errors — one hit
+> and the work goes back. The last three are warnings."
 >
-> "**Fifty-nine task specifications** — each one fixing the files, the values and the
-> acceptance criteria before a line was written."
+> "Why do this? Because **an AI never gets tired, but it makes the same mistake again
+> and again.** Unity 6 removed a whole group of old functions. You can say that ten
+> times in the instructions and it will still use them. But a text search catches it
+> every single time, for free."
+
+Point at the third box on the right. This one deserves its own moment:
+
+> "One thing we learned the hard way. **A check must not blame good code.**"
+>
+> "Our first version of these rules found two errors and fifteen warnings in code that
+> was completely fine. **Every single one was wrong.** That is not just annoying — it
+> wastes a whole round, because the AI then spends two tries fixing things that were
+> never broken. So now we test a new rule on clean code first."
+
+---
+
+### 14 · The numbers — 30 sec
+
+**Do not read all six.** Pick two. Let people read the rest.
+
+> "Eight days. Here is what that came to."
+>
+> "**Fifty-nine task specs** — each one saying which files, which numbers, and how we
+> would test it, before any code was written."
 >
 > "**Sixteen thousand four hundred and sixty-seven lines of C#**, across forty-three
-> scripts, plus three thousand lines of design documentation."
+> scripts. Plus three thousand lines of documents."
 >
-> "All of it is in the repository and every figure is verifiable."
+> "All of it is in our repository. You can check any of these."
 
 ---
 
-### 15 · Schedule and risk gates — 40 sec
+### 15 · The plan — 40 sec
 
-> "The schedule was planned to the day from day zero."
+> "We planned the whole week day by day, before we started."
 >
-> "Day one, walking and looking. Day two, instruments in hand. Day three, the evidence
-> loop closes. Day four, the ghost arrives. Day five, the full loop runs — and note
-> that at this point everything is still grey boxes. **Art doesn't land until day six.**"
+> "Day one, walking and looking. Day two, tools in hand. Day three, the clues work.
+> Day four, the ghost. Day five, the whole game runs — and note that everything is
+> still grey boxes at this point. **Art does not go in until day six.**"
 
 Point at the two red rows:
 
-> "These two are **risk gates**. If evidence hadn't closed by the end of day three,
-> ghost writing was going to be cut and the matrix reduced to two-by-three. If the
-> ghost AI hadn't worked by the end of day four, the art day moved and we'd have
-> sacrificed the visuals."
+> "These two are **cut-off days**. If the clues did not work by the end of day three,
+> we were going to drop ghost writing and use a two-by-three table instead. If the
+> ghost AI did not work by the end of day four, the art day would move and we would
+> accept a worse-looking game."
 
-Beat.
+Stop.
 
-> "**Neither gate ever fired.** But both were written into the documents on day zero —
-> not added afterwards. That's why we were willing to commit to this schedule."
-
----
-
-### 16 · Non-goals — 35 sec
-
-> "Finally, what we deliberately did **not** build."
->
-> "No multiplayer — network sync costs three days minimum, and it would have eaten
-> the entire slice."
->
-> "No second map — one polished map beats three grey-boxed ones."
->
-> "No fourth ghost — it would break the mathematical closure of the matrix."
->
-> "We didn't even implement **jumping**. Because if you can jump you can climb onto
-> furniture, and that breaks both level closure and navmesh pathfinding."
-
-Beat, then the line at the bottom — the only reason this slide exists:
-
-> "**A team that can tell you what it isn't building is ten times more credible.**"
+> "**We did not have to do either one.** But both were written down on day zero,
+> not made up afterwards. That is why we were willing to promise this plan."
 
 ---
 
-### 17 · Demo hand-off — 25 sec
+### 16 · What we did not build — 35 sec
 
-**Leave this slide up while you switch over to Unity.**
-
-> "I'm going to play a run now — roughly eight to ten minutes. You'll see these six
-> stages."
+> "Last, the things we chose **not** to build."
 >
-> "Enter. Find the ghost room — one of seven. Gather evidence. Then sanity crosses fifty percent,
-> the lights start flickering and the heartbeat comes up. Then the hunt — the house
-> goes red and I have to break line of sight to survive it. Then back to the entrance,
-> tick two clues in the journal, and name the ghost."
+> "No online multiplayer — network code costs three days at least, and it would have
+> eaten the whole project."
 >
-> "It's graded on these four. I'll try for an A or better — but no promises.
-> **This game is losable.**"
+> "No second map — one good map beats three empty ones."
+>
+> "No fourth ghost — the three-by-three table would stop working."
+>
+> "We did not even add **jumping**. Because if you can jump, you can climb on the
+> furniture, and that breaks both the level and the paths the ghost walks on."
 
-During the demo, **narrate what is happening, never the mechanics**: "temperature just
-dropped," "reading's at four," "it's hunting." The mechanics are already explained, and
-explaining them again kills the atmosphere.
+Stop, then the line at the bottom. This is the only reason the slide exists:
+
+> "**A team that can tell you what it is NOT making is easier to trust.**"
 
 ---
 
-### 18 · Close — 30 sec
+### 17 · Before the demo — 25 sec
 
-Switch back after the demo.
+**Leave this slide up while you switch to Unity.**
 
-> "Zero to a playable run, in eight days."
+> "I am going to play one game now. About eight to ten minutes. You will see these
+> six stages."
 >
-> "We didn't build a bigger game. **We built one that closes.**"
-
-Point at the three cards:
-
-> "Three things come out of it. A deduction core that closes mathematically.
-> A production pipeline that transfers to the next project. And an architecture
-> contract fixed in advance, so any two modules can be built in parallel.
-> The last two we can carry straight into whatever we do next."
+> "Go in. Find the ghost room. Get the clues. Then sanity drops under fifty percent,
+> the lights start flickering, and a heartbeat starts. Then the hunt — the house turns
+> red and I have to get out of its sight. Then back to the lobby, tick two clues,
+> and pick a ghost."
 >
-> "Next step is a thermometer as a fourth clue — that expands the matrix to four by
-> four and supports six ghosts. The structure is already there. It's an asset file."
+> "It is scored on these four. I will try for an A or better. No promises —
+> **you can lose this game.**"
+
+While you play, **only say what is happening**: "the air just got cold," "the reading is
+at four," "it's hunting." Do not explain the rules again — you already did, and
+explaining kills the mood.
+
+---
+
+### 18 · The end — 30 sec
+
+Come back to the slides after the demo.
+
+> "Eight days, from nothing to a playable game."
+>
+> "We did not make a bigger game. **We made one that finishes.**"
+
+Point at the three boxes:
+
+> "Three things came out of it. A clue table that always works. A way of working we can
+> use again. And a set of rules we agreed before we started, so we could all work at the
+> same time."
+>
+> "This was our first 3D game. Honestly, most of the eight days went into deciding what
+> **not** to build."
+>
+> "Next step is a thermometer as a fourth clue. That gives us a four-by-four table and
+> six ghosts. The structure is already there — it is one more data file."
 
 Stop. Then:
 
 > "Thank you."
 
-**Say nothing after that.** Let the last line hang and wait for questions.
+**Say nothing after that.** Wait for questions.
 
 ---
 
-## Cutting for time
+## If they cut your time
 
-| Time available | Slides |
+| Time | Slides |
 |---|---|
-| **3 minutes** | 4 → 5 → 6 → (one line on 12) |
+| **3 minutes** | 4 → 5 → 6 (and one line about 12) |
 | **6 minutes** | 2 → 4 → 5 → 6 → 7 → 12 → 14 → 18 |
-| **12 minutes** | All 18 (this script) |
-| **20 minutes** | All 18 + the 8-minute live demo + questions |
+| **12 minutes** | All 18 — this script |
+| **20 minutes** | All 18 + the demo + questions |
 
-If time gets cut on the spot, drop **10 (level)**, **9 (ghosts)** and **16 (non-goals)**
-first — lowest information density. **Never drop 4, 5 or 12.**
+If someone cuts your time on the spot, drop **10 (the map)**, **9 (the ghosts)** and
+**16 (what we did not build)** first. **Never drop 4, 5 or 12.**
 
 ---
 
-## Likely questions, and how to answer them
+## Questions people will probably ask
 
-**Q: How is this different from Phasmophobia? Isn't it just a copy?**
+Keep these answers short. If you get stuck, the first sentence of each answer is enough.
 
-> "Mechanically we did borrow its core loop, and we're not pretending otherwise.
-> The difference is that we turned its deduction system into a structure that
-> **closes mathematically**. In Phasmophobia the evidence sets across twenty-four
-> ghosts overlap a lot, so players regularly end up guessing from behaviour.
-> Ours is zero-ambiguity: two clues always identify the ghost. That's a
-> **convergence** of the design, not a simplification of it."
+**Q: How is this different from Phasmophobia? Isn't it a copy?**
 
-**Q: Aren't three ghosts too few? Won't people get bored in two runs?**
+> "We did borrow the main loop, and we are not hiding that. The difference is our clue
+> table. Phasmophobia has twenty-four ghosts and a lot of them share clues, so players
+> often finish collecting and still guess. Ours never does that — two clues always give
+> one answer. We made it smaller on purpose, not because it was easier."
 
-> "For a vertical slice it's enough — ten minutes a run means you need at least three
-> runs to see all of them. And the structure scales cleanly: four kinds of evidence
-> supports six ghosts, five supports ten. Because ghosts are ScriptableObject data
-> rather than classes, adding one is a single asset file and zero code. The extension
-> path is clear. We just chose not to spend the week on it."
+**Q: Are three ghosts too few? Won't people get bored after two games?**
 
-**Q: The AI wrote the code. Can you write it yourself? Is this really your work?**
+> "For a demo it is enough — ten minutes a game means you need at least three games to
+> see all of them. And it grows easily: four kinds of clue would give six ghosts.
+> Because our ghosts are data files and not code, adding one is one file and no code
+> at all. We just chose not to spend the week on it."
 
-> "The AI generated the code, but **a human wrote the architecture.** The event bus,
-> the four interfaces, the seven contract files, the default value of every tunable —
-> those were fixed as contracts first, and the AI could only fill in behind them.
-> It didn't even have permission to open a contract file; the tooling rejects the run
-> if it tries."
+**Q: The AI wrote your code. Can you write code yourselves? Is this really your work?**
+
+> "The AI wrote the code, but **we decided how the code fits together.** The message
+> board, the four interfaces, the seven rule files, the default value of every number —
+> all of that was fixed first, and the AI could only fill in behind it. It is not even
+> allowed to open those files; our tool rejects the work if it tries."
 >
-> "Every delivery went through eight static gates and an eighteen-point audit,
-> and then I read the diff line by line. All fifty-nine task specifications are mine,
-> and each one states what to build, **what explicitly not to build**, and how it
-> would be accepted."
+> "Everything it handed in went through eight automatic checks and eighteen questions,
+> and then one of us read the changes line by line. All fifty-nine task specs are ours.
+> Each one says what to build, **what not to build**, and how we would test it."
 >
-> "An AI can write every script in this project in a day. But only I can tell whether
-> it feels right — how much faster than the player the Poltergeist has to be to feel
-> threatening without feeling hopeless took three rounds of tuning.
-> My job was design and review, not typing."
+> "We are new to 3D games, so honestly this process is how we stayed in control.
+> An AI can write every script here in a day. But only a person can tell whether the
+> game feels right — how much faster than the player the Poltergeist should be took us
+> three tries to get right."
 
-**Q: Why no multiplayer? That's where Phasmophobia's fun lives.**
+**Q: Why no multiplayer? That is the fun part of Phasmophobia.**
 
-> "Agreed, co-op is genuinely where most of its appeal comes from. But network sync
-> costs three days minimum, and in a one-week project those three days would have
-> crowded out everything else. We chose a single-player slice that runs the complete
-> loop over a multiplayer build with nothing in it. Co-op is an explicit next step —
-> just not this week."
+> "We agree, co-op is where most of its fun comes from. But network code costs three
+> days at least, and in a one-week project those three days would take everything else
+> away. We chose a single-player game that finishes over a multiplayer game with nothing
+> in it. Multiplayer is the obvious next step, just not this week."
 
 **Q: Did you make the art yourselves?**
 
-> "Not the assets. Everything is free-licensed — Poly Haven is CC0, Mixamo is free,
-> and the Asset Store has free realistic interior kits. The source and licence of
-> every single one is recorded in `Docs/ASSET_LICENSES.md`."
+> "Not the models. Everything is free to use — Poly Haven, Mixamo, and free interior
+> packs from the Asset Store. We wrote down where every single one came from in
+> `Docs/ASSET_LICENSES.md`."
 >
-> "But **the lighting, the material consistency and the post-processing are ours**,
-> and consistency of style matters far more than the fidelity of any one asset.
-> The cheapest thing about a horror game is that **you don't have to build what nobody
-> can see** — our ghost is invisible most of the time by design."
+> "But **the lighting and the look are ours**, and one clear style matters much more
+> than one nice-looking chair. The cheapest part of a horror game is that **you don't
+> have to build what nobody can see** — our ghost is invisible most of the time anyway."
 
-**Q: A one-week project — how buggy is it? Is it stable?**
+**Q: A one-week project — is it buggy?**
 
-> "Compilation was verified with headless Unity on every single round, so I can
-> guarantee that. But **a clean compile only means the assembly built, not that the
-> behaviour is right** — behaviour we verified by hand in the editor against a
-> written, step-by-step acceptance walkthrough, which is in `Docs/09_验收路径.md` (the acceptance walkthrough)."
+> "Every round was built with Unity before we accepted it, so it builds. But **building
+> is not the same as working** — we tested the actual behaviour by hand in the editor,
+> following a written step-by-step list. That list is in our documents."
 >
-> "Known outstanding issues are documented too — for example an ordering conflict
-> between the hiding system and the camera's rotation write. I'm not going to claim
-> it's bug-free. I will claim every known bug is written down."
+> "We also wrote down the bugs we know about and did not fix. I am not going to say it
+> has no bugs. I will say every bug we know about is written down."
 
-**Q: Could that pipeline be reused on another project?**
+**Q: Could you use that process on another project?**
 
-> "Yes, and that's its biggest value. The tool is a dependency-free Python script.
-> Moving it to a new project means changing three things: the gate regular expressions,
-> the list of contract files, and the compile command. The scheduling, the send-back
-> loop, the audit and the review-package generation are all generic."
+> "Yes, and that is the part we are most happy with. The tool is one Python file with no
+> extra libraries. To move it to a new project you change three things: the eight text
+> rules, the list of protected files, and the build command. Everything else works as is."
 
 ---
 
-## Pre-flight checklist
+## Before you go on stage
 
-- [ ] Deck copied to the presenting machine and **opened once in PowerPoint** — check
-      the dark background renders and nothing overflows
-- [ ] Unity project **already open and played once**, so shaders are compiled and it
-      won't stall live
-- [ ] Confirm the Apartment Kit assets are imported in `Blockout.unity` — without them
-      the scene is nearly empty. Run `python tools/check_kit.py` if unsure
-- [ ] Audio tested through the room speakers — **a horror demo with no sound is not
+- [ ] Deck copied to the presenting computer and **opened once in PowerPoint** —
+      check the dark background looks right and no text is cut off
+- [ ] Unity project **already open, and played once**, so the shaders are ready and it
+      does not freeze in front of everyone
+- [ ] Check the Apartment Kit models are imported in `Blockout.unity`, or the scene will
+      look almost empty. Run `python tools/check_kit.py` if you are not sure
+- [ ] Sound tested through the room speakers — **a horror demo with no sound is not
       a demo**
-- [ ] This script open on your phone as backup
-- [ ] Have a plan if the demo crashes: cut back to slide 17 and narrate the six stages
+- [ ] This script open on your phone
+- [ ] Have a backup plan if the demo crashes: go back to slide 17 and just say the
+      six stages out loud
 
 ---
 
-## One last reminder
+## One last thing
 
-**Slow down.** Take the full twelve minutes for twelve minutes of material. The pauses
-are where the audience catches up — especially the one after
-"No redundancy. No ambiguity. No luck."
+**Talk slowly.** Take the full twelve minutes. The pauses are when people catch up —
+especially the one after "No guessing. No luck. Just logic."
+
+If you forget a line, say the short version and move on. Nobody in the room knows what
+you were going to say.
 
 ---
 
-*Companion documents: `Docs/decks/RESIDUUM_Final_EN.pptx` · `Docs/01_GDD_残响.md` ·
-`Docs/08_Pitch_Script_EN.md` (day-zero pitch version)*
+*See also: `Docs/decks/RESIDUUM_Final_EN.pptx` · `Docs/01_GDD_残响.md` ·
+`Docs/08_Pitch_Script_EN.md` (the day-zero pitch)*

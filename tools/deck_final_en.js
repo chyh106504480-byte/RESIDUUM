@@ -83,20 +83,20 @@ function footNote(s, t, color) {
     x: ML, y: 1.9, w: 7.2, h: 1.3, isTextBox: true, margin: 0,
     fontFace: FD, fontSize: 66, bold: true, color: TEXT, charSpacing: 6,
   });
-  s.addText("A first-person horror investigation game", {
+  s.addText("A first-person horror game about what is in the house", {
     x: ML, y: 3.3, w: 7.2, h: 0.44, isTextBox: true, margin: 0,
-    fontFace: F, fontSize: 21, color: DIM,
+    fontFace: F, fontSize: 17, color: DIM,
   });
-  s.addText("You don't know what it is. That is the entire game.", {
+  s.addText("You don't know what it is. That is the whole game.", {
     x: ML, y: 3.94, w: 7.2, h: 0.44, isTextBox: true, margin: 0,
     fontFace: F, fontSize: 17, italic: true, color: MOONBR,
   });
 
-  s.addText("Unity 6000.5.8f1   ·   URP 17.5   ·   Single-player   ·   Vertical slice", {
+  s.addText("Unity 6   ·   Single player   ·   A playable build made in 8 days", {
     x: ML, y: 5.86, w: 8.0, h: 0.32, isTextBox: true, margin: 0,
     fontFace: FM, fontSize: 11.5, color: DIM2,
   });
-  s.addText("Lead designer: Henry   ·   Final presentation   ·   August 2026", {
+  s.addText("Made by 2 students   ·   Our first 3D game   ·   August 2026", {
     x: ML, y: 6.24, w: 8.0, h: 0.32, isTextBox: true, margin: 0,
     fontFace: FM, fontSize: 11.5, color: DIM2,
   });
@@ -120,28 +120,28 @@ function footNote(s, t, color) {
     fontFace: F, fontSize: 12.5, color: DIM, align: "center", lineSpacing: 19,
   });
 
-  s.addNotes("Ten seconds. Don't linger — say the title and the premise, then advance.");
+  s.addNotes("Ten seconds. Do not stop here. Say the name and the one-line idea, then move on.");
 }
 
 /* ══════════════ 02 · Premise ══════════════ */
 {
   const s = newSlide("PREMISE");
-  title(s, "The game in one sentence", "If you only get one line, say this one");
+  title(s, "The game in one sentence", "If we only get to say one thing, this is it");
 
   card(s, ML, 2.02, CW, 1.5);
   s.addText(
-    "You walk into a house you shouldn't be in with three instruments. Before your sanity runs out, you must identify what is haunting it — and get back out alive.",
+    "You go into a house you should not be in, carrying three tools. Before your sanity runs out, you have to work out what is haunting it and get back out alive.",
     {
-      x: ML + 0.5, y: 2.3, w: CW - 1.0, h: 1.0, isTextBox: true, margin: 0,
-      fontFace: F, fontSize: 20, color: TEXT, lineSpacing: 32,
+      x: ML + 0.5, y: 2.32, w: CW - 1.0, h: 1.0, isTextBox: true, margin: 0,
+      fontFace: F, fontSize: 19, color: TEXT, lineSpacing: 30,
     }
   );
 
   const stats = [
-    ["8–12", "minutes per run"],
-    ["3", "ghosts, three data assets"],
-    ["3", "kinds of evidence, three fears"],
-    ["2", "of them settle it for good"],
+    ["8–12", "minutes per game"],
+    ["3", "ghosts"],
+    ["3", "kinds of evidence"],
+    ["2", "clues give you the answer"],
   ];
   const sw = (CW - 3 * 0.32) / 4;
   stats.forEach((st, i) => {
@@ -157,14 +157,14 @@ function footNote(s, t, color) {
     });
   });
 
-  footNote(s, "Benchmarked against Phasmophobia — we copy its deductive structure, not its content volume.");
-  s.addNotes("This slide is the what. The four numbers are the most memorable thing in the deck. Say them one at a time, with a beat between.");
+  footNote(s, "We looked at Phasmophobia. We copied the way it makes you think, not the amount of stuff in it.");
+  s.addNotes("The four numbers are the easiest thing to remember. Say them one at a time and stop between each one.");
 }
 
 /* ══════════════ 03 · Why we cut to 3x3 ══════════════ */
 {
   const s = newSlide("SCOPE");
-  title(s, "Decision one: cut it down to 3 × 3", "Content volume is not where the fun comes from");
+  title(s, "Choice one: keep it small on purpose", "More content does not mean more fun");
 
   const cw2 = (CW - 0.5) / 2;
   card(s, ML, 2.06, cw2, 2.35);
@@ -174,10 +174,10 @@ function footNote(s, t, color) {
   });
   s.addText(
     [
-      { text: "24 ghost types", options: { bullet: true, breakLine: true } },
+      { text: "24 ghosts", options: { bullet: true, breakLine: true } },
       { text: "7 kinds of evidence", options: { bullet: true, breakLine: true } },
-      { text: "40+ items", options: { bullet: true, breakLine: true } },
-      { text: "Evidence sets overlap; players end up guessing", options: { bullet: true } },
+      { text: "More than 40 tools", options: { bullet: true, breakLine: true } },
+      { text: "Ghosts share clues, so players still guess", options: { bullet: true } },
     ],
     {
       x: ML + 0.34, y: 2.76, w: cw2 - 0.68, h: 1.5, isTextBox: true, margin: 0,
@@ -192,10 +192,10 @@ function footNote(s, t, color) {
   });
   s.addText(
     [
-      { text: "3 ghost types", options: { bullet: true, breakLine: true } },
+      { text: "3 ghosts", options: { bullet: true, breakLine: true } },
       { text: "3 kinds of evidence", options: { bullet: true, breakLine: true } },
-      { text: "4 items plus one deduction journal", options: { bullet: true, breakLine: true } },
-      { text: "Zero overlap; any two clues are decisive", options: { bullet: true } },
+      { text: "4 tools and one notebook", options: { bullet: true, breakLine: true } },
+      { text: "No sharing problem. Two clues, one answer", options: { bullet: true } },
     ],
     {
       x: ML + cw2 + 0.84, y: 2.76, w: cw2 - 0.68, h: 1.5, isTextBox: true, margin: 0,
@@ -203,15 +203,15 @@ function footNote(s, t, color) {
     }
   );
 
-  s.addText("That game's appeal really comes down to three things — and all three survive at minimum scale:", {
+  s.addText("We think that game is fun for three reasons. All three still work when the game is small:", {
     x: ML, y: 4.72, w: CW, h: 0.34, isTextBox: true, margin: 0,
     fontFace: F, fontSize: 15, color: TEXT,
   });
 
   const three = [
-    ["Asymmetric information", "You know it's there. You don't know what, or where."],
-    ["Deduction under constraint", "Elimination, using a limited toolkit"],
-    ["Risk pulling against reward", "One more second is one more clue, and one more chance to die"],
+    ["You don't know what it is", "You know something is in the house. You just don't know what, or where."],
+    ["You have to work it out", "You use clues to rule ghosts out, one at a time."],
+    ["Staying is dangerous", "One more second is one more clue — and one more chance to die."],
   ];
   const tw = (CW - 2 * 0.32) / 3;
   three.forEach((t, i) => {
@@ -227,15 +227,15 @@ function footNote(s, t, color) {
     });
   });
 
-  s.addNotes("This slide buys credibility. We didn't cut because we ran out of time — we cut because we worked out what mattered.");
+  s.addNotes("The point of this slide: we did not make it small because we ran out of time. We made it small on purpose.");
 }
 
 /* ══════════════ 04 · The matrix ══════════════ */
 {
-  const s = newSlide("THE MATRIX");
-  title(s, "The core: a 3 × 3 deduction matrix", "★ The most important slide in the deck");
+  const s = newSlide("THE TABLE");
+  title(s, "The heart of the game: a 3 × 3 table", "★ The most important slide");
 
-  const cols = ["", "EMF-5 reading", "UV fingerprints", "Ghost writing"];
+  const cols = ["", "EMF reading", "UV fingerprints", "Ghost writing"];
   const rows = [
     ["Spirit", 1, 1, 0],
     ["Wraith", 1, 0, 1],
@@ -277,37 +277,37 @@ function footNote(s, t, color) {
   });
 
   card(s, ML, 5.28, CW, 1.16, PANEL2);
-  s.addText("Every ghost has exactly two — and the three ghosts fill all three pairs.", {
+  s.addText("Every ghost has exactly two. The three ghosts use up all three pairs.", {
     x: ML + 0.4, y: 5.48, w: CW - 0.8, h: 0.42, isTextBox: true, margin: 0,
     fontFace: F, fontSize: 19, bold: true, color: MOONBR, align: "center",
   });
-  s.addText("This matrix is the most elegant thing in the project, and the source of every constraint in it.", {
+  s.addText("This small table is the best idea in our project. Everything else is built around it.", {
     x: ML + 0.4, y: 5.94, w: CW - 0.8, h: 0.34, isTextBox: true, margin: 0,
     fontFace: F, fontSize: 13, color: DIM, align: "center",
   });
 
-  s.addNotes("If there is a whiteboard, draw this instead of showing it — three rows, three columns, one checkmark at a time. Watching you build it lands far harder. Beat before advancing.");
+  s.addNotes("If there is a whiteboard, draw this instead of showing it. Three rows, three columns, one tick at a time. People trust something they watch you build. Stop for a second before you move on.");
 }
 
 /* ══════════════ 05 · Uniqueness ══════════════ */
 {
   const s = newSlide("PROOF");
-  title(s, "Why this matrix is airtight", "★ The peak of the talk");
+  title(s, "Why this table always works", "★ The best moment in the talk");
 
   card(s, ML, 2.06, 3.9, 2.5, PANEL2);
   s.addText("C(3, 2)  =  3", {
     x: ML, y: 2.5, w: 3.9, h: 0.8, isTextBox: true, margin: 0,
     fontFace: FD, fontSize: 44, bold: true, color: MOONBR, align: "center",
   });
-  s.addText("Choose two out of three and\nthere are exactly three pairs —\none for each ghost, one to one", {
+  s.addText("Pick 2 things out of 3.\nThere are only 3 ways to do it.\nOne way for each ghost.", {
     x: ML + 0.3, y: 3.34, w: 3.3, h: 1.0, isTextBox: true, margin: 0,
     fontFace: F, fontSize: 13.5, color: DIM, align: "center", lineSpacing: 22,
   });
 
   const facts = [
-    ["One clue is never enough", "Every kind of evidence is shared by two ghosts, so one rules out only one"],
-    ["Two clues are always decisive", "Pairs map one-to-one onto ghosts. There is no second solution"],
-    ["Elimination works just as well", "Proving a kind of evidence absent advances the deduction too"],
+    ["One clue is never enough", "Two ghosts share every clue, so one clue only rules out one ghost"],
+    ["Two clues always give the answer", "Each pair belongs to one ghost only. There is no second answer"],
+    ["Ruling things out works too", "Showing that a clue is NOT there also helps you"],
   ];
   const fx = ML + 4.3, fw = CW - 4.3;
   facts.forEach((f, i) => {
@@ -331,37 +331,37 @@ function footNote(s, t, color) {
     });
   });
 
-  s.addText("No redundancy.    No ambiguity.    No luck.", {
+  s.addText("No guessing.    No luck.    Just logic.", {
     x: ML, y: 5.1, w: CW, h: 0.62, isTextBox: true, margin: 0,
     fontFace: FD, fontSize: 30, bold: true, color: MOONBR, align: "center", charSpacing: 2,
   });
-  s.addText("When a player wins a run, they won it by deduction and nothing else.", {
+  s.addText("If a player wins, it is because they worked it out.", {
     x: ML, y: 5.82, w: CW, h: 0.4, isTextBox: true, margin: 0,
     fontFace: F, fontSize: 14, color: DIM, align: "center",
   });
 
-  s.addNotes("Stop dead after 'No luck.' Let it sit for two full seconds before you advance.");
+  s.addNotes("Stop after 'Just logic.' Count two seconds before you move on. Do not fill the silence.");
 }
 
 /* ══════════════ 06 · Sanity ══════════════ */
 {
   const s = newSlide("PACING");
-  title(s, "Sanity is the pacing engine", "The answer to “why not just take your time?”");
+  title(s, "Sanity sets the pace", "This is why you cannot just take your time");
 
   const lw = 6.4;
   card(s, ML, 2.06, lw, 4.0);
-  s.addText("How sanity moves", {
+  s.addText("How sanity changes", {
     x: ML + 0.36, y: 2.24, w: lw - 0.72, h: 0.34, isTextBox: true, margin: 0,
     fontFace: F, fontSize: 16, bold: true, color: MOON,
   });
   const sanity = [
-    ["Starting value", "100 %"],
-    ["Standing in darkness", "−0.12 %/s"],
-    ["In a lit room", "−0.06 %/s"],
-    ["Holding a lit flashlight", "rate × 0.5"],
-    ["Witnessing a ghost event", "−15 % once"],
-    ["While being hunted", "−0.5 %/s"],
-    ["Back in the entrance safe zone", "+1.0 %/s"],
+    ["You start at", "100 %"],
+    ["Standing in the dark", "−0.12 %/s"],
+    ["In a room with the light on", "−0.06 %/s"],
+    ["Holding a lit flashlight", "half as fast"],
+    ["Seeing the ghost do something", "−15 % at once"],
+    ["While it is hunting you", "−0.5 %/s"],
+    ["Back in the lobby", "+1.0 %/s"],
   ];
   sanity.forEach((r, i) => {
     const y = 2.72 + i * 0.46;
@@ -379,7 +379,7 @@ function footNote(s, t, color) {
 
   const rx = ML + lw + 0.45, rw = CW - lw - 0.45;
   card(s, rx, 2.06, rw, 1.66, PANEL2);
-  s.addText("Hunt probability", {
+  s.addText("Chance of a hunt", {
     x: rx + 0.36, y: 2.22, w: rw - 0.72, h: 0.3, isTextBox: true, margin: 0,
     fontFace: F, fontSize: 15, bold: true, color: MOON,
   });
@@ -387,12 +387,12 @@ function footNote(s, t, color) {
     x: rx + 0.3, y: 2.62, w: rw - 0.6, h: 0.5, isTextBox: true, margin: 0,
     fontFace: FD, fontSize: 25, bold: true, color: BLOODBR, align: "center",
   });
-  s.addText("Rolled once every 25 seconds, once sanity drops below 50 %", {
+  s.addText("The game checks every 25 seconds, once sanity is under 50 %", {
     x: rx + 0.36, y: 3.18, w: rw - 0.72, h: 0.44, isTextBox: true, margin: 0,
     fontFace: F, fontSize: 12.5, color: DIM, align: "center",
   });
 
-  const pts = [["50 %", "0 %"], ["25 %", "50 %"], ["0 %", "certain"]];
+  const pts = [["50 %", "0 %"], ["25 %", "50 %"], ["0 %", "always"]];
   pts.forEach((p, i) => {
     const y = 3.94 + i * 0.72;
     card(s, rx, y, rw, 0.6);
@@ -406,14 +406,14 @@ function footNote(s, t, color) {
     });
   });
 
-  footNote(s, "Design intent: the player is permanently doing the arithmetic on how much longer they can stay. That anxiety is the gameplay.");
-  s.addNotes("Deliver the line 'every extra piece of evidence costs you' slowly. That is the thesis of the whole design.");
+  footNote(s, "The player is always asking the same question: how much longer can I stay? That worry is the game.");
+  s.addNotes("Say 'every extra clue costs you' slowly. That one line is the whole design.");
 }
 
 /* ══════════════ 07 · Hunt speeds ══════════════ */
 {
   const s = newSlide("THE HUNT");
-  title(s, "Running is not the answer", "These numbers were re-tuned by hand, not guessed");
+  title(s, "Running away does not work", "We set these speeds by hand and tested them");
 
   const chartData = [{
     name: "Movement speed (m/s)",
@@ -447,10 +447,10 @@ function footNote(s, t, color) {
 
   const rx = ML + 7.6, rw = CW - 7.6;
   const notes = [
-    ["No adrenaline bonus", "A hunt sprint is 3.5, same as any other sprint. No free crutch."],
-    ["The Poltergeist is faster than you", "Spirit 3.3 and Wraith 3.4 you can just outrun. 3.6 you cannot."],
-    ["Stamina lasts 4.2 seconds", "Then 3.5 seconds to refill, and you are back to walking at 2.0."],
-    ["Break the line of sight", "Lose it and the ghost only searches your last known position. Turn a corner. Shut the door."],
+    ["No speed boost in a hunt", "Sprinting is 3.5, the same as normal. We give you no free help."],
+    ["The Poltergeist is faster than you", "You can just outrun 3.3 and 3.4. You cannot outrun 3.6."],
+    ["You can only sprint 4.2 seconds", "Then 3.5 seconds to get it back, and you walk at 2.0."],
+    ["Get out of its sight instead", "If it cannot see you, it only checks where you were. Turn a corner. Close the door."],
   ];
   notes.forEach((n, i) => {
     const y = 2.02 + i * 1.05;
@@ -465,18 +465,18 @@ function footNote(s, t, color) {
     });
   });
 
-  s.addNotes("This slide is about feel, not features. All six numbers were re-benchmarked on day seven.");
+  s.addNotes("This slide is about how the game feels, not what it has. We re-tested all six numbers on day seven.");
 }
 
 /* ══════════════ 08 · Three instruments ══════════════ */
 {
-  const s = newSlide("INSTRUMENTS");
-  title(s, "Three instruments, three different fears", "They are not three ways of getting the same thing");
+  const s = newSlide("TOOLS");
+  title(s, "Three tools, three kinds of fear", "They are not just three ways to get the same thing");
 
   const tools = [
-    ["EMF Reader", "T R A C K", "You follow the reading. Higher means closer to where it just was.", "It pulls you toward it"],
-    ["UV Flashlight", "S E A R C H", "You stand still and sweep handles and switches. Your flashlight is forced off.", "It takes your light away"],
-    ["Ghost Writing Book", "W A I T", "You set it down in the ghost room, leave, and have to come back to read it.", "It sends you back in"],
+    ["EMF Reader", "F O L L O W", "You follow the number. A higher number means it was just here.", "It pulls you toward it"],
+    ["UV Flashlight", "S E A R C H", "You stand still and check door handles and switches. Your flashlight turns off.", "It takes your light away"],
+    ["Ghost Writing Book", "W A I T", "You put it down, walk away, and have to go back in to read it.", "It sends you back in"],
   ];
   const tw = (CW - 2 * 0.4) / 3;
   tools.forEach((t, i) => {
@@ -501,23 +501,23 @@ function footNote(s, t, color) {
   });
 
   card(s, ML, 5.66, CW, 0.9, PANEL2);
-  s.addText("Only three equipment slots, and the flashlight permanently occupies one. Every run forces a trade. That pressure is deliberate.", {
+  s.addText("You only get 3 tool slots, and the flashlight always takes one of them. So you have to choose. We did that on purpose.", {
     x: ML + 0.5, y: 5.66, w: CW - 1.0, h: 0.9, isTextBox: true, margin: 0,
     fontFace: F, fontSize: 15.5, color: TEXT, valign: "middle",
   });
 
-  s.addNotes("Track, search, wait — three behaviour patterns that do not overlap. That is the answer to 'why these three items'.");
+  s.addNotes("Follow, search, wait. Three different things to do. That is why these three tools and not others.");
 }
 
 /* ══════════════ 09 · The three ghosts ══════════════ */
 {
   const s = newSlide("ENTITIES");
-  title(s, "Three ghosts, one AI", "Every difference is expressed as data, not as a subclass");
+  title(s, "Three ghosts, one AI", "The differences live in data files, not in three sets of code");
 
   const ghosts = [
-    ["Spirit", "Slow · stubborn", ["Lingers in the ghost room", "Heavy, distinct footsteps", "Longest hunt duration"], "Hunt 3.3 m/s"],
-    ["Wraith", "Drifting · traceless", ["Leaves no floor prints", "Blinks short distances closer", "Periodic bursts while chasing"], "Hunt 3.4 m/s"],
-    ["Poltergeist", "Violent · destructive", ["Throws interactable objects", "Flings everything at hunt start", "Drains sanity 1.5× faster"], "Hunt 3.6 m/s"],
+    ["Spirit", "Slow and stubborn", ["Stays in its own room", "Loud, clear footsteps", "Hunts for the longest"], "Hunts at 3.3 m/s"],
+    ["Wraith", "Quiet and hard to follow", ["Leaves no footprints", "Jumps a short way closer", "Speeds up while chasing"], "Hunts at 3.4 m/s"],
+    ["Poltergeist", "Angry and loud", ["Throws things around", "Throws everything at hunt start", "Drains sanity 1.5× faster"], "Hunts at 3.6 m/s"],
   ];
   const gw = (CW - 2 * 0.4) / 3;
   ghosts.forEach((g, i) => {
@@ -545,22 +545,22 @@ function footNote(s, t, color) {
   });
 
   card(s, ML, 5.34, CW, 1.14, PANEL2);
-  s.addText("Three ghosts  =  one GhostAI  +  three ScriptableObject data assets", {
+  s.addText("Three ghosts  =  one GhostAI script  +  three data files", {
     x: ML + 0.5, y: 5.48, w: CW - 1.0, h: 0.4, isTextBox: true, margin: 0,
     fontFace: F, fontSize: 18, bold: true, color: MOONBR,
   });
-  s.addText("Adding a fourth ghost means authoring one asset file — not one line of code changes.", {
+  s.addText("To add a fourth ghost we make one more data file. We do not change any code.", {
     x: ML + 0.5, y: 5.9, w: CW - 1.0, h: 0.4, isTextBox: true, margin: 0,
     fontFace: F, fontSize: 13, color: DIM,
   });
 
-  s.addNotes("If asked 'aren't three ghosts too few', answer with this slide: four kinds of evidence would support six ghosts. We simply chose not to this week.");
+  s.addNotes("If someone says three ghosts is too few, use this slide. Four kinds of clue would give six ghosts. We just chose not to do it this week.");
 }
 
 /* ══════════════ 10 · Level and lighting ══════════════ */
 {
   const s = newSlide("LEVEL");
-  title(s, "One apartment, eight zones", "One polished map beats three grey-boxed ones");
+  title(s, "One apartment, eight areas", "One good map beats three empty ones");
 
   const px = ML, py = 2.14, pw = 6.4;
   const zones = [
@@ -589,18 +589,18 @@ function footNote(s, t, color) {
       fontFace: FM, fontSize: 11, color: safe ? MOON : DIM2, align: "right", valign: "middle",
     });
   });
-  s.addText("Seven rooms are ghost-room candidates — one is drawn at random each run. The lobby is the safe zone.", {
+  s.addText("Seven rooms can be the ghost room. The game picks one at random each time. The lobby is safe.", {
     x: px, y: py + 4 * (zh + zg) + 0.16, w: pw, h: 0.5, isTextBox: true, margin: 0,
     fontFace: F, fontSize: 12, color: DIM,
   });
 
   const rx = ML + pw + 0.6, rw = CW - pw - 0.6;
   const items = [
-    ["Cold blue moonlight is the only ambient", "A directional light through the windows. The interior is almost black."],
-    ["Your flashlight is the only warm source", "4200 K, 12 m range, 45° cone. That is all the light you get."],
-    ["Every room has a switchable ceiling light", "Light slows sanity loss but makes the ghost likelier to notice you."],
-    ["Hunts shift the whole house red and flicker it", "The flashlight dies. There is a chance the power cuts entirely."],
-    ["The corridor breaks up sightlines", "You rarely see the whole space at once — footsteps tend to arrive before vision."],
+    ["Cold blue moonlight is the only room light", "It comes in through the windows. Inside the flat it is almost black."],
+    ["Your flashlight is the only warm light", "4200 K, 12 m, a 45° cone. That is all the light you get."],
+    ["Every room has a light switch", "Lights slow down sanity loss, but the ghost notices you more."],
+    ["A hunt turns the whole house red", "Your flashlight stops working. Sometimes the power goes out."],
+    ["The corridor blocks your view", "You rarely see the whole flat at once. You hear it before you see it."],
   ];
   items.forEach((it, i) => {
     const y = 2.14 + i * 0.9;
@@ -618,20 +618,20 @@ function footNote(s, t, color) {
     });
   });
 
-  s.addNotes("Eight RoomVolumes in the scene, seven of them ghost-room candidates. The cheapest thing about a horror game: you don't have to build what nobody can see.");
+  s.addNotes("Eight room volumes in the scene, seven of them can be the ghost room. The cheapest part of a horror game: you do not have to build what nobody can see.");
 }
 
 /* ══════════════ 11 · Architecture ══════════════ */
 {
-  const s = newSlide("ARCHITECTURE");
-  title(s, "Zero direct references between modules", "So several AI sessions can write code in parallel without colliding");
+  const s = newSlide("HOW THE CODE FITS");
+  title(s, "No part of the code talks to another part directly", "So two people, or two AI sessions, can write code at the same time");
 
   card(s, 4.55, 3.5, 4.22, 1.08, PANEL2);
   s.addText("Core.GameEvents", {
     x: 4.55, y: 3.62, w: 4.22, h: 0.42, isTextBox: true, margin: 0,
     fontFace: FM, fontSize: 19, bold: true, color: MOONBR, align: "center",
   });
-  s.addText("static event bus · 23 events", {
+  s.addText("a message board · 23 messages", {
     x: 4.55, y: 4.06, w: 4.22, h: 0.34, isTextBox: true, margin: 0,
     fontFace: F, fontSize: 12.5, color: DIM, align: "center",
   });
@@ -657,11 +657,11 @@ function footNote(s, t, color) {
   });
 
   const rules = [
-    ["Everything crosses via the bus", "Module files may not import another module's namespace"],
-    ["Four interfaces fixed up front", "IInteractable · IHoldable · IEvidenceSource · GhostDefinition"],
-    ["The contract has one author", "7 contract files owned by the lead. The AI cannot touch them"],
-    ["Tunable values are serialized", "Designers tune in the Inspector, never in code"],
-    ["Ghosts are data, not classes", "Behavioural differences live in ScriptableObjects"],
+    ["Everything goes through the board", "One part of the code may not import another part"],
+    ["Four interfaces agreed first", "IInteractable · IHoldable · IEvidenceSource · GhostDefinition"],
+    ["Only one person edits the rules", "7 files. The AI is not allowed to open them"],
+    ["Numbers live in the Inspector", "We tune the game without touching any code"],
+    ["Ghosts are data, not code", "Their differences live in data files"],
   ];
   const rw2 = (CW - 2 * 0.3) / 3;
   rules.forEach((r, i) => {
@@ -678,21 +678,21 @@ function footNote(s, t, color) {
     });
   });
 
-  s.addNotes("The payoff: any two modules can be written simultaneously by two sessions that know nothing about each other, and it will still compile.");
+  s.addNotes("Why it matters: two parts of the game can be written at the same time by people who never talk to each other, and it still builds.");
 }
 
 /* ══════════════ 12 · Pipeline ══════════════ */
 {
   const s = newSlide("PIPELINE");
-  title(s, "How the code actually got written", "★ The pipeline is a deliverable in its own right");
+  title(s, "How we actually wrote the code", "★ We built this tool, and we can use it again");
 
   const steps = [
-    ["01", "Task spec", "Written by a\nhuman. Files,\nvalues, limits,\nacceptance tests"],
-    ["02", "Implement", "Codex fills in\nbehind the\ncontract. It\ncannot edit it"],
-    ["03", "Static gates", "8 regex rules.\nAny hit sends\nit straight back"],
-    ["04", "Compile", "Headless batch\nmode. Real\ncompiler errors"],
-    ["05", "Self-audit", "18-point list,\nanswered line\nby line"],
-    ["06", "Human review", "A person reads\nthe diff and\npasses or rejects"],
+    ["01", "Task spec", "A person writes\nit. Which files,\nwhich numbers,\nwhat not to do"],
+    ["02", "AI writes it", "Codex fills in\nthe code. It\ncannot change\nthe rules"],
+    ["03", "Auto check", "8 text rules.\nOne hit and it\ngoes back"],
+    ["04", "Build it", "Unity builds it\nwith no window.\nReal errors"],
+    ["05", "Self check", "The AI answers\n18 questions\nabout its work"],
+    ["06", "We read it", "A person reads\nthe changes and\nsays yes or no"],
   ];
   const sw2 = (CW - 5 * 0.24) / 6;
   steps.forEach((st, i) => {
@@ -713,38 +713,38 @@ function footNote(s, t, color) {
     });
   });
 
-  s.addText("A failure at step 3 or 4 returns automatically to step 2 carrying the raw error text. Two rounds maximum.", {
+  s.addText("If step 3 or step 4 fails, it goes back to step 2 with the error text. Two tries, then it stops.", {
     x: ML, y: 4.56, w: CW, h: 0.34, isTextBox: true, margin: 0,
     fontFace: F, fontSize: 13, italic: true, color: DIM, align: "center",
   });
 
   card(s, ML, 5.08, CW, 1.44, PANEL2);
-  s.addText("Humans own design, contract and acceptance. The AI owns implementation.", {
+  s.addText("People decide what to build and whether it is good. The AI writes it.", {
     x: ML + 0.45, y: 5.24, w: CW - 0.9, h: 0.4, isTextBox: true, margin: 0,
     fontFace: F, fontSize: 17, bold: true, color: TEXT,
   });
-  s.addText("The author and the reviewer have to be two independent viewpoints. The AI generated the code, but a human wrote the architecture — the event bus, the interfaces, the data structures were fixed as contracts first. An AI can write every script in this project in a day; only a person can tell whether it feels right.", {
+  s.addText("The person who writes it and the person who checks it cannot be the same. We are new to 3D games, so we made the rules very strict before we started: the message board, the interfaces and the data files were all agreed first, and the AI could only fill in behind them. An AI can write every script in this project in a day. Only a person can tell whether the game feels right.", {
     x: ML + 0.45, y: 5.68, w: CW - 0.9, h: 0.74, isTextBox: true, margin: 0,
     fontFace: F, fontSize: 12.5, color: DIM,
   });
 
-  s.addNotes("This is the differentiator. Other teams hand in a game. We hand in a game plus a production line that transfers to the next project.");
+  s.addNotes("This is what makes us different. Other teams hand in a game. We hand in a game and a way of working we can use again.");
 }
 
 /* ══════════════ 13 · Gates ══════════════ */
 {
   const s = newSlide("GATES");
-  title(s, "Eight hard gates. One hit and it goes back.", "An AI never gets tired — but it will make the same mistake a hundred times");
+  title(s, "Eight rules the code has to pass", "An AI never gets tired, but it makes the same mistake again and again");
 
   const gates = [
-    ["G01", "Deprecated Find APIs are banned", "error"],
-    ["G02", "Rigidbody.velocity → linearVelocity", "error"],
-    ["G03", "No legacy Input Manager", "error"],
-    ["G04", "CinemachineVirtualCamera was renamed", "error"],
-    ["G05", "No direct imports between modules", "error"],
-    ["G06", "Tunables must be SerializeField private", "warn"],
-    ["G07", "No GameObject.Find by name", "warn"],
-    ["G08", "Strip debug logging before commit", "warn"],
+    ["G01", "The old Find functions are not allowed", "error"],
+    ["G02", "Rigidbody.velocity is now linearVelocity", "error"],
+    ["G03", "Do not use the old Input Manager", "error"],
+    ["G04", "CinemachineVirtualCamera has a new name", "error"],
+    ["G05", "No part may import another part", "error"],
+    ["G06", "Numbers must be SerializeField private", "warn"],
+    ["G07", "Do not use GameObject.Find by name", "warn"],
+    ["G08", "Take the debug logs out before saving", "warn"],
   ];
   const gw2 = 6.9;
   gates.forEach((g, i) => {
@@ -770,50 +770,50 @@ function footNote(s, t, color) {
 
   const rx = ML + gw2 + 0.5, rw = CW - gw2 - 0.5;
   card(s, rx, 2.06, rw, 1.5, PANEL2);
-  s.addText("Plus an 18-point self-audit", {
+  s.addText("Plus 18 questions to answer", {
     x: rx + 0.3, y: 2.22, w: rw - 0.6, h: 0.34, isTextBox: true, margin: 0,
     fontFace: F, fontSize: 16, bold: true, color: MOONBR,
   });
-  s.addText("The AI answers every point on delivery and separately lists anything it decided on its own. Those are usually where the next module's landmines are.", {
+  s.addText("The AI answers all 18 when it hands work in, and lists anything it decided by itself. Those decisions are usually where the next bug comes from.", {
     x: rx + 0.3, y: 2.62, w: rw - 0.6, h: 0.82, isTextBox: true, margin: 0,
     fontFace: F, fontSize: 12, color: DIM,
   });
 
   card(s, rx, 3.72, rw, 1.32);
-  s.addText("Gates outrank the self-audit", {
+  s.addText("The auto check wins", {
     x: rx + 0.3, y: 3.88, w: rw - 0.6, h: 0.34, isTextBox: true, margin: 0,
     fontFace: F, fontSize: 15, bold: true, color: TEXT,
   });
-  s.addText("A self-audit is what the AI says about itself. A gate is a fact about the source text.", {
+  s.addText("The self check is what the AI says about itself. The auto check reads the real code.", {
     x: rx + 0.3, y: 4.26, w: rw - 0.6, h: 0.66, isTextBox: true, margin: 0,
     fontFace: F, fontSize: 12, color: DIM,
   });
 
   card(s, rx, 5.2, rw, 1.32);
-  s.addText("A gate must never accuse the innocent", {
+  s.addText("A check must not blame good code", {
     x: rx + 0.3, y: 5.34, w: rw - 0.6, h: 0.36, isTextBox: true, margin: 0,
     fontFace: F, fontSize: 14.5, bold: true, color: BLOODBR,
   });
-  s.addText("Our first rule set flagged 2 errors and 15 warnings on a clean tree. All false positives — that doesn't add noise, it burns a whole round.", {
+  s.addText("Our first version found 2 errors and 15 warnings in code that was fine. All of them were wrong, and that wastes a whole round of work.", {
     x: rx + 0.3, y: 5.74, w: rw - 0.6, h: 0.68, isTextBox: true, margin: 0,
     fontFace: F, fontSize: 11.5, color: DIM,
   });
 
-  s.addNotes("If someone asks 'if the AI wrote it, is it yours?', the answer lives on this slide and the previous one.");
+  s.addNotes("If someone asks whether the work is really ours, the answer is on this slide and the one before it.");
 }
 
 /* ══════════════ 14 · Numbers ══════════════ */
 {
   const s = newSlide("NUMBERS");
-  title(s, "Eight days, measured", "Every figure is verifiable in the repository");
+  title(s, "Eight days, in numbers", "You can check every one of these in our repository");
 
   const nums = [
-    ["59", "task specifications", "Each one fixes the files, the values and the acceptance criteria"],
-    ["58", "pipeline runs", "Gates, compile and self-audit, start to finish"],
-    ["182", "commits", "Contract, implementation, scene and docs kept separate"],
-    ["43", "C# scripts", "34 runtime plus 9 editor assembly tools"],
-    ["16,467", "lines of C#", "All module code produced by the AI behind the contract"],
-    ["3,017", "lines of design docs", "GDD, architecture, schedule, review process, onboarding"],
+    ["59", "task specs", "Each one lists the files, the numbers, and how we would test it"],
+    ["58", "tool runs", "Auto check, build and self check, all the way through"],
+    ["182", "commits", "We kept code, scene and documents in separate commits"],
+    ["43", "C# scripts", "34 in the game, plus 9 editor tools we wrote to help us"],
+    ["16,467", "lines of C#", "The AI wrote the game code, inside the rules we set"],
+    ["3,017", "lines of documents", "Design, plan, review steps, and a setup guide for the team"],
   ];
   const nw = (CW - 2 * 0.36) / 3;
   nums.forEach((n, i) => {
@@ -835,23 +835,23 @@ function footNote(s, t, color) {
     });
   });
 
-  s.addNotes("Do not read all six. Say 59 task specs and 16,467 lines, and let them read the rest.");
+  s.addNotes("Do not read all six out loud. Say 59 task specs and 16,467 lines. Let people read the rest.");
 }
 
 /* ══════════════ 15 · Schedule and risk gates ══════════════ */
 {
   const s = newSlide("SCHEDULE");
-  title(s, "Seven days, two risk gates", "Miss the gate and features get cut. No heroics.");
+  title(s, "Seven days, and two cut-off days", "If we missed a date, we cut features. We did not stay up all night.");
 
   const days = [
-    ["Day 0", "Pitch and setup", "Project stands up; both members can clone and run it", false],
-    ["Day 1", "Walking and looking", "First-person controller, interaction, NavMesh bake", false],
-    ["Day 2", "Instruments in hand", "Equipment slots, flashlight, room system, HUD", false],
-    ["Day 3", "Evidence loop closed", "EMF, UV fingerprints, ghost writing, evidence manager", true],
-    ["Day 4", "The ghost arrives", "Ghost AI and hunt scheduling — the hardest day of the project", true],
-    ["Day 5", "Full loop running", "Round manager, deduction journal, results screen", false],
-    ["Day 6", "Art lands", "Swap assets, re-bake NavMesh, replay the whole loop", false],
-    ["Day 7", "Polish and hand-off", "Audio, lighting, main menu, acceptance walkthrough", false],
+    ["Day 0", "Pitch and setup", "The project runs, and both of us can open it", false],
+    ["Day 1", "Walk and look", "First-person movement, doors, and the AI path map", false],
+    ["Day 2", "Tools in hand", "Tool slots, flashlight, rooms, and the on-screen display", false],
+    ["Day 3", "Clues work", "EMF, UV prints, ghost writing, and the clue tracker", true],
+    ["Day 4", "The ghost", "Ghost AI and hunts — our hardest day by far", true],
+    ["Day 5", "The whole game runs", "Round manager, notebook, and the results screen", false],
+    ["Day 6", "Art goes in", "Swap in models, rebuild the AI path map, play it all again", false],
+    ["Day 7", "Polish", "Sound, lights, main menu, and a full test pass", false],
   ];
   const dh = 0.53;
   days.forEach((d, i) => {
@@ -874,30 +874,30 @@ function footNote(s, t, color) {
       fontFace: F, fontSize: 12.5, color: DIM, valign: "middle",
     });
     if (d[3]) {
-      s.addText("RISK GATE", {
+      s.addText("CUT-OFF DAY", {
         x: ML + CW - 2.1, y, w: 1.84, h: dh, isTextBox: true, margin: 0,
         fontFace: FM, fontSize: 11.5, bold: true, color: BLOODBR, align: "right", valign: "middle",
       });
     }
   });
 
-  footNote(s, "If evidence hadn't closed by day 3, ghost writing was to be cut down to a 2 × 3 table. If the AI hadn't worked by day 4, the art day moved. Neither gate ever fired.", MOONBR);
-  s.addNotes("In a one-week project, being able to state your abort conditions is worth ten times being able to state your goals.");
+  footNote(s, "If the clues did not work by Day 3, we would drop ghost writing and use a 2 × 3 table. If the ghost AI did not work by Day 4, the art day would move. We did not have to do either.", MOONBR);
+  s.addNotes("In a one-week project, saying when you would give up on something is worth more than saying what you want to build.");
 }
 
 /* ══════════════ 16 · Non-goals ══════════════ */
 {
   const s = newSlide("NON-GOALS");
-  title(s, "The seven things we deliberately did not build", "Written down so the week couldn't be eaten alive");
+  title(s, "Seven things we chose not to build", "We wrote this list down so the week would not disappear");
 
   const nos = [
-    ["Multiplayer", "Network sync costs three days minimum. It would have eaten the slice."],
-    ["Voice recognition", "Depends on a third-party SDK. Unbounded risk."],
-    ["A second map", "One polished map beats three grey-boxed ones."],
-    ["A fourth ghost or clue", "It would break the mathematical closure of the 3 × 3 matrix."],
-    ["Saves and progression", "A vertical slice does not need it."],
-    ["Jumping", "If you can jump you can climb furniture — it breaks level closure and navmesh."],
-    ["Original art assets", "All free-licensed. Consistency of style beats fidelity of any one piece."],
+    ["Online multiplayer", "Network code costs 3 days at least. It would have eaten the whole project."],
+    ["Voice input", "It needs software from someone else. Too risky for one week."],
+    ["A second map", "One good map beats three empty ones."],
+    ["A fourth ghost or clue", "The 3 × 3 table would stop working."],
+    ["Save files", "A demo does not need them."],
+    ["Jumping", "If you can jump you can climb on furniture. That breaks the level and the AI paths."],
+    ["Our own 3D models", "We used free ones. One clear style beats one nice-looking chair."],
   ];
   const cw3 = (CW - 0.4) / 2;
   nos.forEach((n, i) => {
@@ -920,26 +920,26 @@ function footNote(s, t, color) {
   });
 
   card(s, ML, 5.98, cw3, 0.84, PANEL2);
-  s.addText("A team that can tell you what it isn't building is ten times more credible.", {
+  s.addText("A team that can tell you what it is NOT making is easier to trust.", {
     x: ML + 0.3, y: 5.98, w: cw3 - 0.6, h: 0.84, isTextBox: true, margin: 0,
     fontFace: FD, fontSize: 15, bold: true, italic: true, color: MOONBR, valign: "middle",
   });
 
-  s.addNotes("This slide exists purely to buy credibility. Pause after 'jumping' — that one is the most counter-intuitive.");
+  s.addNotes("This slide is here to build trust. Stop for a second after 'jumping'. People never expect that one.");
 }
 
 /* ══════════════ 17 · Demo ══════════════ */
 {
   const s = newSlide("DEMO");
-  title(s, "What you're about to watch", "Eight to twelve minutes, one complete loop");
+  title(s, "What you are about to watch", "About 8 to 12 minutes, one full game");
 
   const flow = [
-    ["01", "Enter", "The entrance is the safe zone. Three instruments; the flashlight takes a slot"],
-    ["02", "Find the ghost room", "One of seven, drawn at random. Temperature drop plus EMF"],
-    ["03", "Gather evidence", "Chase the reading · sweep for prints · plant the book and return"],
-    ["04", "Sanity drops below 50 %", "Rolled every 25 seconds. Lights start flickering. The heartbeat comes up"],
-    ["05", "The hunt", "The house goes red, the flashlight dies. Corner, door, break line of sight"],
-    ["06", "Evacuate and call it", "Back to the entrance, tick two clues in the journal, name the ghost"],
+    ["01", "Go in", "The lobby is safe. Three tools, and the flashlight takes one slot"],
+    ["02", "Find the ghost room", "One of seven, picked at random. Cold air and the EMF reader"],
+    ["03", "Get the clues", "Follow the number · look for prints · leave the book and come back"],
+    ["04", "Sanity drops under 50 %", "Checked every 25 seconds. Lights flicker. A heartbeat starts"],
+    ["05", "The hunt", "The house turns red, the flashlight dies. Corner, door, get out of sight"],
+    ["06", "Leave and answer", "Back to the lobby, tick two clues, and pick a ghost"],
   ];
   const fw2 = (CW - 2 * 0.32) / 3;
   flow.forEach((f, i) => {
@@ -961,7 +961,7 @@ function footNote(s, t, color) {
     });
   });
 
-  const grades = [["S", "Correct + both clues + sanity above 30 %"], ["A", "Correct call"], ["C", "Wrong call, walked out alive"], ["F", "Caught during a hunt"]];
+  const grades = [["S", "Right answer, both clues, sanity over 30 %"], ["A", "Right answer"], ["C", "Wrong answer, but got out alive"], ["F", "Caught during a hunt"]];
   const gw3 = (CW - 3 * 0.32) / 4;
   grades.forEach((g, i) => {
     const x = ML + i * (gw3 + 0.32);
@@ -976,7 +976,7 @@ function footNote(s, t, color) {
     });
   });
 
-  s.addNotes("Leave this slide up while you switch to Unity. During the demo, narrate what is happening, never the mechanics — those are already explained.");
+  s.addNotes("Leave this slide up while you switch to Unity. While you play, only say what is happening. Do not explain the rules again.");
 }
 
 /* ══════════════ 18 · Close ══════════════ */
@@ -985,19 +985,19 @@ function footNote(s, t, color) {
   const s = pres.addSlide();
   s.background = { color: BG };
 
-  s.addText("Zero to a playable run, in eight days.", {
+  s.addText("Eight days, from nothing to a playable game.", {
     x: ML, y: 1.5, w: CW, h: 0.9, isTextBox: true, margin: 0,
-    fontFace: FD, fontSize: 42, bold: true, color: TEXT,
+    fontFace: FD, fontSize: 36, bold: true, color: TEXT,
   });
-  s.addText("We didn't build a bigger game. We built one that closes.", {
+  s.addText("We did not make a bigger game. We made one that finishes.", {
     x: ML, y: 2.44, w: CW, h: 0.46, isTextBox: true, margin: 0,
     fontFace: F, fontSize: 19, color: MOON,
   });
 
   const take = [
-    ["A deduction core that closes mathematically", "3 ghosts × 3 clues. Two clues decide it. No luck involved."],
-    ["A production pipeline that transfers", "Spec → AI → gates → compile → self-audit → human review"],
-    ["An architecture contract fixed in advance", "Zero direct references, so any two modules can be built in parallel"],
+    ["A clue table that always works", "3 ghosts × 3 clues. Two clues give one answer. No luck."],
+    ["A way of working we can use again", "Spec → AI → auto check → build → self check → a person reads it"],
+    ["Rules we agreed before we started", "No part touches another, so we could all work at the same time"],
   ];
   const tw3 = (CW - 2 * 0.36) / 3;
   take.forEach((t, i) => {
@@ -1017,9 +1017,9 @@ function footNote(s, t, color) {
     });
   });
 
-  s.addText("Next: a thermometer as a fourth clue, expanding to 4 × 4 and supporting six ghosts · a second map · incense and crucifix · local co-op", {
-    x: ML, y: 5.36, w: CW, h: 0.36, isTextBox: true, margin: 0,
-    fontFace: F, fontSize: 13, color: DIM,
+  s.addText("This was our first 3D game, and most of the eight days went into deciding what NOT to build.\nNext: a thermometer as a fourth clue, which gives a 4 × 4 table and six ghosts · a second map · two players on one PC", {
+    x: ML, y: 5.24, w: CW, h: 0.72, isTextBox: true, margin: 0,
+    fontFace: F, fontSize: 13, color: DIM, lineSpacing: 20,
   });
 
   s.addText("RESIDUUM", {
@@ -1031,7 +1031,7 @@ function footNote(s, t, color) {
     fontFace: F, fontSize: 17, color: MOON, align: "right",
   });
 
-  s.addNotes("Say 'thank you' and stop. Do not explain anything after it. Let the last line hang and wait for questions.");
+  s.addNotes("Say thank you and stop talking. Do not add anything after it. Wait for questions.");
 }
 
 pres.writeFile({ fileName: process.argv[2] || "RESIDUUM_Final_EN.pptx" })
