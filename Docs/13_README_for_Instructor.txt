@@ -11,9 +11,9 @@ HOW TO RUN
 3. Windows may show a blue "Windows protected your PC" box,
    because the build is not code-signed. Click "More info",
    then "Run anyway". This is normal for student builds.
-4. To quit: use the Quit button on the title screen, or press
-   Alt+F4 at any time. There is no in-game pause menu in this
-   slice, so Alt+F4 is the way out once a round has started.
+4. To quit: press ESC during a round to open the pause menu,
+   then "Return to Main Menu", and use the Quit button on the
+   title screen. Alt+F4 also works at any time.
 
 REQUIREMENTS
 ------------
@@ -29,10 +29,12 @@ CONTROLS
   Sprint .............. Left Shift   (stamina: ~4 seconds)
   Crouch .............. C
   Interact ............ E            (doors, light switches, items)
-  Flashlight .......... F
+  Flashlight .......... T            (always carried, no pickup needed)
   Switch tool ......... 1 / 2 / 3
+  Use tool ............ Left mouse    (EMF power, UV light, place book)
+  Drop tool ........... G
   Journal ............. Tab           (evidence notes + ghost table)
-  Quit ................ Alt+F4        (no pause menu in this slice)
+  Pause / Quit ........ ESC           (resume, or return to main menu)
 
 
 WHAT YOU ARE SUPPOSED TO DO
