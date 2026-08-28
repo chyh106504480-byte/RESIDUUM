@@ -24,6 +24,9 @@ namespace Residuum.World
         [Range(0f, 1f)]
         [SerializeField] private float _huntBlackoutChance = 0.3f;
 
+        [Tooltip("猎杀期间的灯光颜色")]
+        [SerializeField] private Color _huntColor = new Color(0.85f, 0.1f, 0.1f, 1f);
+
         [Header("鬼现身")]
         [Tooltip("鬼现身时灯光变红并闪烁的持续秒数。应与 GhostAI 的显形秒数接近")]
         [Min(0f)]
@@ -54,6 +57,7 @@ namespace Residuum.World
         [SerializeField] private float _blackoutRecoveryCheckInterval = 1f;
 
         private bool[] _lightStatesBeforeFlicker;
+        private Color[] _lightColorsBeforeFlicker;
         private bool[] _lightStatesBeforeManifest;
         private Color[] _lightColorsBeforeManifest;
         private bool _hasValidManagedLight;
@@ -122,6 +126,7 @@ namespace Residuum.World
             StopBlackoutRecoveryCheck();
 
             _lightStatesBeforeFlicker = null;
+            _lightColorsBeforeFlicker = null;
             _lightStatesBeforeManifest = null;
             _lightColorsBeforeManifest = null;
             _flickerWait = null;
@@ -187,6 +192,7 @@ namespace Residuum.World
             bool wasBlackout = _isBlackout;
             _isBlackout = false;
             _lightStatesBeforeFlicker = null;
+            _lightColorsBeforeFlicker = null;
             _lightStatesBeforeManifest = null;
             _lightColorsBeforeManifest = null;
             CacheWaitInstructions();
@@ -338,6 +344,7 @@ namespace Residuum.World
                     Light managedLight = _managedLights[index];
                     if (managedLight != null)
                     {
+                        managedLight.color = _huntColor;
                         managedLight.enabled = RollChance(_flickerOnChance);
                     }
                 }
@@ -362,34 +369,41 @@ namespace Residuum.World
             }
 
             _lightStatesBeforeFlicker = null;
+            _lightColorsBeforeFlicker = null;
         }
 
         private void CaptureLightStates()
         {
             _lightStatesBeforeFlicker = new bool[_managedLights.Length];
+            _lightColorsBeforeFlicker = new Color[_managedLights.Length];
             for (int index = 0; index < _managedLights.Length; index++)
             {
                 Light managedLight = _managedLights[index];
                 if (managedLight != null)
                 {
                     _lightStatesBeforeFlicker[index] = managedLight.enabled;
+                    _lightColorsBeforeFlicker[index] = managedLight.color;
                 }
             }
         }
 
         private void RestoreLightStates()
         {
-            if (_lightStatesBeforeFlicker == null || _managedLights == null)
+            if (_lightStatesBeforeFlicker == null || _lightColorsBeforeFlicker == null ||
+                _managedLights == null)
             {
                 return;
             }
 
-            int stateCount = Mathf.Min(_lightStatesBeforeFlicker.Length, _managedLights.Length);
+            int stateCount = Mathf.Min(
+                Mathf.Min(_lightStatesBeforeFlicker.Length, _lightColorsBeforeFlicker.Length),
+                _managedLights.Length);
             for (int index = 0; index < stateCount; index++)
             {
                 Light managedLight = _managedLights[index];
                 if (managedLight != null)
                 {
+                    managedLight.color = _lightColorsBeforeFlicker[index];
                     managedLight.enabled = _lightStatesBeforeFlicker[index];
                 }
             }
