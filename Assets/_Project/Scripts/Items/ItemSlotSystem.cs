@@ -10,6 +10,7 @@ namespace Residuum.Items
         private const int FirstSlotIndex = 0;
         private const int SecondSlotIndex = 1;
         private const int ThirdSlotIndex = 2;
+        private const int NoSlotIndex = -1;
         private const string PlayerActionMapName = "Player";
         private const string UiActionMapName = "UI";
         private const string SlotOneActionName = "Slot1";
@@ -31,6 +32,36 @@ namespace Residuum.Items
         [Tooltip("工程现有的 Assets/InputSystem_Actions.inputactions。脚本直接使用其中定义的 Action。")]
         [SerializeField] private UnityEngine.InputSystem.InputActionAsset _inputActions;
 
+        [Header("世界道具")]
+        [Tooltip("三个编号槽各自在世界中的道具对象，长度必须为 3。拾取时隐藏，丢弃时移到玩家前方再显示。")]
+        [SerializeField] private GameObject[] _worldItems = new GameObject[SlotCount];
+
+        [Header("手电筒")]
+        [Tooltip("手电筒的 IHoldable 控制组件，独立于三个编号槽")]
+        [SerializeField] private MonoBehaviour _flashlightSlot;
+
+        [Tooltip("手电筒的手持模型")]
+        [SerializeField] private GameObject _flashlightModel;
+
+        [Tooltip("手电筒在世界中的对象")]
+        [SerializeField] private GameObject _flashlightWorldItem;
+
+        [Tooltip("装备/收起手电筒的按键")]
+        [SerializeField] private UnityEngine.InputSystem.Key _flashlightKey
+            = UnityEngine.InputSystem.Key.T;
+
+        [Header("丢弃")]
+        [Tooltip("丢弃当前手持道具的按键")]
+        [SerializeField] private UnityEngine.InputSystem.Key _dropKey
+            = UnityEngine.InputSystem.Key.G;
+
+        [Tooltip("丢弃时道具出现在玩家前方多远，单位：米")]
+        [Min(0.3f)]
+        [SerializeField] private float _dropDistance = 1.2f;
+
+        [Tooltip("丢弃时道具出现的高度偏移，单位：米")]
+        [SerializeField] private float _dropHeightOffset = -0.3f;
+
         [Header("切换")]
         [Tooltip("鼠标滚轮输入超过此绝对值时才切换槽位，用于过滤设备噪声。")]
         [SerializeField] private float _scrollInputThreshold = 0.01f;
@@ -38,14 +69,26 @@ namespace Residuum.Items
         public IHoldable Current { get; private set; }
 
         private readonly IHoldable[] _holdables = new IHoldable[SlotCount];
+        private readonly bool[] _hasSlotItem = new bool[SlotCount];
+        private readonly Vector3[] _worldItemInitialPositions = new Vector3[SlotCount];
+        private readonly Quaternion[] _worldItemInitialRotations = new Quaternion[SlotCount];
+        private readonly bool[] _hasWorldItemInitialTransform = new bool[SlotCount];
 
+        private IHoldable _flashlightHoldable;
         private UnityEngine.InputSystem.InputAction _slotOneAction;
         private UnityEngine.InputSystem.InputAction _slotTwoAction;
         private UnityEngine.InputSystem.InputAction _slotThreeAction;
         private UnityEngine.InputSystem.InputAction _scrollAction;
         private UnityEngine.InputSystem.InputAction _primaryUseAction;
-        private int _currentSlotIndex = -1;
+        private Vector3 _flashlightInitialPosition;
+        private Quaternion _flashlightInitialRotation;
+        private int _currentSlotIndex = NoSlotIndex;
+        private int _lastNumberedSlotIndex = NoSlotIndex;
+        private bool _hasFlashlightInitialTransform;
+        private bool _hasFlashlight;
+        private bool _isFlashlightEquipped;
         private bool _isInitialized;
+        private bool _slotBroadcastPending;
         private bool _slotOneActionEnabledHere;
         private bool _slotTwoActionEnabledHere;
         private bool _slotThreeActionEnabledHere;
@@ -65,6 +108,8 @@ namespace Residuum.Items
 
             CacheSlots();
             PrepareHeldModels();
+            CacheWorldItemInitialTransforms();
+            ResetInventory();
 
             if (!TryInitializeInput())
             {
@@ -84,26 +129,21 @@ namespace Residuum.Items
 
             SubscribeInputActions();
             EnableInputActions();
-            SwitchToSlot(FirstSlotIndex);
+            GameEvents.OnRoundStart += HandleRoundStart;
+            _slotBroadcastPending = true;
         }
 
         private void OnDisable()
         {
+            GameEvents.OnRoundStart -= HandleRoundStart;
             UnsubscribeInputActions();
             DisableInputActions();
-
-            if (Current != null)
-            {
-                Current.OnUnequip();
-            }
-
-            SetHeldModelActive(_currentSlotIndex, false);
-            Current = null;
-            _currentSlotIndex = -1;
+            UnequipCurrent();
         }
 
         private void OnDestroy()
         {
+            GameEvents.OnRoundStart -= HandleRoundStart;
             UnsubscribeInputActions();
             DisableInputActions();
 
@@ -112,7 +152,38 @@ namespace Residuum.Items
             _slotThreeAction = null;
             _scrollAction = null;
             _primaryUseAction = null;
+            _flashlightHoldable = null;
             Current = null;
+        }
+
+        private void Update()
+        {
+            UnityEngine.InputSystem.Keyboard keyboard = UnityEngine.InputSystem.Keyboard.current;
+            if (keyboard == null)
+            {
+                return;
+            }
+
+            if (WasKeyPressed(keyboard, _flashlightKey))
+            {
+                ToggleFlashlight();
+            }
+
+            if (WasKeyPressed(keyboard, _dropKey))
+            {
+                DropCurrent();
+            }
+        }
+
+        private void LateUpdate()
+        {
+            if (!_slotBroadcastPending)
+            {
+                return;
+            }
+
+            _slotBroadcastPending = false;
+            GameEvents.RaiseSlotChanged(_currentSlotIndex, Current?.ItemName);
         }
 
         private void CacheSlots()
@@ -136,6 +207,20 @@ namespace Residuum.Items
                         $"ItemSlotSystem 第 {index + 1} 槽的组件 {slot.GetType().Name} 未实现 IHoldable，该槽将按空槽处理。",
                         slot);
                 }
+            }
+
+            if (_flashlightSlot == null)
+            {
+                _flashlightHoldable = null;
+                return;
+            }
+
+            _flashlightHoldable = _flashlightSlot as IHoldable;
+            if (_flashlightHoldable == null)
+            {
+                Debug.LogError(
+                    $"ItemSlotSystem 的手电筒组件 {_flashlightSlot.GetType().Name} 未实现 IHoldable，手电筒将无法拾取。",
+                    _flashlightSlot);
             }
         }
 
@@ -167,6 +252,57 @@ namespace Residuum.Items
 
                 heldModel.SetActive(false);
             }
+
+            PrepareHeldModel(_flashlightModel, "手电筒");
+        }
+
+        private void PrepareHeldModel(GameObject heldModel, string itemDescription)
+        {
+            if (heldModel == null)
+            {
+                Debug.LogWarning($"ItemSlotSystem 未指定{itemDescription}手持模型：这是灰盒阶段的预期状态，待美术资源到位后再配置即可。", this);
+                return;
+            }
+
+            if (heldModel.transform == _handAnchor)
+            {
+                Debug.LogError($"ItemSlotSystem 不能把 Hand Anchor 自身作为{itemDescription}手持模型。", this);
+                return;
+            }
+
+            if (heldModel.transform.parent != _handAnchor)
+            {
+                heldModel.transform.SetParent(_handAnchor, false);
+            }
+
+            heldModel.SetActive(false);
+        }
+
+        private void CacheWorldItemInitialTransforms()
+        {
+            for (int index = 0; index < SlotCount; index++)
+            {
+                GameObject worldItem = GetWorldItem(index);
+                if (worldItem == null)
+                {
+                    continue;
+                }
+
+                Transform worldItemTransform = worldItem.transform;
+                _worldItemInitialPositions[index] = worldItemTransform.position;
+                _worldItemInitialRotations[index] = worldItemTransform.rotation;
+                _hasWorldItemInitialTransform[index] = true;
+            }
+
+            if (_flashlightWorldItem == null)
+            {
+                return;
+            }
+
+            Transform flashlightTransform = _flashlightWorldItem.transform;
+            _flashlightInitialPosition = flashlightTransform.position;
+            _flashlightInitialRotation = flashlightTransform.rotation;
+            _hasFlashlightInitialTransform = true;
         }
 
         private bool TryInitializeInput()
@@ -310,8 +446,11 @@ namespace Residuum.Items
 
             int direction = scrollY > 0f ? -1 : 1;
             int startIndex = _currentSlotIndex >= FirstSlotIndex ? _currentSlotIndex : FirstSlotIndex;
-            int nextIndex = (startIndex + direction + SlotCount) % SlotCount;
-            SwitchToSlot(nextIndex);
+            int nextIndex = FindNextHeldSlot(startIndex, direction);
+            if (nextIndex != NoSlotIndex)
+            {
+                SwitchToSlot(nextIndex);
+            }
         }
 
         private void HandlePrimaryUsePerformed(UnityEngine.InputSystem.InputAction.CallbackContext context)
@@ -322,28 +461,285 @@ namespace Residuum.Items
 
         private void SwitchToSlot(int slotIndex)
         {
-            if (slotIndex < FirstSlotIndex || slotIndex >= SlotCount || slotIndex == _currentSlotIndex)
+            if (!CanEquipSlot(slotIndex) || (!_isFlashlightEquipped && slotIndex == _currentSlotIndex))
             {
                 return;
             }
 
+            UnequipCurrent();
+            _currentSlotIndex = slotIndex;
+            Current = _holdables[slotIndex];
+            _lastNumberedSlotIndex = slotIndex;
+            SetHeldModelActive(_currentSlotIndex, true);
+            Current.OnEquip();
+
+            GameEvents.RaiseSlotChanged(_currentSlotIndex, Current?.ItemName);
+        }
+
+        /// <summary>拾取第 index 个编号槽的道具。已持有或索引越界返回 false。</summary>
+        public bool TryPickUpSlot(int index)
+        {
+            if (index < FirstSlotIndex || index >= SlotCount || _hasSlotItem[index])
+            {
+                return false;
+            }
+
+            if (_holdables[index] == null)
+            {
+                Debug.LogError($"ItemSlotSystem 第 {index + 1} 槽没有有效的 IHoldable，无法拾取。", this);
+                return false;
+            }
+
+            GameObject worldItem = GetWorldItem(index);
+            if (worldItem == null)
+            {
+                Debug.LogError($"ItemSlotSystem 第 {index + 1} 槽未指定世界道具对象，无法拾取。", this);
+                return false;
+            }
+
+            worldItem.SetActive(false);
+            _hasSlotItem[index] = true;
+            SwitchToSlot(index);
+            return true;
+        }
+
+        /// <summary>拾取手电筒。已持有返回 false。</summary>
+        public bool TryPickUpFlashlight()
+        {
+            if (_hasFlashlight)
+            {
+                return false;
+            }
+
+            if (_flashlightHoldable == null)
+            {
+                Debug.LogError("ItemSlotSystem 没有有效的手电筒 IHoldable，无法拾取。", this);
+                return false;
+            }
+
+            if (_flashlightWorldItem == null)
+            {
+                Debug.LogError("ItemSlotSystem 未指定手电筒世界道具对象，无法拾取。", this);
+                return false;
+            }
+
+            _flashlightWorldItem.SetActive(false);
+            _hasFlashlight = true;
+            EquipFlashlight();
+            return true;
+        }
+
+        private void ToggleFlashlight()
+        {
+            if (!_hasFlashlight || _flashlightHoldable == null)
+            {
+                return;
+            }
+
+            if (!_isFlashlightEquipped)
+            {
+                EquipFlashlight();
+                return;
+            }
+
+            UnequipCurrent();
+            if (CanEquipSlot(_lastNumberedSlotIndex))
+            {
+                SwitchToSlot(_lastNumberedSlotIndex);
+                return;
+            }
+
+            BroadcastEmptySlot();
+        }
+
+        private void EquipFlashlight()
+        {
+            if (!_hasFlashlight || _flashlightHoldable == null || _isFlashlightEquipped)
+            {
+                return;
+            }
+
+            UnequipCurrent();
+            Current = _flashlightHoldable;
+            _isFlashlightEquipped = true;
+            SetFlashlightModelActive(true);
+            Current.OnEquip();
+            GameEvents.RaiseSlotChanged(NoSlotIndex, Current.ItemName);
+        }
+
+        private void DropCurrent()
+        {
+            if (Current == null)
+            {
+                return;
+            }
+
+            if (_isFlashlightEquipped)
+            {
+                DropFlashlight();
+                return;
+            }
+
+            DropNumberedSlot(_currentSlotIndex);
+        }
+
+        private void DropNumberedSlot(int slotIndex)
+        {
+            if (!CanEquipSlot(slotIndex))
+            {
+                return;
+            }
+
+            GameObject worldItem = GetWorldItem(slotIndex);
+            if (worldItem == null)
+            {
+                Debug.LogError($"ItemSlotSystem 第 {slotIndex + 1} 槽未指定世界道具对象，无法丢弃。", this);
+                return;
+            }
+
+            UnequipCurrent();
+            _hasSlotItem[slotIndex] = false;
+            PlaceWorldItemForDrop(worldItem);
+            GameEvents.RaiseSlotChanged(slotIndex, null);
+        }
+
+        private void DropFlashlight()
+        {
+            if (!_hasFlashlight || _flashlightWorldItem == null)
+            {
+                if (_flashlightWorldItem == null)
+                {
+                    Debug.LogError("ItemSlotSystem 未指定手电筒世界道具对象，无法丢弃。", this);
+                }
+
+                return;
+            }
+
+            UnequipCurrent();
+            _hasFlashlight = false;
+            PlaceWorldItemForDrop(_flashlightWorldItem);
+            BroadcastEmptySlot();
+        }
+
+        private void PlaceWorldItemForDrop(GameObject worldItem)
+        {
+            Transform worldItemTransform = worldItem.transform;
+            worldItemTransform.position = transform.position
+                + transform.forward * _dropDistance
+                + Vector3.up * _dropHeightOffset;
+            worldItem.SetActive(true);
+        }
+
+        private void HandleRoundStart()
+        {
+            ResetInventory();
+        }
+
+        private void ResetInventory()
+        {
+            UnequipCurrent();
+
+            for (int index = 0; index < SlotCount; index++)
+            {
+                _hasSlotItem[index] = false;
+                RestoreWorldItem(index);
+            }
+
+            _hasFlashlight = false;
+            _lastNumberedSlotIndex = NoSlotIndex;
+            RestoreFlashlightWorldItem();
+            _slotBroadcastPending = true;
+        }
+
+        private void RestoreWorldItem(int slotIndex)
+        {
+            GameObject worldItem = GetWorldItem(slotIndex);
+            if (worldItem == null)
+            {
+                return;
+            }
+
+            if (_hasWorldItemInitialTransform[slotIndex])
+            {
+                worldItem.transform.SetPositionAndRotation(
+                    _worldItemInitialPositions[slotIndex],
+                    _worldItemInitialRotations[slotIndex]);
+            }
+
+            worldItem.SetActive(true);
+        }
+
+        private void RestoreFlashlightWorldItem()
+        {
+            if (_flashlightWorldItem == null)
+            {
+                return;
+            }
+
+            if (_hasFlashlightInitialTransform)
+            {
+                _flashlightWorldItem.transform.SetPositionAndRotation(
+                    _flashlightInitialPosition,
+                    _flashlightInitialRotation);
+            }
+
+            _flashlightWorldItem.SetActive(true);
+        }
+
+        private int FindNextHeldSlot(int startIndex, int direction)
+        {
+            for (int offset = 1; offset <= SlotCount; offset++)
+            {
+                int candidateIndex = (startIndex + direction * offset + SlotCount) % SlotCount;
+                if (CanEquipSlot(candidateIndex))
+                {
+                    return candidateIndex;
+                }
+            }
+
+            return NoSlotIndex;
+        }
+
+        private bool CanEquipSlot(int slotIndex)
+        {
+            return slotIndex >= FirstSlotIndex
+                && slotIndex < SlotCount
+                && _hasSlotItem[slotIndex]
+                && _holdables[slotIndex] != null;
+        }
+
+        private void UnequipCurrent()
+        {
             if (Current != null)
             {
                 Current.OnUnequip();
             }
 
-            SetHeldModelActive(_currentSlotIndex, false);
-
-            _currentSlotIndex = slotIndex;
-            Current = _holdables[slotIndex];
-            SetHeldModelActive(_currentSlotIndex, Current != null);
-
-            if (Current != null)
+            if (_isFlashlightEquipped)
             {
-                Current.OnEquip();
+                SetFlashlightModelActive(false);
+            }
+            else
+            {
+                SetHeldModelActive(_currentSlotIndex, false);
             }
 
-            GameEvents.RaiseSlotChanged(_currentSlotIndex, Current?.ItemName);
+            Current = null;
+            _currentSlotIndex = NoSlotIndex;
+            _isFlashlightEquipped = false;
+        }
+
+        private void BroadcastEmptySlot()
+        {
+            GameEvents.RaiseSlotChanged(NoSlotIndex, null);
+        }
+
+        private static bool WasKeyPressed(
+            UnityEngine.InputSystem.Keyboard keyboard,
+            UnityEngine.InputSystem.Key key)
+        {
+            return key != UnityEngine.InputSystem.Key.None
+                && keyboard[key].wasPressedThisFrame;
         }
 
         private void SetHeldModelActive(int slotIndex, bool isActive)
@@ -365,6 +761,24 @@ namespace Residuum.Items
             return _heldModels[slotIndex];
         }
 
+        private void SetFlashlightModelActive(bool isActive)
+        {
+            if (_flashlightModel != null && _flashlightModel.transform != _handAnchor)
+            {
+                _flashlightModel.SetActive(isActive);
+            }
+        }
+
+        private GameObject GetWorldItem(int slotIndex)
+        {
+            if (_worldItems == null || slotIndex < FirstSlotIndex || slotIndex >= _worldItems.Length)
+            {
+                return null;
+            }
+
+            return _worldItems[slotIndex];
+        }
+
         private void ValidateSettings()
         {
             if (_slots == null || _slots.Length != SlotCount)
@@ -375,6 +789,11 @@ namespace Residuum.Items
             if (_heldModels == null || _heldModels.Length != SlotCount)
             {
                 Debug.LogError($"ItemSlotSystem 的 Held Models 长度必须为 {SlotCount}；缺失位置将不显示模型。", this);
+            }
+
+            if (_worldItems == null || _worldItems.Length != SlotCount)
+            {
+                Debug.LogError($"ItemSlotSystem 的 World Items 长度必须为 {SlotCount}；缺失位置将无法拾取或丢弃。", this);
             }
 
             if (_scrollInputThreshold < 0f)
