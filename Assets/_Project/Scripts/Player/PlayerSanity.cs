@@ -92,6 +92,7 @@ namespace Residuum.Player
             GameEvents.OnHuntStart += HandleHuntStart;
             GameEvents.OnHuntEnd += HandleHuntEnd;
             GameEvents.OnRoundStart += HandleRoundStart;
+            GameEvents.OnSanityPenalty += HandleSanityPenalty;
 
             StartLightCheckCoroutine();
         }
@@ -125,6 +126,7 @@ namespace Residuum.Player
             GameEvents.OnHuntStart -= HandleHuntStart;
             GameEvents.OnHuntEnd -= HandleHuntEnd;
             GameEvents.OnRoundStart -= HandleRoundStart;
+            GameEvents.OnSanityPenalty -= HandleSanityPenalty;
 
             StopLightCheckCoroutine();
         }
@@ -136,6 +138,7 @@ namespace Residuum.Player
             GameEvents.OnHuntStart -= HandleHuntStart;
             GameEvents.OnHuntEnd -= HandleHuntEnd;
             GameEvents.OnRoundStart -= HandleRoundStart;
+            GameEvents.OnSanityPenalty -= HandleSanityPenalty;
 
             StopLightCheckCoroutine();
             _lightCheckWait = null;
@@ -197,6 +200,17 @@ namespace Residuum.Player
             RefreshLightCache();
             ResetRuntimeState(true);
             RestartLightCheckCoroutine();
+        }
+
+        private void HandleSanityPenalty(float points)
+        {
+            if (points <= 0f || float.IsNaN(points))
+            {
+                Debug.LogWarning("理智惩罚必须是大于 0 的扣减点数，已忽略本次请求。", this);
+                return;
+            }
+
+            ChangeSanity(-points);
         }
 
         private void ChangeSanity(float delta)
